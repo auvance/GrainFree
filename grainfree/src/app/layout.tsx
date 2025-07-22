@@ -28,8 +28,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#FAFAF5] text-black`}>
-        <Header />
-        {/* <main className="min-h-screen">{children}</main> */}
+        
+        <main className="min-h-screen">{children}</main>
         {/* Optional: <Footer /> */}
       </body>
     </html>

@@ -9,9 +9,9 @@ export default function Header() {
     
 
     return (
-        <header className="flex | justify-between | items-center | mr-12 ml-12 mt-5 |">
+        <header className="flex | justify-between | items-center | mr-12 ml-12 pt-5 |">
             {/* Left nav links */}
-            <nav className="flex | flex-row | gap-20 | pt-4 pb-4 pr-20 pl-20 | bg-black | rounded-xl">
+            <nav className="flex | flex-row | gap-20 | pt-3 pb-3 pr-20 pl-20 | bg-transparent | text-[#4A4A4A] | border-1 border-[#E6E6E6] | rounded-xl">
                 <Link href="/system" className="">Get Started</Link>
                 <Link href="/dash" className="">Dashboard</Link>
                 <Link href="/grainhub" className="">GrainFreeHub</Link>
@@ -22,9 +22,9 @@ export default function Header() {
 
             {/* Right-side text + icon */}
             <div className="flex | flex-row | gap-10 | items-center |">
-                <p>
-                    You're <span className="">one</span> decision away<br/>
-                    from <span className="">changing your life.</span>
+                <p className="text-black">
+                    You're <span className="font-bold">one</span> decision away<br/>
+                    from <span className="text-[#1DA1C9] font-bold font-italic">changing your life.</span>
                 </p>
 
                 {/* Leaf Icon Hamburger Menu Toggle */}
