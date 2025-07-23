@@ -25,7 +25,42 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* @font-face {
+@font-face {
   font-family: 'AeonikATrial-Air';
   src: url('/fonts/AeonikArabicTRIAL-Air.otf') format('otf');
-} */
+}
+
+@font-face {
+  font-family: 'AeonikATrial-Black';
+  src: url('/fonts/AeonikATrial-Black.otf');
+}
+
+@font-face {
+  font-family: 'AeonikATrial-Bold';
+  src: url();
+}
+
+@font-face {
+  font-family: 'AeonikATrial-Light';
+  src: url();
+}
+
+@font-face {
+  font-family: 'AeonikATrial-Medium';
+  src: url();
+}
+
+@font-face {
+  font-family: 'AeonikATrial-Regular';
+  src: url();
+}
+
+@font-face {
+  font-family: 'AeonikATrial-SemiBold';
+  src: url();
+}
+
+@font-face {
+  font-family: 'AeonikATrial-Thin';
+  src: url();
+}
