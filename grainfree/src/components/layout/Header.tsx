@@ -22,9 +22,9 @@ export default function Header() {
 
             {/* Right-side text + icon */}
             <div className="flex | flex-row | gap-10 | items-center |">
-                <p className="text-black">
-                    You're <span className="font-bold">one</span> decision away<br/>
-                    from <span className="text-[#1DA1C9] font-bold font-italic">changing your life.</span>
+                <p className="text-black font-normal font-[AeonikArabic]">
+                    You're <span className="font-semibold font-[AeonikArabic]">one</span> decision away<br/>
+                    from <span className="text-[#1DA1C9] font-semibold font-[AeonikArabic]">changing your life.</span>
                 </p>
 
                 {/* Leaf Icon Hamburger Menu Toggle */}

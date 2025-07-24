@@ -26,41 +26,57 @@ body {
 }
 
 @font-face {
-  font-family: 'AeonikATrial-Air';
-  src: url('/fonts/AeonikArabicTRIAL-Air.otf') format('otf');
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-Air.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'AeonikATrial-Black';
-  src: url('/fonts/AeonikATrial-Black.otf');
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-Thin.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'AeonikATrial-Bold';
-  src: url();
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-Light.otf') format('opentype');
+  font-weight: 350;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'AeonikATrial-Light';
-  src: url();
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'AeonikATrial-Medium';
-  src: url();
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'AeonikATrial-Regular';
-  src: url();
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'AeonikATrial-SemiBold';
-  src: url();
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'AeonikATrial-Thin';
-  src: url();
+  font-family: 'AeonikArabic';
+  src: url('/fonts/AeonikArabicTRIAL-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
 }
