@@ -28,7 +28,7 @@ export default function Header() {
                 </p>
 
                 {/* Leaf Icon Hamburger Menu Toggle */}
-                <Image src={LeafIcon} alt="LeafIcon" className="block w-20 h-auto "/>
+                <Image src={LeafIcon} alt="LeafIcon" className="block w-20 h-auto"/>
             </div>
 
         </header>

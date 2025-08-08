@@ -1,5 +1,6 @@
 'use client'
 import Header from "@/components/layout/Header"
+import Footer from "@/components/layout/Footer"
 
 import Button from '@/components/ui/button'
 
@@ -14,6 +15,8 @@ export default function HomePage() {
       <Button variant="secondary" onClick={() => alert('Secondary clicked!')}>
         Button Secondary
       </Button>
+      <Footer/>
+      
     </main>
   )
 }
