@@ -1,10 +1,12 @@
+import Header from "../layout/Header"
+import Footer from "../layout/Footer"
+
 export default function PageDash() {
     return (
-        <main>
-            <div>
-                <h1>Dashboard Page</h1>
-                <p>This is the Dashboard section of GrainFree.</p>
-            </div>
+        <main className="min-h-screen bg-[#FAFAF5]">
+            <Header/>
+                <h1 className="text-3xl font-bold mb-4 text-black">This is the Dashboard</h1>
+            <Footer/>
         </main>
     )
 }

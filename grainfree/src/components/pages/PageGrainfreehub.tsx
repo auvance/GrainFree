@@ -1,10 +1,14 @@
+import Header from "../layout/Header"
+import Footer from "../layout/Footer"
+
 export default function GrainFreeHub() {
     return (
-        <main>
-            <div>
-                <h1>GrainFreeHub Page</h1>
-                <p>This is the GrainFree Hub page of GrainFree.</p>
-            </div>
+        <main className="min-h-screen bg-[#FAFAF5]">
+
+            <Header/>
+                <h1 className="text-3xl font-bold mb-4 text-black">This is the Grain Hub!</h1>
+            <Footer/>
+      
         </main>
     )
 }

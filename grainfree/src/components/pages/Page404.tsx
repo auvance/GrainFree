@@ -1,10 +1,14 @@
+import Header from "../layout/Header"
+import Footer from "../layout/Footer"
+
 export default function Page404() {
     return (
-        <main>
-            <div>
-                <h1>404 Page</h1>
-                <p>This is the 404 section of GrainFree.</p>
-            </div>
+        <main className="min-h-screen bg-[#FAFAF5]">
+
+            <Header/>
+                <h1 className="text-3xl font-bold mb-4 text-black">How did we get here :c</h1>
+            <Footer/>
+      
         </main>
     )
   }
