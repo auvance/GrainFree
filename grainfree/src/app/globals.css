@@ -80,3 +80,8 @@ body {
   font-weight: 900;
   font-style: normal;
 }
+
+/* Hero Flex */
+.hero-flex {
+  @apply flex justify-end flex-col items-start;
+}
