@@ -19,10 +19,10 @@ GrainFree is a web application designed for individuals living with **celiac dis
 It simplifies food discovery by providing a curated database of gluten-free products, meal tracking tools, and personalized dietary recommendations.  
 
 ## Features
-- ✅ Search & discover verified **gluten-free products**  
-- ✅ Track daily **meals & nutrition**  
-- ✅ Personalized **dietary plans & recommendations**  
-- ✅ Modern, responsive UI with smooth scrolling animations  
+- 🔎 Search & discover verified **gluten-free products**  
+- 📆 Track daily **meals & nutrition**  
+- 🍴 Personalized **dietary plans & recommendations**  
+- 📲 Modern, responsive UI with smooth scrolling animations  
 - ✅ Secure authentication & cloud-backed storage  
 
 ## Tech Stack
@@ -60,7 +60,7 @@ pnpm dev
 - Enjoy Splide-powered carousels for trailers & posters
 
 ## Snapshots
-None at the moment :(
+None at the moment :( <br>
 Check Back Later!
 
 ## Contributing
