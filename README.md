@@ -9,10 +9,10 @@ Helping people with celiac disease and dietary restrictions find safe foods, pla
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
+- [Snapshots](#snapshots)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
-- [Snapshots](#snapshots)
 
 ## About
 GrainFree is a web application designed for individuals living with **celiac disease** or **gluten sensitivity**.  
@@ -59,6 +59,10 @@ pnpm dev
 - Search for films by title
 - Enjoy Splide-powered carousels for trailers & posters
 
+## Snapshots
+None at the moment :(
+Check Back Later!
+
 ## Contributing
 
 👑 Contributions are welcome! 👑
@@ -76,5 +80,3 @@ Distributed under the MIT License. See LICENSE for details.
 > Portfolio: aumar.xyz <br>
 > Email: aakifumar55@gmail.com  <br>
 > Business Inquiries: therealauvance@gmail.com
-
-## Snapshots
