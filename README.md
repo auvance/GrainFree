@@ -14,7 +14,7 @@ Helping people with celiac disease and dietary restrictions find safe foods, pla
 - [Contact](#contact)
 - [Screenshots](#screenshots)
 
-## 1. About
+## About
 GrainFree is a web application designed for individuals living with **celiac disease** or **gluten sensitivity**.  
 It simplifies food discovery by providing a curated database of gluten-free products, meal tracking tools, and personalized dietary recommendations.  
 
