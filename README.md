@@ -4,7 +4,7 @@
 Helping people with celiac disease and dietary restrictions find safe foods, plan meals, and build healthier habits.  
 
 ## 📖 Table of Contents
-- [1. About](#about)
+- [About](#about)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
@@ -12,25 +12,25 @@ Helping people with celiac disease and dietary restrictions find safe foods, pla
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
-- [Screenshots](#screenshots)
+- [Snapshots](#snapshots)
 
-## 1. About
+## About
 GrainFree is a web application designed for individuals living with **celiac disease** or **gluten sensitivity**.  
 It simplifies food discovery by providing a curated database of gluten-free products, meal tracking tools, and personalized dietary recommendations.  
 
-## 2. Features
+## Features
 - ✅ Search & discover verified **gluten-free products**  
 - ✅ Track daily **meals & nutrition**  
 - ✅ Personalized **dietary plans & recommendations**  
 - ✅ Modern, responsive UI with smooth scrolling animations  
 - ✅ Secure authentication & cloud-backed storage  
 
-## 3. Tech Stack
+## Tech Stack
 - **Frontend**: Next.js, TypeScript, Tailwind CSS, Locomotive Scroll, SplideJS  
 - **Backend**: Supabase (authentication & database)  
 - **Other**: TypeScript, pnpm, Vercel (deployment)
 
-## 4. Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js v18+  
@@ -52,14 +52,14 @@ pnpm install
 pnpm dev
 ```
 
-## 5. Usage
+## Usage
 
 - Visit http://localhost:5173 during development
 - Browse trending & popular movies
 - Search for films by title
 - Enjoy Splide-powered carousels for trailers & posters
 
-## 6. Contributing
+## Contributing
 
 👑 Contributions are welcome! 👑
 
@@ -69,12 +69,12 @@ pnpm dev
 - Push to branch (git push origin feature/YourFeature)
 - Open a Pull Request
 
-## 7. License
+## License
 Distributed under the MIT License. See LICENSE for details.
 
-## 8. Contact
+## Contact
 > Portfolio: aumar.xyz <br>
 > Email: aakifumar55@gmail.com  <br>
 > Business Inquiries: therealauvance@gmail.com
 
-## 9. Screenshots
+## Snapshots
