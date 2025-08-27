@@ -71,6 +71,6 @@ pnpm dev
 Distributed under the MIT License. See LICENSE for details.
 
 ### 8. Contact
-Portfolio: aumar.xyz
-Email: aakifumar55@gmail.com
-Business Inquiries: therealauvance@gmail.com
+> Portfolio: aumar.xyz <br>
+> Email: aakifumar55@gmail.com  <br>
+> Business Inquiries: therealauvance@gmail.com
