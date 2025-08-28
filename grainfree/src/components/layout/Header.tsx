@@ -42,7 +42,7 @@ export default function Header() {
         <>
         <header className="flex | justify-between | items-center | mr-8 ml-8 pt-8 |">
             {/* Left nav links */}
-            <nav className="flex | flex-row | gap-20 | pr-8 pl-8 | bg-transparent | text-[#4A4A4A] font-normal font-[AeonikArabic] | border-1 border-[#E6E6E6] | rounded-xl">
+            <nav className="flex | flex-row | gap-20 | pr-8 pl-8 | bg-[#ffffff3d] | text-[#4A4A4A] font-normal font-[AeonikArabic] | border-1 border-[#E6E6E6] | rounded-xl">
                 <Link href="/system" className="p-3">Get Started</Link>
                 <Link href="/dash" className="p-3">Dashboard</Link>
                 <Link href="/grainhub" className="p-3">GrainFreeHub</Link>
