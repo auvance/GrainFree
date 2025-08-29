@@ -12,10 +12,10 @@ export default function PageAbout() {
         <section className="">
             <div className="relative inline-block flex">
                 {/* Tag */}
-                <div data-scroll data-scroll-speed="3" className="pt-85">
+                <div className="| [@media(min-width:1400px)]:pt-75 | [@media(min-width:1500px)]:pt-85">
                     {/* Heading */}
-                    <h2 className="text-[#3D4F46] text-[11rem] font-bold font-[AeonikArabic] leading-[0.85] tracking-tight pl-15">Why I built</h2>
-                    <h1 className="text-[#3D4F46] text-[17rem] font-bold font-[AeonikArabic] | leading-[0.85] tracking-tight | pl-15 pb-15">
+                    <h2 className="text-[#3D4F46] | [@media(min-width:1400px)]:text-[7rem] [@media(min-width:1500px)]:text-[11rem] | font-bold font-[AeonikArabic] leading-[0.85] tracking-tight pl-15">Why I built</h2>
+                    <h1 className="text-[#3D4F46] | [@media(min-width:1400px)]:text-[12rem] [@media(min-width:1500px)]:text-[17rem] | font-bold font-[AeonikArabic] | leading-[0.85] tracking-tight | pl-15 pb-15">
                         Grain<span className="text-[#008509]">Free</span>
                     
                     </h1>

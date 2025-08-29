@@ -11,19 +11,19 @@ export default function HomePage() {
     <main className="bg-[#FAFAF5] rounded-xl">
     <Header/>
 
-    <section className="">
+    <section className="flex">
       <div className="relative inline-block flex">
         {/* Tag */}
-        <div className="pt-125">
+        <div className=" | [@media(min-width:1400px)]:pt-70 | [@media(min-width:1500px)]:pt-125">
           <div className="relative left-0 -top-8 w-60">
-          <div className="rounded bg-[#517F58] px-4 py-2 text-white drop-shadow-[6px_6px_0px_#3D4F46]">
-            <p className="text-[12px] leading-tight font-[AeonikArabic]">
-              The No BS <span className="italic">'Allergen Free'</span> Guide.
-            </p>
-            <p className="text-[12px] leading-tight font-[AeonikArabic]">
-              All in one, right in your pocket.
-            </p>
-          </div>
+            <div className="rounded bg-[#517F58] px-4 py-2 text-white drop-shadow-[6px_6px_0px_#3D4F46]">
+              <p className="text-[12px] leading-tight font-[AeonikArabic]">
+                The No BS <span className="italic">'Allergen Free'</span> Guide.
+              </p>
+              <p className="text-[12px] leading-tight font-[AeonikArabic]">
+                All in one, right in your pocket.
+              </p>
+            </div>
           </div>
 
           {/* Heading */}
