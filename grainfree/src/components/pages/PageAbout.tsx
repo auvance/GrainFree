@@ -1,15 +1,18 @@
 import Header from "../layout/Header"
 import Footer from "../layout/Footer"
 import Image from "next/image"
+import SmoothScroll from "@/styles/SmoothScroll"
 
 export default function PageAbout() {
     return (
+
         <main className="min-h-screen bg-[#BFDFC7]">
         <Header/>
+    
         <section className="">
             <div className="relative inline-block flex">
                 {/* Tag */}
-                <div className="pt-85">
+                <div data-scroll data-scroll-speed="3" className="pt-85">
                     {/* Heading */}
                     <h2 className="text-[#3D4F46] text-[11rem] font-bold font-[AeonikArabic] leading-[0.85] tracking-tight pl-15">Why I built</h2>
                     <h1 className="text-[#3D4F46] text-[17rem] font-bold font-[AeonikArabic] | leading-[0.85] tracking-tight | pl-15 pb-15">
@@ -135,8 +138,11 @@ export default function PageAbout() {
     
         
 
+        
+      
         <Footer/>
-        </main>
+    </main>
+   
     )
   }
   

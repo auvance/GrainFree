@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import "locomotive-scroll/dist/locomotive-scroll.css";
 import "./globals.css"
 
 import Header from "@/components/layout/Header"
@@ -27,6 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+    
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#FAFAF5] text-black`}>
         
         <main className="min-h-screen">{children}</main>
