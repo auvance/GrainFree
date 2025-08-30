@@ -1,5 +1,4 @@
 'use client'
-
 import Link from "next/link"
 import Image from "next/image"
 import React from "react"
@@ -40,9 +39,9 @@ export default function Header() {
 
     return (
         <>
-        <header className="flex | justify-between | items-center | mr-8 ml-8 pt-8 |">
+        <header className="flex justify-between items-center mr-8 ml-8 pt-8">
             {/* Left nav links */}
-            <nav className="flex | flex-row | gap-20 | pr-8 pl-8 | bg-[#ffffff3d] | text-[#4A4A4A] font-normal font-[AeonikArabic] | border-1 border-[#E6E6E6] | rounded-xl">
+            <nav className="flex flex-row gap-20 pr-8 pl-8 bg-[#ffffff3d] text-[#4A4A4A] font-normal font-[AeonikArabic] border-1 border-[#E6E6E6] rounded-xl">
                 <Link href="/system" className="p-3">Get Started</Link>
                 <Link href="/dash" className="p-3">Dashboard</Link>
                 <Link href="/grainhub" className="p-3">GrainFreeHub</Link>
@@ -52,7 +51,7 @@ export default function Header() {
 
 
             {/* Right-side text + icon */}
-            <div className="flex | flex-row | gap-10 | items-center |">
+            <div className="flex flex-row gap-10 items-center">
                 <p className="text-black font-normal font-[AeonikArabic]">
                     You're <span className="font-semibold font-[AeonikArabic]">one</span> decision away<br/>
                     from <span className="text-[#1DA1C9] font-semibold font-[AeonikArabic]">changing your life.</span>
