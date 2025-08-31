@@ -10,8 +10,8 @@ export default function HomePage() {
     
     <main className="bg-[#FAFAF5] rounded-xl">
     <Header/>
-
-    <section className="flex">
+   
+    <section className="">
       <div className="relative inline-block flex">
         {/* Tag */}
         <div className=" | [@media(min-width:1400px)]:pt-70 | [@media(min-width:1500px)]:pt-125">
@@ -25,7 +25,7 @@ export default function HomePage() {
               </p>
             </div>
           </div>
-
+     
           {/* Heading */}
           <h1 className="text-[#3D4F46] text-[17rem] font-bold font-[AeonikArabic] | leading-[0.85] tracking-tight | pl-15 pb-15">
             Grain<span className="text-[#008509]">Free</span>
@@ -37,7 +37,7 @@ export default function HomePage() {
     {/* Section 1  */}
     <section aria-labelledby="s1-title" className="bg-gradient-to-b from-[#67A871] to-[#517F58] text-white rounded-xl pb-70">
       
-      <div className="mx-auto max-w-7xl px-10 py-20">
+      <div className="mx-auto max-w-7xl px-10 py-30">
 
         {/* [0.5] Top copy: left headline, right helper text */}
         <div className="flex items-center justify-between">
@@ -53,43 +53,43 @@ export default function HomePage() {
         </div>
 
         {/* [0.5] Main content */}
-        <article className="mt-30 flex items-end gap-10">
+        <article className="mt-45 flex items-end gap-10 justify-center">
           <div>
             <div>
               <Image src="/image/rec1.png" width={500} height={500} alt="Picture of the author"/>
             </div>
           </div>
 
-          <div>
-            <p>Choose your goals, allergies, food preferences, schedule & everything else that’s important.</p>
-            <p>Tell us about your diet.</p>
+          <div className="w-150">
+            <p className="text-[1.7rem] font-normal font-[AeonikArabic]">Choose your goals, allergies, food preferences, schedule & everything else that’s important.</p>
+            <p className="italic text-[1.5rem] font-bold font-[AeonikArabic]">Tell us about your diet.</p>
             <span>
-                <h2>1</h2>
+                <h2 className="text-[7rem] font-extrabold font-[AeonikArabic]">1</h2>
             </span>
           </div>
           
         </article>
       </div>
-
+      
     {/* Section 2  */}
-      <section className="mx-auto w-200 mt-75">
+      <section className="mx-auto w-200 mt-55">
         <div>
-          <article className="flex flex-col gap-10">
+          <article className="flex flex-col gap-2">
             <div>
               <div>
                 <Image src="/image/rec2.png" width={800} height={500} alt="Picture of the author"/>
               </div>
             </div>
 
-          <div className="flex flex-row-reverse justify-end items-center gap-5">
-            <div>
-              <p>Let our system build for you.</p>
-              <p>Our AI-enhanced guide maps out your starter plan; products, 
+          <div className="flex flex-row-reverse justify-end items-center gap-7">
+            <div className="w-150">
+              <p className="italic text-[1.5rem] font-bold font-[AeonikArabic]">Let our system build for you.</p>
+              <p className="text-[1.5rem] font-normal font-[AeonikArabic]">Our AI-enhanced guide maps out your starter plan; products, 
                 meals, and routines built around you.</p>
             </div>
             <div>
               <span>
-                  <h2>2</h2>
+                  <h2 className="text-[7rem] font-extrabold font-[AeonikArabic]">2</h2>
               </span>
             </div>
           </div>
@@ -109,15 +109,15 @@ export default function HomePage() {
                 </div>
                 <div>
                   <span>
-                    <h2>3</h2>
+                    <h2 className="text-[7rem] font-extrabold font-[AeonikArabic]">3</h2>
                   </span>
                 </div>
               </div>
 
               <div>
-                <div>
-                  <p>Let our system build for you.</p>
-                  <p>Our AI-enhanced guide maps out your starter plan; products, 
+                <div className="text-right w-150">
+                  <p className="italic text-[1.5rem] font-bold font-[AeonikArabic]">Let our system build for you.</p>
+                  <p className="text-[1.5rem] font-normal font-[AeonikArabic]">Our AI-enhanced guide maps out your starter plan; products, 
                     meals, and routines built around you.</p>
                 </div>
               </div>
@@ -129,30 +129,29 @@ export default function HomePage() {
     </section>
 
 
-
     <section className="bg-[#475845] text-white">
-      <div className="mx-auto w-full max-w-[1120px] px-16 pt-35 pb-40">
+      <div className="mx-auto w-full max-w-[1500px] px-16 pt-35 pb-40">
 
         {/* Title + subline */}
         <header className="text-center">
           <h2 className="font-[AeonikArabic] font-bold text-[3rem] leading-[1.15]">
             It’s not just a ‘Guide’
           </h2>
-          <p className="mt-[10px] text-[1.5rem] leading-tight text-white/85">
+          <p className="font-[AeonikArabic] font-normal mt-[10px] font-light text-[1.5rem] leading-tight text-white/85">
             Everything Grainless does is built around one question:
           </p>
-          <p className="mt-[2px] text-[1.5rem] italic text-white/85">
+          <p className="font-[AeonikArabic] font-light mt-[2px] text-[1.5rem] italic text-white/85">
             “What would’ve helped me when I was struggling?”
           </p>
         </header>
 
         {/* Pills */}
-        <div className="mt-[40px] space-y-[44px]">
+        <div className="mt-[150px] space-y-[44px]">
           {/* Row 1 — left pill */}
           <div className="flex">
-            <div className="w-[520px] rounded-[14px] bg-white/16 border border-white/14 px-[20px] py-[16px] backdrop-blur-[0.5px]">
-              <h3 className="text-[14px] font-semibold text-center">Save your favorites</h3>
-              <p className="mt-[6px] text-[12px] leading-snug text-center text-white/85">
+            <div className="w-[720px] rounded-tl-3xl bg-[#617862] border border-white/14 px-[20px] py-[86px] backdrop-blur-[0.5px] ">
+              <h3 className="text-[1.5rem] font-bold font-[AeonikArabic] text-center">Save your favorites</h3>
+              <p className="text-[1.2rem] font-normal font-[AeonikArabic] leading-snug text-center text-white/85">
                 Bookmark meals and products, so you<br/>don’t forget what works for you.
               </p>
             </div>
@@ -160,9 +159,9 @@ export default function HomePage() {
 
           {/* Row 2 — right pill */}
           <div className="flex">
-            <div className="ml-auto w-[520px] rounded-[14px] bg-white/16 border border-white/14 px-[20px] py-[16px] backdrop-blur-[0.5px]">
-              <h3 className="text-[14px] font-semibold text-center">Filter by goals</h3>
-              <p className="mt-[6px] text-[12px] leading-snug text-center text-white/85">
+            <div className="ml-auto w-[720px] rounded-tr-3xl bg-[#617862] border border-white/14 px-[20px] py-[86px] backdrop-blur-[0.5px]">
+              <h3 className="text-[1.5rem] font-bold font-[AeonikArabic] text-center">Filter by goals</h3>
+              <p className="text-[1.2rem] font-normal font-[AeonikArabic] leading-snug text-center text-white/85">
                 Gain weight? Eat Clean? Budget‑friendly?<br/>
                 Tag‑based filtering gives you clarity fast.
               </p>
@@ -171,9 +170,9 @@ export default function HomePage() {
 
           {/* Row 3 — left pill */}
           <div className="flex">
-            <div className="w-[520px] rounded-[14px] bg-white/16 border border-white/14 px-[20px] py-[16px] backdrop-blur-[0.5px]">
-              <h3 className="text-[14px] font-semibold text-center">Dietary Flags Built‑In</h3>
-              <p className="mt-[6px] text-[12px] leading-snug text-center text-white/85">
+            <div className="w-[720px] rounded-tl-3xl bg-[#617862] border border-white/14 px-[20px] py-[86px] backdrop-blur-[0.5px]">
+              <h3 className="text-[1.5rem] font-bold font-[AeonikArabic] text-center">Dietary Flags Built‑In</h3>
+              <p className="text-[1.2rem] font-normal font-[AeonikArabic] leading-snug text-center text-white/85">
                 Lactose‑free, nut‑free, soy‑free… no<br/>second guessing. It’s labeled right.
               </p>
             </div>
@@ -181,9 +180,9 @@ export default function HomePage() {
 
           {/* Row 4 — right pill */}
           <div className="flex">
-            <div className="ml-auto w-[520px] rounded-[14px] bg-white/16 border border-white/14 px-[20px] py-[16px] backdrop-blur-[0.5px]">
-              <h3 className="text-[14px] font-semibold text-center">Constantly Evolving</h3>
-              <p className="mt-[6px] text-[12px] leading-snug text-center text-white/85">
+            <div className="ml-auto w-[720px] rounded-tr-3xl bg-[#617862] border border-white/14 px-[20px] py-[86px] backdrop-blur-[0.5px]">
+              <h3 className="text-[1.5rem] font-bold font-[AeonikArabic] text-center">Constantly Evolving</h3>
+              <p className="text-[1.2rem] font-normal font-[AeonikArabic] leading-snug text-center text-white/85">
                 New products, better meals, smarter<br/>filters — all added regularly.
               </p>
             </div>
@@ -200,15 +199,14 @@ export default function HomePage() {
 
           <button
             className="mt-[12px] inline-block rounded-[6px] px-[10px] py-[6px]
-                       text-[11px] font-medium text-[#3D4F46] bg-white hover:bg-white/90 transition"
-          >
+                       text-[11px] font-medium text-[#3D4F46] bg-white hover:bg-white/90 transition">
             Get Started
           </button>
         </div>
       </div>
     </section>
 
-
+    
 
 
 
