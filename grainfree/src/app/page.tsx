@@ -190,23 +190,30 @@ export default function HomePage() {
         </div>
 
         {/* Bottom copy + tiny CTA */}
-        <div className="mt-[56px] text-center">
-          <p className="text-[13px] font-semibold">And the best part?</p>
-          <p className="mt-[6px] text-[12px] text-white/85">
-            <span className="font-semibold">Completely Free</span>, No pricing,<br/>
-            <span className="italic">No strings attached.</span>
+        <div className="mt-[200px] text-center font-[AeonikArabic]">
+          {/* Heading */}
+          <p className="text-[2.5rem] font-semibold text-white">
+            And the best part?
           </p>
 
+          {/* Subtext */}
+          <p className="text-[2rem] leading-snug text-[#9DE7C5] font-semibold italic text-[#9DE7C5]">
+            Completely Free, No pricing,<br />
+            No strings attached.
+          </p>
+
+          {/* Button */}
           <button
-            className="mt-[12px] inline-block rounded-[6px] px-[10px] py-[6px]
-                       text-[11px] font-medium text-[#3D4F46] bg-white hover:bg-white/90 transition">
+            className="mt-[20px] inline-block rounded-xl border border-white/40
+                      px-[40px] py-[20px] text-[1rem] font-medium text-black 
+                      bg-[#8EB397] hover:bg-white hover:text-[#3D4F46] 
+                      transition-colors duration-300 shadow-sm">
             Get Started
           </button>
         </div>
       </div>
     </section>
 
-    
 
 
 
