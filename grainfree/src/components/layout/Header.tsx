@@ -5,14 +5,19 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import LeafIcon from "/public/LeafLogo.svg";
-import { useUser } from "@supabase/auth-helpers-react";
+import { useUser } from "@supabase/auth-helpers-react"; // ✅ inside component
 import { supabase } from "@/lib/supabaseClient";
+import { LogIn, UserCircle } from "lucide-react"; // icons
+import { useAuth } from "../providers/AuthProvider";
+import UserProfile from "@/components/ui/UserProfile";
+
 
 export default function Header() {
-  const user = useUser(); // ✅ inside component
+  const { user, loading } = useAuth(); // ✅ inside component
   const [menuOpen, setMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
 
   // Close overlay on route change
   useEffect(() => {
@@ -44,59 +49,19 @@ export default function Header() {
       <header className="flex justify-between items-center mr-8 ml-8 pt-8">
         {/* Left nav links */}
         
-          
-        <nav className="flex flex-row [@media(min-width:1400px)]:gap-7 [@media(min-width:1500px)]:gap-20 pr-8 pl-8 bg-[#ffffff3d] text-[#4A4A4A] font-normal font-[AeonikArabic] border-1 border-[#E6E6E6] rounded-xl">
-          <Link href="/system" className="p-3">Get Started</Link>
-          <Link href="/dash" className="p-3">Dashboard</Link>
-          <Link href="/grainhub" className="p-3">GrainFreeHub</Link>
-          <Link href="/about" className="p-3">Learn More</Link>
-          <Link href="/help" className="p-3">Help Center</Link>
-          
-          <div className="relative">
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden"
-            >
-              {user?.user_metadata?.avatar_url ? (
-                <Image
-                  src={user.user_metadata.avatar_url}
-                  alt="User Avatar"
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-400 rounded-full" />
-              )}
-            </button>
-
-            {/* Dropdown Menu */}
-            {menuOpen && (
-              <div className="absolute left-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black/10">
-                <ul className="py-2 text-sm font-[AeonikArabic] text-gray-800">
-                  <li>
-                    <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
-                      Profile Settings
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/account" className="block px-4 py-2 hover:bg-gray-100">
-                      Account
-                    </Link>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => supabase.auth.signOut()}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            )}
+          <div>
+            <nav className="flex flex-row items-center [@media(min-width:1400px)]:gap-7 [@media(min-width:1500px)]:gap-20 pr-8 pl-8 bg-[#ffffff3d] text-[#4A4A4A] font-normal font-[AeonikArabic] border-1 border-[#E6E6E6] rounded-xl">
+              
+              <Link href="/system" className="p-3">Get Started</Link>
+              <Link href="/dash" className="p-3">Dashboard</Link>
+              <Link href="/grainhub" className="p-3">GrainFreeHub</Link>
+              <Link href="/about" className="p-3">Learn More</Link>
+              <Link href="/help" className="p-3">Help Center</Link>
+              {/* Profile/Login Icon */}
+              <UserProfile user={user} loading={loading} />
+              
+            </nav>
           </div>
-        </nav>
 
         {/* Right side text + icons */}
         <div className="flex flex-row gap-10 items-center">

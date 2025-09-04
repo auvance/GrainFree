@@ -4,21 +4,37 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PageAuth() {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [username, setUsername] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setMessage("");
 
     if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) setError(error.message);
-    } else {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { username } },
+      });
+      if (error) setMessage(error.message);
+      else setMessage("Check your email to confirm your account.");
+    }
+
+    if (mode === "signin") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setError(error.message);
+      if (error) setMessage(error.message);
+    }
+
+    if (mode === "forgot") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: "http://localhost:3000/auth/reset",
+      });
+      if (error) setMessage(error.message);
+      else setMessage("We’ve sent you a password reset email.");
     }
   };
 
@@ -30,7 +46,11 @@ export default function PageAuth() {
     <main className="flex min-h-screen items-center justify-center bg-[#FAFAF5]">
       <div className="w-full max-w-md bg-white shadow rounded-lg p-8">
         <h1 className="text-2xl font-bold text-center text-[#3D4F46]">
-          {mode === "signup" ? "Create Account" : "Sign In"}
+          {mode === "signup"
+            ? "Create Account"
+            : mode === "signin"
+            ? "Sign In"
+            : "Forgot Password"}
         </h1>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -41,39 +61,80 @@ export default function PageAuth() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full rounded border px-4 py-2"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          {mode !== "forgot" && (
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full rounded border px-4 py-2"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          )}
+
+          {mode === "signup" && (
+            <input
+              type="text"
+              placeholder="Username"
+              className="w-full rounded border px-4 py-2"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          )}
+
+          {message && <p className="text-sm text-red-600">{message}</p>}
+
           <button
             type="submit"
             className="w-full rounded bg-green-600 py-2 text-white"
           >
-            {mode === "signup" ? "Sign Up" : "Sign In"}
+            {mode === "signup"
+              ? "Sign Up"
+              : mode === "signin"
+              ? "Sign In"
+              : "Send Reset Link"}
           </button>
         </form>
 
-        <button
-          onClick={handleGoogle}
-          className="mt-4 w-full rounded bg-gray-200 py-2"
-        >
-          Continue with Google
-        </button>
+        {mode !== "forgot" && (
+          <button
+            onClick={handleGoogle}
+            className="mt-4 w-full rounded bg-gray-200 py-2"
+          >
+            Continue with Google
+          </button>
+        )}
 
         <p className="mt-4 text-center text-sm">
-          {mode === "signup" ? "Already have an account?" : "Don’t have an account?"}{" "}
-          <button
-            onClick={() =>
-              setMode(mode === "signup" ? "signin" : "signup")
-            }
-            className="text-green-600 underline"
-          >
-            {mode === "signup" ? "Sign In" : "Sign Up"}
-          </button>
+          {mode === "signup" && (
+            <>
+              Already have an account?{" "}
+              <button onClick={() => setMode("signin")} className="text-green-600 underline">
+                Sign In
+              </button>
+            </>
+          )}
+          {mode === "signin" && (
+            <>
+              Don’t have an account?{" "}
+              <button onClick={() => setMode("signup")} className="text-green-600 underline">
+                Sign Up
+              </button>
+              <br />
+              Forgot password?{" "}
+              <button onClick={() => setMode("forgot")} className="text-green-600 underline">
+                Reset
+              </button>
+            </>
+          )}
+          {mode === "forgot" && (
+            <>
+              Remembered your password?{" "}
+              <button onClick={() => setMode("signin")} className="text-green-600 underline">
+                Sign In
+              </button>
+            </>
+          )}
         </p>
       </div>
     </main>
