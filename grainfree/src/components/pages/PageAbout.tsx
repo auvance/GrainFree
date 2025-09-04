@@ -6,7 +6,7 @@ import SmoothScroll from "@/styles/SmoothScroll"
 export default function PageAbout() {
     return (
 
-        <main className="min-h-screen bg-[#BFDFC7]">
+        <main className="min-h-screen bg-[#BFDFC7] rounded-xl">
         <Header/>
     
         <section className="">
@@ -24,28 +24,31 @@ export default function PageAbout() {
         </section>
 
         {/* Section 1 */}
-        <section>
+        <section className="mt-[200px]">
             {/* Article - Surviving To Building */}
-            <article className="flex flex-row gap-10">
-                <div>
-                    <h1>From Surviving to Building Again</h1>
-                    <p>Before celiac, I was gaining muscle, eating well, finally feeling strong. But after one vacation, everything changed.</p>
-                    <p>What started as food poisoning turned into fatigue, rapid weight loss, panic attacks, and months of confusion. No answers. Just frustration, anxiety, and feeling like I was slipping further away from who I was.</p>
+            <article className="flex flex-row gap-5 justify-center">
+                <div className="w-220">
+                    <h1 className="text-[#4A4A4A] font-[AeonikArabic] font-bold text-[3rem] w-100 leading-[1]">From Surviving to Building Again</h1>
+                    <p className="mt-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] w-170">Before celiac, I was gaining muscle, eating well, finally feeling strong. But after one vacation, everything changed.</p>
+                    <p className="mt-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] w-170">What started as food poisoning turned into fatigue, rapid weight loss, panic attacks, and months of confusion. No answers. Just frustration, anxiety, and feeling like I was slipping further away from who I was.</p>
                 </div>
                 <div>
-                    <Image src="/image/Rec4.png" width={400} height={500} alt="Picture of the author"/>
+                    <Image src="/image/Rec4.png" width={500} height={500} alt="Picture of the author"/>
                 </div>
             </article>
 
-            <article>
-                <div>
-                    <p>I tried to go back to my old routine, eating more, pushing through, but nothing 
+            <article className="mt-[200px] flex flex-row-reverse gap-5 items-end justify-center mb-50">
+                <div className="w-220">
+                    <p className="mt-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] text-right w-190 ml-auto">
+                        I tried to go back to my old routine, eating more, pushing through, but nothing 
                         worked. Every meal ended in fatigue, vomiting, anxiety, and eventually panic attacks. I was nearly diagnosed 
                         with PTSD.</p>
-                    <p>I saw doctors. Took pills. Still, nothing. Two years later, I was finally diagnosed with <span>celiac disease.</span></p>
+                    <p className="mt-10 mb-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] text-right w-190 ml-auto">
+                        I saw doctors. Took pills. Still, nothing. Two years later, I was finally diagnosed with <span className="italic font-bold">celiac disease.</span>
+                    </p>
                 </div>
                 <div>
-                    <Image src="/image/Rec5.png" width={400} height={500} alt="Picture of the author"/>
+                    <Image src="/image/Rec5.png" width={500} height={500} alt="Picture of the author"/>
                 </div>
             </article>
 
@@ -53,24 +56,24 @@ export default function PageAbout() {
 
         {/* Section 2 */}
         <section className="bg-[#9ABF9E]">
-            <article>
-                <div>
-                    <h1>Healing Took More Than a Diagnosis</h1>
-                    <p>I was relieved, but also crushed. I couldn’t eat what I used to. I couldn’t trust labels. And figuring out what was safe felt like a full-time job.</p>
-                    <p>With the help of my mom, we researched everything, snacks, ingredients, hidden gluten sources. It was long, exhausting, and overwhelming. But we made it work.</p>
+            <article className="pt-[200px] flex flex-row-reverse gap-5 justify-center items-end mb-50">
+                <div className="w-220">
+                    <h1 className="text-[#4A4A4A] font-[AeonikArabic] font-bold text-[3rem] w-130 leading-[1] text-right ml-auto">Healing Took More Than a Diagnosis</h1>
+                    <p className="mt-10 mb-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] text-right w-170 ml-auto">I was relieved, but also crushed. I couldn’t eat what I used to. I couldn’t trust labels. And figuring out what was safe felt like a full-time job.</p>
+                    <p className="mt-10 mb-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] text-right w-170 ml-auto">With the help of my mom, we researched everything, snacks, ingredients, hidden gluten sources. It was long, exhausting, and overwhelming. But we made it work.</p>
                 </div>
                 <div>
-                    <Image src="/image/Rec6.png" width={400} height={500} alt="Picture of the author"/>
+                    <Image src="/image/Rec6.png" width={500} height={500} alt="Picture of the author"/>
                 </div>
             </article>
 
-            <article>
-                <div>
-                    <p>I fasted for a month during Ramadan. I stayed strictly gluten-free. And I finally started gaining weight again.</p>
-                    <p>My energy came back. My mind was clear. <span>No fatigue. No panic.</span> Alhamdulillah.</p>
+            <article className="flex flex-row gap-5 justify-center items-end pb-50">
+                <div className="w-220">
+                    <p className="mt-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] w-170">I fasted for a month during Ramadan. I stayed strictly gluten-free. And I finally started gaining weight again.</p>
+                    <p className="mt-10 text-[#4A4A4A] font-[AeonikArabic] text-[1.7rem] leading-[1] w-170">My energy came back. My mind was clear. <span>No fatigue. No panic.</span> Alhamdulillah.</p>
                 </div>
                 <div>
-                    <Image src="/image/Rec6.png" width={400} height={500} alt="Picture of the author"/>
+                    <Image src="/image/Rec6.png" width={500} height={500} alt="Picture of the author"/>
                 </div>
             </article>
         </section>

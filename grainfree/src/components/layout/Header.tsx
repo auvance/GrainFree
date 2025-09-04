@@ -52,11 +52,11 @@ export default function Header() {
           <div>
             <nav className="flex flex-row items-center [@media(min-width:1400px)]:gap-7 [@media(min-width:1500px)]:gap-20 pr-8 pl-8 bg-[#ffffff3d] text-[#4A4A4A] font-normal font-[AeonikArabic] border-1 border-[#E6E6E6] rounded-xl">
               
-              <Link href="/system" className="p-3">Get Started</Link>
-              <Link href="/dash" className="p-3">Dashboard</Link>
-              <Link href="/grainhub" className="p-3">GrainFreeHub</Link>
-              <Link href="/about" className="p-3">Learn More</Link>
-              <Link href="/help" className="p-3">Help Center</Link>
+              <Link href="/system" className="p-3 hover:text-black transition">Get Started</Link>
+              <Link href="/dash" className="p-3 hover:text-black transition">Dashboard</Link>
+              <Link href="/grainhub" className="p-3 hover:text-black transition">GrainFreeHub</Link>
+              <Link href="/about" className="p-3 hover:text-black transition">Learn More</Link>
+              <Link href="/help" className="p-3 hover:text-black transition">Help Center</Link>
               {/* Profile/Login Icon */}
               <UserProfile user={user} loading={loading} />
               
@@ -78,8 +78,7 @@ export default function Header() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="top-5 right-5 z-30"
-          >
+            className="top-5 right-5 z-30">
             <Image
               src={LeafIcon}
               alt="Menu"
