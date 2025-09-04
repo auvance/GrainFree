@@ -26,7 +26,7 @@ export default function PageAbout() {
         {/* Section 1 */}
         <section>
             {/* Article - Surviving To Building */}
-            <article>
+            <article className="flex flex-row gap-10">
                 <div>
                     <h1>From Surviving to Building Again</h1>
                     <p>Before celiac, I was gaining muscle, eating well, finally feeling strong. But after one vacation, everything changed.</p>
