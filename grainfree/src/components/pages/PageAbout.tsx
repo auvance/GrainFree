@@ -2,6 +2,7 @@ import Header from "../layout/Header"
 import Footer from "../layout/Footer"
 import Image from "next/image"
 import SmoothScroll from "@/styles/SmoothScroll"
+import ScrollHorizonal from "@/styles/ScrollHorziontal"
 
 export default function PageAbout() {
     return (
@@ -80,68 +81,38 @@ export default function PageAbout() {
 
         {/* Section 3 */}
         <section className="bg-[#739D78]">
-            <div className="mx-auto w-full max-w-[1120px] px-[24px] py-[72px]">
+            <div className="mx-auto w-full py-[250px]">
                 {/* Heading */}
                 <div className="text-center">
-                    <h2 className="font-[AeonikArabic] font-bold text-[36px] leading-[1.15] text-white/95">
-                        This is why I built
+                    <h2 className="font-[AeonikArabic] font-bold text-[5rem] leading-[1] text-[#4A4A4A]">
+                        Purpose of Grain<span className="text-[#008509]">Free</span>
                     </h2>
-                    <p className="mt-[6px] font-[AeonikArabic] font-bold text-[32px] leading-tight text-white/95">
-                        Grain<span className="text-[#008509]">Free</span>
-                    </p>
 
-                    <p className="mt-[12px] text-[14px] leading-snug text-white/85">
+                    <p className="mt-[30px] font-[AeonikArabic] font-semibold text-[#4A4A4A] text-[2rem] leading-[1]">
                         This site wasn’t built by a company. It was
                         <br />built by someone who lived it.
                     </p>
                 </div>
 
-                {/* 3 squares */}
-                <div className="mt-[36px] grid grid-cols-3 gap-[28px]">
-                    {/* Replace each with <Image /> later */}
-                    <Image src="/image/Rec8.png" width={400} height={400} alt="Picture of the author"/>
-                    <Image src="/image/Rec8.png" width={400} height={400} alt="Picture of the author"/>
-                    <Image src="/image/Rec8.png" width={400} height={400} alt="Picture of the author"/>
-                </div>
 
-                {/* Closing line */}
-                <p className="mt-[20px] text-center text-[12px] leading-snug text-white/85 max-w-[520px] mx-auto">
-                    Someone who struggled to figure it out, and
-                    wants to make sure you don’t have to go
-                    through that alone.
-                </p>
+                {/* <ScrollHorizonal/> */}
+
+                
             </div>
 
-            <div>
-                <article>
-                    <div>
-                        <h3>GrainFree is for:</h3>
-                        <ul>
-                            <li>✦ People trying to eat better without confusion</li>
-                            <li>✦ Those struggling to gain weight on a gluten-free diet</li>
-                            <li>✦ Anyone just trying to feel like themselves again</li>
-                            <li>✦ and everyone in between</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <Image src="/image/Rec9.png" width={400} height={400} alt="Picture of the author"/>
-                    </div>
-                    
-                </article>
-                <div>
+                {/* <div>
                     <p>There’s no pricing, no spam, no BS. Just real food, smart tools, and a guide I wish I had when I needed it most.</p>
                 </div>
 
                 <button className="mt-[12px] inline-block rounded-[6px] px-[10px] py-[6px] text-[11px] font-medium text-[#3D4F46] bg-white hover:bg-white/90 transition">
                     Get Started
-                </button>
-            </div>
+                </button> */}
+        
         </section>
 
-    
-        
+                
 
-        
+    
       
         <Footer/>
     </main>

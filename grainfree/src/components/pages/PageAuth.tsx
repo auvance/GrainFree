@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Header from "../layout/Header";
 
 export default function PageAuth() {
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
@@ -43,7 +44,9 @@ export default function PageAuth() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#FAFAF5]">
+    <main className="">
+    <section className="flex min-h-screen items-center justify-center bg-[#FAFAF5]">
+      
       <div className="w-full max-w-md bg-white shadow rounded-lg p-8">
         <h1 className="text-2xl font-bold text-center text-[#3D4F46]">
           {mode === "signup"
@@ -137,6 +140,7 @@ export default function PageAuth() {
           )}
         </p>
       </div>
+      </section>
     </main>
   );
 }
