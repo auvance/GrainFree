@@ -8,13 +8,19 @@ export default function AuthWatcher({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") router.push("/");
-      if (event === "SIGNED_OUT") router.push("/auth");
-    });
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_IN") {
+          router.push("/");
+        }
+        if (event === "SIGNED_OUT") {
+          router.push("/auth");
+        }
+      }
+    );
 
     return () => {
-      listener.subscription.unsubscribe();
+      subscription?.subscription.unsubscribe();
     };
   }, [router]);
 
