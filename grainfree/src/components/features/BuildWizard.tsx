@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 type Answer = string | string[] | null;
 
+// Step IDs
 type Step =
   | "goal"
   | "dietary_restrictions"
@@ -18,7 +19,17 @@ type Step =
   | "cuisine_prefs"
   | "freeform";
 
-const steps: { id: Step; label: string; type: "single" | "multi" | "text"; options?: string[]; placeholder?: string }[] = [
+// Step configuration type
+type StepConfig = {
+  id: Step;
+  label: string;
+  type: "single" | "multi" | "text";
+  options?: string[];
+  placeholder?: string;
+};
+
+// Step definitions
+const steps: StepConfig[] = [
   { id: "goal", label: "Primary goal", type: "single", options: ["Gain healthy weight", "Reduce bloating", "Energy & stamina", "General clean eating"] },
   { id: "dietary_restrictions", label: "Dietary restrictions", type: "multi", options: ["Gluten-free", "Lactose-free", "Nut-free", "Soy-free", "Halal", "Vegan"] },
   { id: "symptoms", label: "Current symptoms (if any)", type: "multi", options: ["Brain fog", "Bloating", "Fatigue", "Indigestion", "Nausea", "Skin flare-ups"] },
@@ -32,14 +43,17 @@ const steps: { id: Step; label: string; type: "single" | "multi" | "text"; optio
     id: "freeform",
     label: "Anything else to personalize?",
     type: "text",
-    placeholder: "Add extra details (e.g., specific foods you avoid, schedule, goals in your own words)",
+    placeholder: "Add extra details (e.g., foods you avoid, schedule, or your own goals)",
   },
 ];
+
 
 export default function BuildWizard() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [started, setStarted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<Step, Answer>>({
     goal: null,
     dietary_restrictions: [],
@@ -54,15 +68,42 @@ export default function BuildWizard() {
   });
 
   const step = steps[stepIndex];
+  const progress = useMemo(() => Math.round(((stepIndex + 1) / steps.length) * 100), [stepIndex]);
 
-  // Gate: logged-in users only
+  // Load session + saved answers
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) router.replace("/auth");
-    });
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        router.replace("/auth");
+        return;
+      }
+      setUserId(data.session.user.id);
+
+      // Load saved draft from Supabase (table: healthplans_drafts)
+      const { data: draft } = await supabase
+        .from("healthplans_drafts")
+        .select("answers")
+        .eq("user_id", data.session.user.id)
+        .single();
+
+      if (draft?.answers) {
+        setAnswers(draft.answers);
+      }
+    };
+    init();
   }, [router]);
 
-  const progress = useMemo(() => Math.round(((stepIndex + 1) / steps.length) * 100), [stepIndex]);
+  // Auto-save to Supabase on answers change
+  useEffect(() => {
+    if (!userId) return;
+    const saveDraft = async () => {
+      await supabase
+        .from("healthplans_drafts")
+        .upsert({ user_id: userId, answers });
+    };
+    saveDraft();
+  }, [answers, userId]);
 
   const onSelect = (value: string) => {
     if (step.type === "single") {
@@ -83,14 +124,6 @@ export default function BuildWizard() {
 
   const onSubmit = async () => {
     setLoading(true);
-    const { data: sessionData } = await supabase.auth.getSession();
-    const userId = sessionData.session?.user.id;
-    if (!userId) {
-      setLoading(false);
-      router.replace("/auth");
-      return;
-    }
-
     try {
       const res = await fetch("/api/test-groq", {
         method: "POST",
@@ -106,7 +139,9 @@ export default function BuildWizard() {
         return;
       }
 
-      // Redirect and show “new plan” popup
+      // Clear draft after successful plan generation
+      await supabase.from("healthplans_drafts").delete().eq("user_id", userId);
+
       router.push("/dash?newPlan=1");
     } catch (e: any) {
       console.error(e.message);
@@ -117,84 +152,109 @@ export default function BuildWizard() {
   const isLast = stepIndex === steps.length - 1;
   const canNext =
     (step.type === "text" && typeof answers[step.id] === "string") ||
-    (step.type !== "text" && answers[step.id] !== null && (Array.isArray(answers[step.id]) ? (answers[step.id] as string[]).length >= 0 : true));
+    (step.type !== "text" && answers[step.id] !== null);
 
   return (
-    <section className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-6 md:p-8">
-      {/* Title */}
-      <header className="mb-6">
-        <p className="text-sm uppercase tracking-widest text-white/70">Build your plan</p>
-        <h1 className="text-2xl md:text-3xl font-bold">{step.label}</h1>
-      </header>
-
-      {/* Progress */}
-      <div className="w-full h-2 bg-white/10 rounded mb-6">
-        <div className="h-2 bg-[#008509] rounded" style={{ width: `${progress}%` }} />
-      </div>
-
-      {/* Content */}
-      <div className="space-y-4">
-        {step.type !== "text" && step.options?.length ? (
-          <div className="flex flex-wrap gap-3">
-            {step.options.map((opt) => {
-              const selected =
-                step.type === "single"
-                  ? answers[step.id] === opt
-                  : (answers[step.id] as string[])?.includes(opt);
-              return (
-                <button
-                  key={opt}
-                  onClick={() => onSelect(opt)}
-                  className={`px-3 py-2 rounded-lg border transition ${
-                    selected ? "bg-[#008509] border-[#008509] text-white" : "bg-white/5 border-white/15 hover:bg-white/10"
-                  }`}
-                >
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <textarea
-            value={(answers.freeform as string) || ""}
-            onChange={(e) => setAnswers((s) => ({ ...s, freeform: e.target.value }))}
-            placeholder={step.placeholder}
-            rows={5}
-            className="w-full rounded-lg border border-white/10 bg-white/5 p-3 outline-none placeholder:text-white/50"
-          />
-        )}
-      </div>
-
-      {/* Actions */}
-      <footer className="mt-8 flex items-center justify-between">
-        <button
-          onClick={onPrev}
-          disabled={stepIndex === 0}
-          className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-40"
-        >
-          Back
-        </button>
-
-        {!isLast ? (
+    <section className="rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-30 max-w-3xl mx-auto mt-10">
+      {!started ? (
+        <div className="flex flex-col items-center text-center space-y-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-white font-[AeonikArabic]">
+            Ready To Build Your Personal<span className="italic"> Gluten Free</span> Guide?
+          </h1>
+          <p className="text-white/80 max-w-lg font-[AeonikArabic]">
+            We'll ask a few quick questions and create your personalized results, products, meals, and tools to get you started.
+          </p>
           <button
-            onClick={onNext}
-            disabled={!canNext}
-            className="px-5 py-2 rounded-lg bg-[#008509] hover:bg-green-700 disabled:opacity-40"
+            onClick={() => setStarted(true)}
+            className="px-8 py-3 rounded-lg bg-[#008509] hover:bg-green-700 text-white text-lg font-semibold shadow"
           >
-            Next
+            Start!
           </button>
-        ) : (
-          <button onClick={onSubmit} className="px-5 py-2 rounded-lg bg-[#008509] hover:bg-green-700">
-            Build my plan
-          </button>
-        )}
-      </footer>
+        </div>
+      ) : (
+        <>
+          {/* Title + Progress */}
+          <header className="mb-6">
+            <p className="text-sm uppercase tracking-widest text-white/70">
+              Question {stepIndex + 1} of {steps.length}
+            </p>
+            <h1 className="text-2xl md:text-3xl font-bold">{step.label}</h1>
+          </header>
+
+          <div className="w-full h-2 bg-white/10 rounded mb-6">
+            <div className="h-2 bg-[#008509] rounded" style={{ width: `${progress}%` }} />
+          </div>
+
+          {/* Content */}
+          <div className="space-y-4">
+            {step.type !== "text" && step.options?.length ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {step.options.map((opt) => {
+                  const selected =
+                    step.type === "single"
+                      ? answers[step.id] === opt
+                      : (answers[step.id] as string[])?.includes(opt);
+                  return (
+                    <button
+                      key={opt}
+                      onClick={() => onSelect(opt)}
+                      className={`px-4 py-3 rounded-lg border transition text-left ${
+                        selected
+                          ? "bg-[#008509] border-[#008509] text-white"
+                          : "bg-white/5 border-white/15 hover:bg-white/10 text-white/90"
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <textarea
+                value={(answers.freeform as string) || ""}
+                onChange={(e) => setAnswers((s) => ({ ...s, freeform: e.target.value }))}
+                placeholder={step.placeholder}
+                rows={5}
+                className="w-full rounded-lg border border-white/10 bg-white/5 p-3 outline-none placeholder:text-white/50 text-white"
+              />
+            )}
+          </div>
+
+          {/* Actions */}
+          <footer className="mt-8 flex items-center justify-between">
+            <button
+              onClick={onPrev}
+              disabled={stepIndex === 0}
+              className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-40 text-white"
+            >
+              Back
+            </button>
+
+            {!isLast ? (
+              <button
+                onClick={onNext}
+                disabled={!canNext}
+                className="px-5 py-2 rounded-lg bg-[#008509] hover:bg-green-700 disabled:opacity-40 text-white"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                onClick={onSubmit}
+                className="px-5 py-2 rounded-lg bg-[#008509] hover:bg-green-700 text-white"
+              >
+                Build my plan
+              </button>
+            )}
+          </footer>
+        </>
+      )}
 
       {/* Loading Overlay */}
       {loading && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#008509] border-t-transparent mb-4" />
-          <p className="text-lg font-semibold">Building your meal plan for a better life…</p>
+          <p className="text-lg font-semibold text-white">Building your meal plan for a better life…</p>
         </div>
       )}
     </section>
