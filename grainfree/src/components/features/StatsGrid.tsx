@@ -13,10 +13,9 @@ export default function StatsGrid() {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="bg-white/10 px-4 py-3 rounded-lg text-center"
-        >
-          <p className="text-sm text-gray-300">{stat.label}</p>
-          <p className="text-lg font-bold">{stat.value}</p>
+          className="bg-[#223528] px-20 py-3 rounded-lg text-center">
+          <p className="font-[AeonikArabic] font-bold text-[1.2rem] text-gray-300">{stat.label}</p>
+          <p className="font-[AeonikArabic] text-lg italic">{stat.value}</p>
         </div>
       ))}
     </div>

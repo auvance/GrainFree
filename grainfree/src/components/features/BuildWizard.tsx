@@ -159,7 +159,7 @@ export default function BuildWizard() {
    
     <main>
    
-    <section className="rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-30  mx-auto mt-10">
+    <section className="mt-40 rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-30  mx-auto mt-10">
       {!started ? (
         <div className="flex flex-col items-center text-center space-y-6">
           <h1 className="text-3xl md:text-4xl font-bold text-white font-[AeonikArabic]">
