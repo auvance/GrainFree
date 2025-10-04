@@ -74,10 +74,11 @@ export default function DashboardPage() {
         m.eaten_at &&
         new Date(m.eaten_at).toDateString() === today
     );
-    const totalCalories = todaysMeals.reduce(
-      (sum, m) => sum + (m.calories || 0),
-      0
-    );
+  
+    const totalCalories = todaysMeals.reduce((sum, m) => sum + (m.calories || 0), 0);
+    const totalProtein = todaysMeals.reduce((sum, m) => sum + (m.protein || 0), 0);
+    const totalCarbs = todaysMeals.reduce((sum, m) => sum + (m.carbs || 0), 0);
+    const totalFat = todaysMeals.reduce((sum, m) => sum + (m.fat || 0), 0);
     const streak = calculateStreak(meals);
   
     setStats((prev) => ({
@@ -85,6 +86,9 @@ export default function DashboardPage() {
       caloriesToday: totalCalories,
       mealsLogged: todaysMeals.length,
       streak,
+      protein: totalProtein,
+      carbs: totalCarbs,
+      fat: totalFat,
     }));
   };
   

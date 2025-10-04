@@ -150,17 +150,27 @@ const markAsEaten = async (mealId: string) => {
                 {suggestions.map((s) => (
                   <div
                     key={s.id}
-                    onClick={() =>
+                    onClick={() => {
+                      const macros = s.nutrition?.nutrients?.reduce(
+                        (acc: any, n: any) => {
+                          if (n.name === "Protein") acc.protein = n.amount;
+                          if (n.name === "Carbohydrates") acc.carbs = n.amount;
+                          if (n.name === "Fat") acc.fat = n.amount;
+                          return acc;
+                        },
+                        { protein: 0, carbs: 0, fat: 0 }
+                      );
+                    
                       setNewMeal({
                         ...newMeal,
                         name: s.title,
                         calories: Math.round(
-                          s.nutrition?.nutrients?.find(
-                            (n: any) => n.name === "Calories"
-                          )?.amount || 0
+                          s.nutrition?.nutrients?.find((n: any) => n.name === "Calories")?.amount ||
+                            0
                         ),
-                      })
-                    }
+                        ...macros,
+                      });
+                    }}
                     className="px-3 py-2 text-sm hover:bg-white/10 cursor-pointer"
                   >
                     {s.title}
