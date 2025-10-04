@@ -136,6 +136,15 @@ const markAsEaten = async (mealId: string) => {
               onChange={(e) => setNewMeal({ ...newMeal, name: e.target.value })}
               className="px-3 py-2 rounded bg-white/10 border border-white/20 outline-none"
             />
+            <input
+              type="number"
+              placeholder="Calories (optional)"
+              value={newMeal.calories || ""}
+              onChange={(e) =>
+                setNewMeal({ ...newMeal, calories: Number(e.target.value) })
+              }
+              className="px-3 py-2 rounded bg-white/10 border border-white/20 outline-none"
+            />
             {suggestions.length > 0 && (
               <div className="absolute top-12 left-0 w-full bg-[#223528] border border-white/10 rounded-lg z-50">
                 {suggestions.map((s) => (
