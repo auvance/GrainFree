@@ -85,6 +85,14 @@ export default function DashboardPage() {
   // ─── Handle Meal Add ──────────────────────────────────────────
   const handleMealAdded = (newMeal: any) => {
     setMeals((prev) => {
+      // If the meal was just completed, remove it from list
+      if (newMeal.completed) {
+        const updated = prev.filter((m) => m.id !== newMeal.id);
+        updateStats(updated);
+        return updated;
+      }
+  
+      // Otherwise, treat as new or updated
       const updated = [newMeal, ...prev];
       updateStats(updated);
       return updated;

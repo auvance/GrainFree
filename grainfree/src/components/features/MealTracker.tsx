@@ -79,22 +79,33 @@ export default function MealTracker({
     setSuggestions([]);
   };
 
-  // ─── Mark as Completed ─────────────────────────────────────
-  const markAsEaten = async (mealId: string) => {
-    const { data, error } = await supabase
-      .from("completed_meals")
-      .update({ completed: true, eaten_at: new Date().toISOString() })
-      .eq("id", mealId)
-      .select()
-      .single();
+ // ─── Mark as Completed ─────────────────────────────────────
+const markAsEaten = async (mealId: string) => {
+  const { data, error } = await supabase
+    .from("completed_meals")
+    .update({ completed: true, eaten_at: new Date().toISOString() })
+    .eq("id", mealId)
+    .select()
+    .single();
 
-    if (error) {
-      console.error("Supabase update error:", error);
-      return;
-    }
+  if (error) {
+    console.error("Supabase update error:", error);
+    return;
+  }
 
-    onMealAdded?.(data); // Refresh parent stats
-  };
+  // ✅ Remove the meal instantly from local list
+  onMealAdded?.(data); // this updates stats in parent
+
+  // Trigger local UI update without reload
+  setSuggestions([]);
+  setShowForm(false);
+
+  // Remove the completed meal from displayed pending meals
+  const updated = meals.filter((m) => m.id !== mealId);
+  // @ts-ignore — safe to call this way for your structure
+  onMealAdded?.({ ...data, _refreshMeals: updated });
+};
+
 
   return (
     <div>
