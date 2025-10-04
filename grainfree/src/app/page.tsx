@@ -3,6 +3,7 @@ import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import Image from "next/image"
 import Button from '@/components/ui/button'
+import Link from "next/link"
 
 export default function HomePage() {
   
@@ -203,12 +204,8 @@ export default function HomePage() {
           </p>
 
           {/* Button */}
-          <button
-            className="mt-[20px] inline-block rounded-xl border border-white/40
-                      px-[40px] py-[20px] text-[1rem] font-medium text-black 
-                      bg-[#8EB397] hover:bg-white hover:text-[#3D4F46] 
-                      transition-colors duration-300 shadow-sm">
-            Get Started
+          <button className="mt-[20px] inline-block rounded-xl border border-white/40 px-[40px] py-[20px] text-[1rem] font-medium text-black bg-[#8EB397] hover:bg-white hover:text-[#3D4F46] transition-colors duration-300 shadow-sm">
+            <Link href="/system" className="p-3 hover:text-black transition">Get Started</Link>
           </button>
         </div>
       </div>

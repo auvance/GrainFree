@@ -31,7 +31,7 @@ ${JSON.stringify(answers, null, 2)}
 `;
 
     const response = await client.chat.completions.create({
-      model: "llama-3.1-8b-instant", // ✅ fast + free tier
+      model: "llama-3.1-8b-instant",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.4,
     });
@@ -42,11 +42,17 @@ ${JSON.stringify(answers, null, 2)}
     try {
       parsed = JSON.parse(text);
     } catch {
-      // salvage JSON if wrapped in markdown fences
       const match = text.match(/\{[\s\S]*\}/);
       parsed = match ? JSON.parse(match[0]) : {};
     }
 
+    // 🎯 Derive calorie target from answers
+    let calorieTarget = 2000;
+    if (answers.goal?.includes("Gain healthy weight")) calorieTarget = 2800;
+    if (answers.goal?.includes("Reduce bloating")) calorieTarget = 1800;
+    if (answers.goal?.includes("Energy & stamina")) calorieTarget = 2500;
+
+    // 📝 Save plan
     const { data, error } = await supabase
       .from("healthplans")
       .insert({
@@ -62,6 +68,11 @@ ${JSON.stringify(answers, null, 2)}
       .single();
 
     if (error) throw error;
+
+    // 📝 Upsert into user profile with calorie_target
+    await supabase
+      .from("profiles")
+      .upsert({ id: userId, calorie_target: calorieTarget }, { onConflict: "id" });
 
     return NextResponse.json({ success: true, plan: data });
   } catch (err: any) {
