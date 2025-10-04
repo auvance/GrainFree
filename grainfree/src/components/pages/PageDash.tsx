@@ -74,11 +74,10 @@ export default function DashboardPage() {
         m.eaten_at &&
         new Date(m.eaten_at).toDateString() === today
     );
-  
-    const totalCalories = todaysMeals.reduce((sum, m) => sum + (m.calories || 0), 0);
-    const totalProtein = todaysMeals.reduce((sum, m) => sum + (m.protein || 0), 0);
-    const totalCarbs = todaysMeals.reduce((sum, m) => sum + (m.carbs || 0), 0);
-    const totalFat = todaysMeals.reduce((sum, m) => sum + (m.fat || 0), 0);
+    const totalCalories = todaysMeals.reduce(
+      (sum, m) => sum + (m.calories || 0),
+      0
+    );
     const streak = calculateStreak(meals);
   
     setStats((prev) => ({
@@ -86,33 +85,10 @@ export default function DashboardPage() {
       caloriesToday: totalCalories,
       mealsLogged: todaysMeals.length,
       streak,
-      protein: totalProtein,
-      carbs: totalCarbs,
-      fat: totalFat,
     }));
   };
   
-  // ─── Calculate streak based on consecutive days with completed meals ──────────────
-const calculateStreak = (meals: any[]) => {
-  const dates = [...new Set(
-    meals
-      .filter((m) => m.completed && m.eaten_at)
-      .map((m) => new Date(m.eaten_at).toDateString())
-  )].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-
-  let streak = 0;
-  for (let i = 0; i < dates.length; i++) {
-    if (
-      i === 0 ||
-      (new Date(dates[i - 1]).getTime() - new Date(dates[i]).getTime()) /
-        86400000 ===
-        1
-    ) {
-      streak++;
-    } else break;
-  }
-  return streak;
-};
+  
 
   // ─── Handle Meal Add ──────────────────────────────────────────
   const handleMealAdded = (newMeal: any) => {
