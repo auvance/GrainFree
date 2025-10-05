@@ -16,18 +16,39 @@ type Recipe = {
 
 export default function GrainFreeHub() {
   const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("All");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
 
   const SPOONACULAR_KEY = process.env.NEXT_PUBLIC_SPOONACULAR_KEY;
 
-  // ─── Fetch gluten-free recipes ───────────────────────────────
-  const fetchRecipes = async (searchQuery?: string) => {
+  const filters = [
+    "All",
+    "Breakfast",
+    "Lunch",
+    "Dinner",
+    "Snacks",
+    "Vegetarian",
+    "Vegan",
+    "Low Carb",
+    "High Protein",
+    "Dairy Free",
+  ];
+
+  // ─── Fetch Recipes ───────────────────────────────────────────────
+  const fetchRecipes = async (searchQuery?: string, filterType?: string) => {
     try {
       setLoading(true);
-      const url = `https://api.spoonacular.com/recipes/complexSearch?query=${
-        searchQuery || "gluten free"
-      }&number=12&addRecipeNutrition=true&diet=gluten%20free&apiKey=${SPOONACULAR_KEY}`;
+
+      const queryTerm =
+        filterType && filterType !== "All"
+          ? `${searchQuery || "gluten free"} ${filterType}`
+          : searchQuery || "gluten free";
+
+      const url = `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(
+        queryTerm
+      )}&number=12&addRecipeNutrition=true&diet=gluten%20free&apiKey=${SPOONACULAR_KEY}`;
+
       const res = await fetch(url);
       const data = await res.json();
       setRecipes(data.results || []);
@@ -39,13 +60,19 @@ export default function GrainFreeHub() {
   };
 
   useEffect(() => {
-    fetchRecipes(); // Default load
+    fetchRecipes();
   }, []);
 
-  // ─── Handle search ───────────────────────────────────────────
+  // ─── Handle Search Submit ────────────────────────────────────────
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchRecipes(query);
+    fetchRecipes(query, filter);
+  };
+
+  // ─── Handle Dropdown Change ──────────────────────────────────────
+  const handleFilterChange = (value: string) => {
+    setFilter(value);
+    fetchRecipes(query, value);
   };
 
   return (
@@ -63,10 +90,10 @@ export default function GrainFreeHub() {
           everything in between.
         </p>
 
-        {/* Search Bar */}
+        {/* Search Bar with Dropdown */}
         <form
           onSubmit={handleSearch}
-          className="mt-10 flex justify-center w-full max-w-xl mx-auto"
+          className="mt-10 flex justify-center w-full max-w-2xl mx-auto gap-3"
         >
           <input
             type="text"
@@ -75,6 +102,17 @@ export default function GrainFreeHub() {
             onChange={(e) => setQuery(e.target.value)}
             className="w-full rounded-full px-6 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#009B3E]"
           />
+          <select
+            value={filter}
+            onChange={(e) => handleFilterChange(e.target.value)}
+            className="rounded-full border border-gray-300 px-4 py-3 text-gray-700 focus:ring-2 focus:ring-[#009B3E] bg-white"
+          >
+            {filters.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </form>
       </section>
 
@@ -105,7 +143,7 @@ export default function GrainFreeHub() {
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">
+                    <h3 className="font-semibold text-lg mb-1 truncate">
                       {recipe.title}
                     </h3>
                     <p className="text-sm text-gray-500 mb-2">
