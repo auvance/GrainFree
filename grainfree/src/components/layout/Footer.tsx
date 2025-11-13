@@ -32,12 +32,12 @@ export default function Footer() {
             
             <section className="flex flex-col gap-30 mb-8 mx-auto w-11/12">
                 <div className="text-[#658273] grid grid-cols-2 gap-5 font-normal font-[AeonikArabic]">
-                    <Link href="/system" className="">Get Started</Link>
-                    <Link href="/dash" className="">Privacy Policy</Link>
-                    <Link href="/grainhub" className="">Donate ❥</Link>
-                    <Link href="/about" className="">Terms & Conditions</Link>
-                    <Link href="/help" className="">Github</Link>
-                    <Link href="/help" className="">Help Center</Link>
+                    <Link href="/system" className="" prefetch>Get Started</Link>
+                    <Link href="/dash" className="" prefetch>Privacy Policy</Link>
+                    <Link href="/grainhub" className="" prefetch>Donate ❥</Link>
+                    <Link href="/about" className="" prefetch>Terms & Conditions</Link>
+                    <Link href="/help" className="" prefetch>Github</Link>
+                    <Link href="/help" className="" prefetch>Help Center</Link>
                 </div>
 
                 <p className="text-[#658273] font-normal font-[AeonikArabic]">@GrainFree 2025. All Rights Reserved</p>

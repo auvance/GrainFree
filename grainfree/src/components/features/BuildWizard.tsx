@@ -127,6 +127,7 @@ export default function BuildWizard() {
     setLoading(true);
     try {
       const res = await fetch("/api/test-groq", {
+        next: {revalidate: 3600},
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, answers }),

@@ -1,24 +1,38 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
+import Image from "next/image";
 
-type Recipe = {
-  id: number;
-  title: string;
-  image: string;
-  readyInMinutes: number;
+type Item = {
+  id?: number;
+  code?: string;
+  title?: string;
+  product_name?: string;
+  image?: string;
+  image_front_url?: string;
+  readyInMinutes?: number;
   nutrition?: {
     nutrients?: { name: string; amount: number; unit: string }[];
   };
+  nutriments?: {
+    "energy-kcal"?: number;
+    proteins?: number;
+    carbohydrates?: number;
+    fat?: number;
+  };
+  type: "meal" | "product";
 };
 
-export default function GrainFreeHub() {
+export default function PageGrainfreehub() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [source, setSource] = useState<"meals" | "products">("meals");
+  const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState(false);
 
   const SPOONACULAR_KEY = process.env.NEXT_PUBLIC_SPOONACULAR_KEY;
 
@@ -33,132 +47,270 @@ export default function GrainFreeHub() {
     "Low Carb",
     "High Protein",
     "Dairy Free",
+    "Nut Free",
+    "Fish Free",
   ];
 
-  // ─── Fetch Recipes ───────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────────
+  // Fetch Spoonacular Meals
+  // ────────────────────────────────────────────────────────────
   const fetchRecipes = async (searchQuery?: string, filterType?: string) => {
     try {
       setLoading(true);
+      setApiError(false);
 
-      const queryTerm =
-        filterType && filterType !== "All"
-          ? `${searchQuery || "gluten free"} ${filterType}`
-          : searchQuery || "gluten free";
+      const baseQuery = searchQuery?.trim() || "healthy";
+      let dietParam: string | undefined;
+      let intolerancesParam: string | undefined;
+      let suffix = "";
 
-      const url = `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(
-        queryTerm
-      )}&number=12&addRecipeNutrition=true&diet=gluten%20free&apiKey=${SPOONACULAR_KEY}`;
+      switch ((filterType || "All").toLowerCase()) {
+        case "all":
+          break;
+        case "breakfast":
+        case "lunch":
+        case "dinner":
+        case "snacks":
+          suffix = ` ${filterType!.toLowerCase()}`;
+          break;
+        case "vegetarian":
+          dietParam = "vegetarian";
+          break;
+        case "vegan":
+          dietParam = "vegan";
+          break;
+        case "low carb":
+          dietParam = "ketogenic";
+          break;
+        case "high protein":
+          suffix = " high protein";
+          break;
+        case "dairy free":
+          intolerancesParam = "dairy";
+          break;
+        case "nut free":
+          intolerancesParam = "peanut,tree nut";
+          break;
+        case "fish free":
+          intolerancesParam = "fish";
+          break;
+      }
 
-      const res = await fetch(url);
+      const url = new URL("https://api.spoonacular.com/recipes/complexSearch");
+      url.searchParams.set("query", `${baseQuery}${suffix}`.trim());
+      url.searchParams.set("number", "12");
+      url.searchParams.set("addRecipeNutrition", "true");
+      url.searchParams.set("apiKey", String(SPOONACULAR_KEY));
+      if (dietParam) url.searchParams.set("diet", dietParam);
+      if (intolerancesParam)
+        url.searchParams.set("intolerances", intolerancesParam);
+
+      const res = await fetch(url.toString());
+
+      if ([402, 429, 401].includes(res.status)) {
+        setApiError(true);
+        setItems([]);
+        return;
+      }
+
       const data = await res.json();
-      setRecipes(data.results || []);
-    } catch (error) {
-      console.error("Error fetching recipes:", error);
+      setItems(
+        (data.results || []).map((r: any) => ({
+          ...r,
+          type: "meal",
+        }))
+      );
+    } catch (err) {
+      console.error("Recipe fetch error:", err);
+      setApiError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchRecipes();
-  }, []);
+  // ────────────────────────────────────────────────────────────
+  // Fetch OpenFoodFacts Products
+  // ────────────────────────────────────────────────────────────
+  const fetchProducts = async (searchQuery?: string) => {
+    try {
+      setLoading(true);
+      setApiError(false);
 
-  // ─── Handle Search Submit ────────────────────────────────────────
+      const q = searchQuery?.trim() || "gluten-free";
+
+      const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(
+        q
+      )}&tagtype_0=labels&tag_contains_0=contains&tag_0=gluten-free&json=1&page_size=12`;
+
+      const res = await fetch(url, {
+        next: { revalidate: 3600 } // cache for 1 hour
+      });
+      if (!res.ok) throw new Error("Failed to fetch products");
+
+      const data = await res.json();
+
+      setItems(
+        (data.products || []).map((p: any) => ({
+          ...p,
+          type: "product",
+        }))
+      );
+    } catch (err) {
+      console.error("Product fetch error:", err);
+      setApiError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ────────────────────────────────────────────────────────────
+  // Event Handlers
+  // ────────────────────────────────────────────────────────────
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchRecipes(query, filter);
+    source === "products" ? fetchProducts(query) : fetchRecipes(query, filter);
   };
 
-  // ─── Handle Dropdown Change ──────────────────────────────────────
   const handleFilterChange = (value: string) => {
     setFilter(value);
-    fetchRecipes(query, value);
+    if (source === "meals") fetchRecipes(query, value);
   };
+
+  // ────────────────────────────────────────────────────────────
+  // Load initial data
+  // ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    source === "products" ? fetchProducts() : fetchRecipes();
+  }, [source]);
 
   return (
     <main className="min-h-screen bg-[#FAFAF5] text-black">
       <Header />
 
-      {/* Hero Section */}
       <section className="text-center py-16">
         <h1 className="text-[3.5rem] font-extrabold mb-4">
           <span className="text-black">Grain</span>
           <span className="text-[#009B3E]">FreeHub</span>
         </h1>
-        <p className="text-lg italic text-gray-600 max-w-2xl mx-auto">
-          Search, filter and find what works for you — meals, snacks, and
-          everything in between.
-        </p>
 
-        {/* Search Bar with Dropdown */}
+        {/* Search */}
         <form
           onSubmit={handleSearch}
-          className="mt-10 flex justify-center w-full max-w-2xl mx-auto gap-3"
+          className="mt-10 flex flex-wrap justify-center w-full max-w-3xl mx-auto gap-3"
         >
           <input
             type="text"
-            placeholder="Search for allergen-free foods..."
+            placeholder="Search foods, meals, products..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-full px-6 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#009B3E]"
+            className="flex-grow rounded-full px-6 py-3 border border-gray-300 focus:ring-2 focus:ring-[#009B3E]"
           />
+
+          {/* Source Toggle */}
+          <select
+            value={source}
+            onChange={(e) =>
+              setSource(e.target.value as "meals" | "products")
+            }
+            className="rounded-full border border-gray-300 px-4 py-3 bg-white"
+          >
+            <option value="meals">Meals</option>
+            <option value="products">Products</option>
+          </select>
+
+          {/* Filters (Meals only) */}
           <select
             value={filter}
+            disabled={source === "products"}
             onChange={(e) => handleFilterChange(e.target.value)}
-            className="rounded-full border border-gray-300 px-4 py-3 text-gray-700 focus:ring-2 focus:ring-[#009B3E] bg-white"
+            className="rounded-full border border-gray-300 px-4 py-3 bg-white disabled:opacity-40"
           >
-            {filters.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
+            {filters.map((f) => (
+              <option key={f}>{f}</option>
             ))}
           </select>
         </form>
       </section>
 
-      {/* Results Section */}
-      <section className="max-w-7xl mx-auto px-6 pb-16">
+      {/* Results */}
+      <section className="max-w-7xl mx-auto px-6 pb-20">
         {loading ? (
-          <p className="text-center text-gray-600">Loading recipes...</p>
-        ) : recipes.length === 0 ? (
-          <p className="text-center text-gray-600">
-            No results found. Try another search.
-          </p>
+          <p className="text-center text-gray-600">Loading...</p>
+        ) : apiError ? (
+          <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
+            <h2 className="text-3xl font-bold text-[#009B3E] mb-3">
+              API Limit Reached
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Spoonacular or OpenFoodFacts has stopped responding.  
+              Support the project to keep data flowing ❤️
+            </p>
+            <a
+              href="https://buymeacoffee.com/auvance"
+              target="_blank"
+              className="px-6 py-3 bg-[#009B3E] text-white rounded-full font-semibold hover:bg-[#007d32]"
+            >
+              Support GrainFreeHub
+            </a>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {recipes.map((recipe) => {
+            {items.map((item) => {
+              const title =
+                item.title ||
+                item.product_name ||
+                item.code ||
+                "Untitled";
+
+              const image =
+                item.image ||
+                item.image_front_url ||
+                "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg";
+
               const calories =
-                recipe.nutrition?.nutrients?.find(
+                item.nutrition?.nutrients?.find(
                   (n) => n.name === "Calories"
-                )?.amount || 0;
+                )?.amount ||
+                item.nutriments?.["energy-kcal"] ||
+                0;
+
+              const link =
+                item.type === "meal"
+                  ? `/meal?id=${item.id}`
+                  : `/product?id=${item.code}`;
 
               return (
-                <div
-                  key={recipe.id}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 hover:shadow-lg transition"
+                <Link
+                  href={link}
+                  key={item.id || item.code}
+                  className="block bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 hover:shadow-lg hover:scale-[1.01] transition transform"
                 >
-                  <img
-                    src={recipe.image}
-                    alt={recipe.title}
+                  <Image
+                    src={image}
+                    alt={title}
+                    width={400}
+                    height={192}
                     className="w-full h-48 object-cover"
                   />
+
                   <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1 truncate">
-                      {recipe.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-2">
-                      Ready in {recipe.readyInMinutes} min
+                    <p className="text-xs uppercase text-gray-400 mb-1">
+                      {item.type === "product" ? "Product" : "Meal"}
                     </p>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#009B3E] font-medium">
-                        {Math.round(calories)} kcal
-                      </span>
-                      <button className="text-[#009B3E] hover:underline">
-                        View Details →
-                      </button>
-                    </div>
+
+                    <h3 className="font-semibold text-lg truncate">{title}</h3>
+
+                    {item.readyInMinutes && (
+                      <p className="text-sm text-gray-500">
+                        Ready in {item.readyInMinutes} min
+                      </p>
+                    )}
+
+                    <span className="text-[#009B3E] font-medium">
+                      {Math.round(calories)} kcal
+                    </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

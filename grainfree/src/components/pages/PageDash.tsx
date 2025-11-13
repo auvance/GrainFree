@@ -65,6 +65,34 @@ export default function DashboardPage() {
     fetchMeals();
   }, [user]);
 
+  // ─── Calculate streak based on consecutive days with completed meals ──────────────
+const calculateStreak = (meals: any[]) => {
+  const completedMeals = meals.filter((m) => m.completed && m.eaten_at);
+  if (completedMeals.length === 0) return 0;
+
+  // Extract unique dates
+  const uniqueDates = [...new Set(
+    completedMeals.map((m) => new Date(m.eaten_at).toDateString())
+  )].sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  );
+
+  let streak = 1;
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const current = new Date(uniqueDates[i]);
+    const previous = new Date(uniqueDates[i - 1]);
+    const diffDays = Math.floor(
+      (previous.getTime() - current.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (diffDays === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  return streak;
+};
+
   // ─── Update Stats ─────────────────────────────────────────────
   const updateStats = (meals: any[]) => {
     const today = new Date().toDateString();
@@ -121,7 +149,7 @@ export default function DashboardPage() {
   return (
     <main className="bg-gradient-to-b from-[#2F4339] to-[#496256] min-h-screen text-white">
       <Header />
-
+    
       <section className="px-30 py-25 mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="w-170">

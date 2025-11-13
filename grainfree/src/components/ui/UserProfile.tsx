@@ -54,14 +54,14 @@ export default function UserProfile({ user, loading }: UserProfileProps) {
                     Account Preferences
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     href="/account"
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
                     Profile Settings
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <button
                     onClick={() => supabase.auth.signOut()}

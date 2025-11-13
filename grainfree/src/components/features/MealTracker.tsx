@@ -37,7 +37,8 @@ export default function MealTracker({
       try {
         setLoading(true);
         const res = await fetch(
-          `https://api.spoonacular.com/recipes/complexSearch?query=${newMeal.name}&number=5&addRecipeNutrition=true&apiKey=${SPOONACULAR_KEY}`
+          `https://api.spoonacular.com/recipes/complexSearch?query=${newMeal.name}&number=5&addRecipeNutrition=true&apiKey=${SPOONACULAR_KEY}`,
+          { next: { revalidate: 3600 } }
         );
         const data = await res.json();
         setSuggestions(data.results || []);

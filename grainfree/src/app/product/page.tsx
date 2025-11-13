@@ -1,5 +1,10 @@
-import PageProduct from '@/components/pages/PageProduct'
+import { Suspense } from 'react';
+import PageProduct from '@/components/pages/PageProduct';
 
 export default function AboutPage() {
-  return <PageProduct />
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageProduct />
+    </Suspense>
+  );
 }

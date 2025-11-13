@@ -52,11 +52,11 @@ export default function Header() {
           <div>
             <nav className="flex flex-row items-center [@media(min-width:1400px)]:gap-7 [@media(min-width:1500px)]:gap-20 pr-8 pl-8 bg-[#ffffff3d] text-[#4A4A4A] font-normal font-[AeonikArabic] border-1 border-[#E6E6E6] rounded-xl">
               
-              <Link href="/system" className="p-3 hover:text-black transition">Get Started</Link>
-              <Link href="/dash" className="p-3 hover:text-black transition">Dashboard</Link>
-              <Link href="/grainhub" className="p-3 hover:text-black transition">GrainFreeHub</Link>
-              <Link href="/about" className="p-3 hover:text-black transition">Learn More</Link>
-              <Link href="/help" className="p-3 hover:text-black transition">Help Center</Link>
+              <Link href="/system" className="p-3 hover:text-black transition" prefetch>Get Started</Link>
+              <Link href="/dash" className="p-3 hover:text-black transition" prefetch>Dashboard</Link>
+              <Link href="/grainhub" className="p-3 hover:text-black transition" prefetch>GrainFreeHub</Link>
+              <Link href="/about" className="p-3 hover:text-black transition" prefetch>Learn More</Link>
+              <Link href="/help" className="p-3 hover:text-black transition" prefetch>Help Center</Link>
               {/* Profile/Login Icon */}
               <UserProfile user={user} loading={loading} />
               
