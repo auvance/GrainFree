@@ -10,14 +10,15 @@ import MealTracker from "@/components/features/MealTracker";
 import GoalsSection from "@/components/features/GoalsSection";
 import Recommendations from "@/components/features/Recommendations";
 import SavedMeals from "@/components/features/SavedMeals";
+import SavedProducts from "@/components/features/SavedProducts";
 import Header from "../layout/Header";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const [plan, setPlan] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<
-    "meals" | "goals" | "recommendations" | "saved"
-  >("meals");
+     "meals" | "goals" | "recommendations" | "savedMeals" | "savedProducts">
+    ("meals");
   const [showModal, setShowModal] = useState(false);
   const [meals, setMeals] = useState<any[]>([]);
   const [stats, setStats] = useState({
@@ -141,10 +142,12 @@ const calculateStreak = (meals: any[]) => {
       { id: "meals", label: "Meal Tracker" },
       { id: "goals", label: "My Goals" },
       { id: "recommendations", label: "Recommendations" },
-      { id: "saved", label: "Saved Meals" },
+      { id: "savedMeals", label: "Saved Meals" },
+      { id: "savedProducts", label: "Saved Products" },
     ],
     []
   );
+  
 
   return (
     <main className="bg-gradient-to-b from-[#2F4339] to-[#496256] min-h-screen text-white">
@@ -191,13 +194,14 @@ const calculateStreak = (meals: any[]) => {
           {plan ? (
             <>
               {activeTab === "meals" && (
-                <MealTracker meals={meals} onMealAdded={handleMealAdded} />
+              <MealTracker meals={meals} onMealAdded={handleMealAdded} />
               )}
               {activeTab === "goals" && <GoalsSection goals={plan.goals} />}
               {activeTab === "recommendations" && (
                 <Recommendations items={plan.recommendations} />
               )}
-              {activeTab === "saved" && <SavedMeals />}
+              {activeTab === "savedMeals" && <SavedMeals />}
+              {activeTab === "savedProducts" && <SavedProducts />}
             </>
           ) : (
             <p className="text-gray-300">

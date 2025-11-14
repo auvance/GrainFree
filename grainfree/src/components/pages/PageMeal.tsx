@@ -172,7 +172,7 @@ export default function PageMeal() {
                     {meal.extendedIngredients.map((ing, index) => (
                       <Link
                         key={`${ing.id}-${index}-${ing.name}`}
-                        href={`/product?id=${encodeURIComponent(ing.name)}`}
+                        href={`/product-search?name=${encodeURIComponent(ing.name)}`}
                         className="flex items-center gap-4 bg-[#F4F6F4] border border-gray-200 rounded-lg p-3 hover:bg-[#E0EFE6] transition"
                       >
                         <Image
