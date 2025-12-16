@@ -112,7 +112,7 @@ const markAsEaten = async (mealId: string) => {
     <div>
       {/* Header */}
 
-      <div className=" bg-[#2C4435] pt-15 pb-15 pl-10 pr-10 mb-6 rounded-[20px]">
+      <div className=" bg-[#2C4435] pt-10 pb-10 pl-15 pr-15 mb-6 rounded-[20px]">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-[2rem] font-[AeonikArabic] font-semibold">Today's Meals</h2>
@@ -239,7 +239,7 @@ const markAsEaten = async (mealId: string) => {
           return (
             <div
               key={mealType}
-              className="bg-[#2C4435] text-[1.5rem] border border-white/10 pt-15 py-15 pr-10 pl-10 rounded-[20px]"
+              className="bg-[#2C4435] text-[1.5rem] border border-white/10 pt-10 pb-10 pl-15 pr-15 rounded-[20px]"
             >
               <h3 className="font-semibold mb-2 font-[AeonikArabic]">{mealType}</h3>
               {logged.length > 0 ? (

@@ -50,26 +50,26 @@ export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
   return (
     <div className="space-y-10">
       {/* Section 1: Your Health Goals */}
-      <section className="bg-white/5 backdrop-blur-md rounded-xl p-6 md:p-8">
+      <section className="bg-[#2C4435] backdrop-blur-md rounded-xl pt-10 pb-10 pr-15 pl-15">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">
+            <h2 className="font-[AeonikArabic] text-2xl md:text-3xl font-bold mb-2">
               Your Health Goals
             </h2>
-            <p className="text-gray-300 max-w-xl">
+            <p className="font-[AeonikArabic] italic text-[1.3rem] text-white/90-300 w-105">
               Track your progress towards achieving your personalized health
               objectives.
             </p>
           </div>
           <div className="mt-4 md:mt-0 text-right max-w-sm">
-            <p className="text-sm text-gray-300 mb-2">★ Want to Start Over?</p>
-            <p className="text-xs text-gray-400 mb-2">
+            <p className="font-[AeonikArabic] text-[1.1rem] text-white mb-2">★ Want to Start Over?</p>
+            <p className="font-[AeonikArabic] text-[0.85rem] text-white/90 w-75 mb-2">
               Your needs change — and so should your plan. If you’d like to
               rebuild from scratch, we’ve got you.
             </p>
             <button
               onClick={handleStartFresh}
-              className="px-4 py-2 rounded-lg bg-[#3D4F46] hover:bg-[#2d3a34] text-white text-sm"
+              className="px-8 py-3 mt-5 rounded-lg font-[AeonikArabic] bg-[#3D4F46] hover:bg-[#2d3a34] text-white text-sm"
             >
               Start Fresh
             </button>
@@ -77,11 +77,11 @@ export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
         </div>
 
         {/* Goals as pill-like cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="flex justify-center gap-7 mt-20 mb-10">
           {toRender.map((goal) => (
             <div
               key={goal.title}
-              className="px-4 py-3 rounded-lg bg-white/10 text-center text-white text-sm font-medium"
+              className="px-8 py-5 rounded-lg bg-[#47674E] font-[AeonikArabic] italic text-center text-white/70 text-sm font-normal"
             >
               {goal.title}
             </div>
@@ -90,7 +90,7 @@ export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
       </section>
 
       {/* Section 2: Active Goals */}
-      <section className="bg-white/5 backdrop-blur-md rounded-xl p-6 md:p-8">
+      <section className="bg-[#2C4435] backdrop-blur-md rounded-xl p-6 md:p-8">
         <h2 className="text-2xl font-bold mb-6">Active Goals</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {toRender.map((goal) => (
