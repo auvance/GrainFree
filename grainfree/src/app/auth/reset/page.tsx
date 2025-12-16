@@ -13,7 +13,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#FAFAF5]">
+    <main className="flex min-h-screen items-center justify-center bg-[#FAFAF5] font-[AeonikArabic]">
       <div className="bg-white p-8 rounded-lg shadow w-full max-w-sm">
         <h1 className="text-xl font-bold mb-4">Reset Password</h1>
         <input

@@ -171,7 +171,7 @@ export default function BuildWizard() {
           </p>
           <button
             onClick={() => setStarted(true)}
-            className="font-[AeonikArabic] px-20 py-3 rounded-lg bg-[#4B7C57] hover:bg-[#3E824F] text-[#25332A] text-lg font-normal shadow"
+            className="font-[AeonikArabic] px-20 py-3 rounded-lg bg-[#65A775] hover:bg-[#3E824F] text-[#25332A] text-lg font-normal shadow"
           >
             Start!
           </button>

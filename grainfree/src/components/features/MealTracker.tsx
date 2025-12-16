@@ -111,31 +111,33 @@ const markAsEaten = async (mealId: string) => {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold">Today's Meals</h2>
-          <p className="text-sm text-gray-300">
-            Track your daily meals and mark them when eaten.
-          </p>
+
+      <div className=" bg-[#2C4435] pt-15 pb-15 pl-10 pr-10 mb-6 rounded-[20px]">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-[2rem] font-[AeonikArabic] font-semibold">Today's Meals</h2>
+            <p className="text-[1.2rem] font-[AeonikArabic] text-gray-300">
+              Track your daily meals and mark them when eaten.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-10 py-5 text-sm rounded-lg bg-[#223528] text-[1rem] font-[AeonikArabic]"
+          >
+            Create New Meal
+          </button>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-4 py-2 text-sm rounded-lg bg-white/10 hover:bg-white/20"
-        >
-          Create New Meal
-        </button>
-      </div>
 
       {/* Add Meal Form */}
       {showForm && (
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6 relative">
+      <div className="mt-6 relative">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
               type="text"
-              placeholder="Meal Name"
+              placeholder="Enter Meal Name"
               value={newMeal.name || ""}
               onChange={(e) => setNewMeal({ ...newMeal, name: e.target.value })}
-              className="px-3 py-2 rounded bg-white/10 border border-white/20 outline-none"
+              className="px-3 py-2 rounded bg-[#3A5340]"
             />
             <input
               type="number"
@@ -144,7 +146,7 @@ const markAsEaten = async (mealId: string) => {
               onChange={(e) =>
                 setNewMeal({ ...newMeal, calories: Number(e.target.value) })
               }
-              className="px-3 py-2 rounded bg-white/10 border border-white/20 outline-none"
+              className="px-3 py-2 rounded bg-[#3A5340]"
             />
             {suggestions.length > 0 && (
               <div className="absolute top-12 left-0 w-full bg-[#223528] border border-white/10 rounded-lg z-50">
@@ -185,7 +187,7 @@ const markAsEaten = async (mealId: string) => {
               onChange={(e) =>
                 setNewMeal({ ...newMeal, type: e.target.value as Meal["type"] })
               }
-              className="px-3 py-2 rounded bg-white/10 border border-white/20 outline-none"
+              className="px-3 py-2 rounded bg-[#3A5340] "
             >
               <option value="">Select Type</option>
               {mealTypes.map((t) => (
@@ -199,14 +201,14 @@ const markAsEaten = async (mealId: string) => {
               type="time"
               value={newMeal.time || ""}
               onChange={(e) => setNewMeal({ ...newMeal, time: e.target.value })}
-              className="px-3 py-2 rounded bg-white/10 border border-white/20 outline-none"
+              className="px-3 py-2 rounded bg-[#3A5340]"
             />
           </div>
 
           <div className="flex gap-3 mt-4">
             <button
               onClick={handleAddMeal}
-              className="px-4 py-2 rounded-lg bg-[#008509] hover:bg-green-700 text-white"
+              className="px-13 py-2 font-[AeonikArabic] rounded-[10px] bg-[#008509] hover:bg-green-700 text-white"
             >
               Add Meal
             </button>
@@ -216,13 +218,16 @@ const markAsEaten = async (mealId: string) => {
                 setNewMeal({});
                 setSuggestions([]);
               }}
-              className="px-4 py-2 rounded-lg bg-red-900/50 hover:bg-red-900/70 text-white"
+              className="px-13 py-2 font-[AeonikArabic] rounded-[10px] bg-[#352225] hover:bg-red-900/70 text-white"
             >
               Cancel
             </button>
           </div>
         </div>
       )}
+      </div>
+
+      
 
       {/* Meals Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -234,9 +239,9 @@ const markAsEaten = async (mealId: string) => {
           return (
             <div
               key={mealType}
-              className="bg-white/5 border border-white/10 p-4 rounded-lg"
+              className="bg-[#2C4435] text-[1.5rem] border border-white/10 pt-15 py-15 pr-10 pl-10 rounded-[20px]"
             >
-              <h3 className="font-semibold mb-2">{mealType}</h3>
+              <h3 className="font-semibold mb-2 font-[AeonikArabic]">{mealType}</h3>
               {logged.length > 0 ? (
                 logged.map((meal) => (
                   <div
@@ -269,7 +274,7 @@ const markAsEaten = async (mealId: string) => {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-400">
+                <p className="text-[1rem] font-[AeonikArabic] text-gray-400 ">
                   No {mealType} logged yet.
                 </p>
               )}

@@ -188,22 +188,25 @@ export default function PageGrainfreehub() {
       <Header />
 
       <section className="text-center py-16">
-        <h1 className="text-[3.5rem] font-extrabold mb-4">
-          <span className="text-black">Grain</span>
-          <span className="text-[#009B3E]">FreeHub</span>
+        <h1 className="text-[5.5rem] font-extrabold">
+          <span className="text-black font-[AeonikArabic]">Grain</span>
+          <span className="text-[#009B3E] font-[AeonikArabic]">FreeHub</span>
         </h1>
+        <p className="text-[1.5rem] font-[AeonikArabic] font-bold text-gray-600">
+          Your ultimate resource for grain-free meals and products.
+        </p>
 
         {/* Search */}
         <form
           onSubmit={handleSearch}
-          className="mt-10 flex flex-wrap justify-center w-full max-w-3xl mx-auto gap-3"
+          className="mt-10 flex flex-wrap justify-center w-full max-w-3xl mx-auto gap-3 font-[AeonikArabic]"
         >
           <input
             type="text"
             placeholder="Search foods, meals, products..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-grow rounded-full px-6 py-3 border border-gray-300 focus:ring-2 focus:ring-[#009B3E]"
+            className="flex-grow rounded-full px-6 py-3 border border-gray-300 focus:ring-2 focus:ring-[#009B3E] font-[AeonikArabic]"
           />
 
           {/* Source Toggle */}
@@ -212,7 +215,7 @@ export default function PageGrainfreehub() {
             onChange={(e) =>
               setSource(e.target.value as "meals" | "products")
             }
-            className="rounded-full border border-gray-300 px-4 py-3 bg-white"
+            className="rounded-full border border-gray-300 px-4 py-3 bg-white font-[AeonikArabic]"
           >
             <option value="meals">Meals</option>
             <option value="products">Products</option>
@@ -223,7 +226,7 @@ export default function PageGrainfreehub() {
             value={filter}
             disabled={source === "products"}
             onChange={(e) => handleFilterChange(e.target.value)}
-            className="rounded-full border border-gray-300 px-4 py-3 bg-white disabled:opacity-40"
+            className="rounded-full border border-gray-300 px-4 py-3 bg-white disabled:opacity-40 font-[AeonikArabic]"
           >
             {filters.map((f) => (
               <option key={f}>{f}</option>
@@ -235,26 +238,26 @@ export default function PageGrainfreehub() {
       {/* Results */}
       <section className="max-w-7xl mx-auto px-6 pb-20">
         {loading ? (
-          <p className="text-center text-gray-600">Loading...</p>
+          <p className="text-center text-gray-600 font-[AeonikArabic]">Loading...</p>
         ) : apiError ? (
           <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
-            <h2 className="text-3xl font-bold text-[#009B3E] mb-3">
+            <h2 className="text-3xl font-bold text-[#009B3E] mb-3 font-[AeonikArabic]">
               API Limit Reached
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 font-[AeonikArabic]">
               Spoonacular or OpenFoodFacts has stopped responding.  
               Support the project to keep data flowing ❤️
             </p>
             <a
               href="https://buymeacoffee.com/auvance"
               target="_blank"
-              className="px-6 py-3 bg-[#009B3E] text-white rounded-full font-semibold hover:bg-[#007d32]"
+              className="px-6 py-3 bg-[#009B3E] text-white rounded-full font-semibold hover:bg-[#007d32] font-[AeonikArabic]"
             >
               Support GrainFreeHub
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 font-[AeonikArabic]">
             {items.map((item) => {
               const title =
                 item.title ||

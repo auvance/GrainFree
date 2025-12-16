@@ -155,13 +155,13 @@ const calculateStreak = (meals: any[]) => {
     
       <section className="px-30 py-25 mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div className="w-170">
-            <h1 className="font-[AeonikArabic] text-[4rem] font-bold">Your Dashboard</h1>
-            <p className="text-[1.5rem] font-[AeonikArabic] font-semibold text-gray-200">
-              Welcome back
+          <div className="w-200">
+            <h1 className="font-[AeonikArabic] text-[6rem] font-bold">Your Dashboard</h1>
+            <p className="text-[2.5rem] font-[AeonikArabic] font-semibold">
+              Welcome, 
               {user?.user_metadata?.username ? `, ${user.user_metadata.username}` : ""}!
             </p>
-            <p className="text-[1.5rem] font-[AeonikArabic] text-[#C5C5C5]">
+            <p className="text-[1.5rem] font-[AeonikArabic] text-[#C5C5C5] w-130  text-white/90">
               Your personal dashboard of all the curated foods that we specifically designed for you.
             </p>
           </div>
@@ -181,8 +181,8 @@ const calculateStreak = (meals: any[]) => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-25 py-2 rounded-2xl text-sm font-medium transition ${
                 activeTab === tab.id
-                  ? "bg-[#212C27] text-white"
-                  : "bg-[#304039] text-gray-300 hover:bg-white/10 hover:text-white"
+                  ? "bg-[#212C27] text-white font-[AeonikArabic]"
+                  : "bg-[#304039] text-gray-300 font-normal hover:bg-white/10 hover:text-white font-[AeonikArabic]"
               }`}
             >
               {tab.label}
@@ -190,7 +190,7 @@ const calculateStreak = (meals: any[]) => {
           ))}
         </div>
 
-        <div className="bg-[#2C4435] backdrop-blur-md rounded-xl p-6">
+        <div className="bg-transparent backdrop-blur-md rounded-xl p-6">
           {plan ? (
             <>
               {activeTab === "meals" && (
@@ -204,7 +204,7 @@ const calculateStreak = (meals: any[]) => {
               {activeTab === "savedProducts" && <SavedProducts />}
             </>
           ) : (
-            <p className="text-gray-300">
+            <p className="text-gray-300 font-[AeonikArabic] font-bold">
               No plan yet. Please build one to get started.
             </p>
           )}
