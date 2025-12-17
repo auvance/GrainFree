@@ -12,6 +12,7 @@ import Recommendations from "@/components/features/Recommendations";
 import SavedMeals from "@/components/features/SavedMeals";
 import SavedProducts from "@/components/features/SavedProducts";
 import Header from "../layout/Header";
+import Image from "next/image";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -149,6 +150,8 @@ const calculateStreak = (meals: any[]) => {
   );
   
 
+  const imageHome = "/image/Home-SVG.svg";
+
   return (
     <main className="bg-gradient-to-b from-[#2F4339] to-[#496256] min-h-screen text-white">
       <Header />
@@ -157,13 +160,22 @@ const calculateStreak = (meals: any[]) => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="w-200">
             <h1 className="font-[AeonikArabic] text-[6rem] font-bold">Your Dashboard</h1>
-            <p className="text-[2.5rem] font-[AeonikArabic] font-semibold">
-              Welcome, 
-              {user?.user_metadata?.username ? `, ${user.user_metadata.username}` : ""}!
-            </p>
-            <p className="text-[1.5rem] font-[AeonikArabic] text-[#C5C5C5] w-130  text-white/90">
-              Your personal dashboard of all the curated foods that we specifically designed for you.
-            </p>
+
+            <div className="flex items-center gap-8">
+              <div>
+                <Image src={imageHome} alt="Home" width={100} height={100} />
+              </div>
+              <div>
+                <p className="text-[2.5rem] font-[AeonikArabic] font-semibold">
+                  Welcome, 
+                  {user?.user_metadata?.username ? `, ${user.user_metadata.username}` : ""}!
+                </p>
+                <p className="text-[1.5rem] font-[AeonikArabic] text-[#C5C5C5] w-130  text-white/90">
+                  Your personal dashboard of all the curated foods that we specifically designed for you.
+                </p>
+              </div>
+            </div>
+
           </div>
           <StatsGrid
             caloriesToday={stats.caloriesToday}

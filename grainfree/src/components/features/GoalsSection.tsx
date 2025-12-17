@@ -50,7 +50,7 @@ export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
   return (
     <div className="space-y-10">
       {/* Section 1: Your Health Goals */}
-      <section className="bg-[#2C4435] backdrop-blur-md rounded-xl pt-10 pb-10 pr-15 pl-15">
+      <section className="bg-[#2C4435] backdrop-blur-md rounded-[20px] pt-10 pb-10 pr-15 pl-15">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
           <div>
             <h2 className="font-[AeonikArabic] text-2xl md:text-3xl font-bold mb-2">
@@ -90,19 +90,19 @@ export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
       </section>
 
       {/* Section 2: Active Goals */}
-      <section className="bg-[#2C4435] backdrop-blur-md rounded-xl p-6 md:p-8">
-        <h2 className="text-2xl font-bold mb-6">Active Goals</h2>
+      <section className="bg-[#2C4435]  backdrop-blur-md rounded-[20px] pt-10 pb-10 pr-15 pl-15">
+        <h2 className="font-[AeonikArabic] text-2xl font-bold mb-6">Active Goals</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {toRender.map((goal) => (
             <div
               key={goal.title}
-              className="bg-white/5 border border-white/10 p-5 rounded-lg"
+              className="bg-[#334E3D] pt-10 pb-10 pr-13 pl-13 rounded-[10px]"
             >
-              <h3 className="font-semibold mb-2">{goal.title}</h3>
-              <p className="text-sm italic text-gray-300 mb-2">
+              <h3 className="font-[AeonikArabic] italic font-semibold mb-2">{goal.title}</h3>
+              <p className="font-[AeonikArabic] text-sm italic text-gray-300 mb-2">
                 Progress – {goal.progress}%
               </p>
-              <div className="w-full bg-white/10 h-2 rounded-full">
+              <div className="w-full bg-[white/10] h-2 rounded-full">
                 <div
                   className="bg-[#008509] h-2 rounded-full transition-all"
                   style={{ width: `${goal.progress}%` }}

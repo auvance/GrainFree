@@ -16,7 +16,10 @@ const toRender: Recommendation[] = items.length ? items : fallback;
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6">Recommended For You</h2>
+      <div className="bg-[#2C4435] pt-8 pb-8 pr-15 pl-15 font-[AeonikArabic] mb-6 rounded-[20px]">
+        <h2 className="text-3xl font-semibold">Recommended For You</h2>
+        <p>Based on your dietary preferences and past meals.</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {toRender.map((item) => (
           <div

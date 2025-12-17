@@ -132,12 +132,12 @@ export default function Header() {
 
             {/* Right: links bottom-right */}
             <div className="relative px-8 py-8">
-              <div className="absolute bottom-6 right-8 space-y-2 text-xs md:text-sm text-[#C9D3CF] text-right">
+              <div className="font-[AeonikArabic] absolute bottom-6 right-8 space-y-2 text-[1rem] text-[#C9D3CF] text-right">
                 <Link href="https://github.com" className="block hover:text-white transition" onClick={() => setOpen(false)}>Github</Link>
                 <Link href="/donate" className="block hover:text-white transition" onClick={() => setOpen(false)}>Donate</Link>
                 <Link href="/privacy" className="block hover:text-white transition" onClick={() => setOpen(false)}>Privacy Policy</Link>
                 <Link href="/terms" className="block hover:text-white transition" onClick={() => setOpen(false)}>Terms & Condition</Link>
-                <p className="pt-2 text-[11px] opacity-80">@GrainFree 2025</p>
+                <p className="pt-2 text-[20px] opacity-80">@GrainFree 2025</p>
               </div>
             </div>
           </div>
