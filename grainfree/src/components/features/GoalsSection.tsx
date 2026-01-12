@@ -44,7 +44,7 @@ export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
     }
 
     // Redirect to build wizard
-    router.push("/build");
+    router.push("/system");
   };
 
   return (

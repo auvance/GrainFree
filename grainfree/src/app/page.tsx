@@ -1,5 +1,5 @@
 'use client'
-import Header from "@/components/layout/Header"
+import Header from "@/components/layout/Header/Header"
 import Footer from "@/components/layout/Footer"
 import Image from "next/image"
 import Button from '@/components/ui/button'
@@ -15,7 +15,7 @@ export default function HomePage() {
     <section className="">
       <div className="relative inline-block flex">
         {/* Tag */}
-        <div className="| [@media(min-width:1400px)]:pt-70 | [@media(min-width:1500px)]:pt-140">
+        <div className="| [@media(min-width:1400px)]:pt-100 | [@media(min-width:1500px)]:pt-140">
           <div className="absolute right-0 bottom-[-20] w-60">
             <div className="rounded bg-[#517F58] px-4 py-2 text-white drop-shadow-[6px_6px_0px_#3D4F46]">
               <p className="text-[12px] leading-tight font-[AeonikArabic]">

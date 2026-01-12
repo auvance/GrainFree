@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/providers/AuthProvider";
+import Header from "@/components/layout/Header/Header";
 
 import StatsGrid from "@/components/features/StatsGrid";
 import MealTracker from "@/components/features/MealTracker";
@@ -11,7 +12,6 @@ import GoalsSection from "@/components/features/GoalsSection";
 import Recommendations from "@/components/features/Recommendations";
 import SavedMeals from "@/components/features/SavedMeals";
 import SavedProducts from "@/components/features/SavedProducts";
-import Header from "../layout/Header";
 import Image from "next/image";
 
 export default function DashboardPage() {
@@ -159,7 +159,7 @@ const calculateStreak = (meals: any[]) => {
       <section className="px-30 py-25 mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="w-200">
-            <h1 className="font-[AeonikArabic] text-[6rem] font-bold">Your Dashboard</h1>
+            <h1 className="font-[AeonikArabic] font-bold [@media(min-width:1400px)]:text-[4rem] [@media(min-width:1500px)]:text-[6rem]">Your Dashboard</h1>
 
             <div className="flex items-center gap-8">
               <div>
@@ -167,8 +167,7 @@ const calculateStreak = (meals: any[]) => {
               </div>
               <div>
                 <p className="text-[2.5rem] font-[AeonikArabic] font-semibold">
-                  Welcome, 
-                  {user?.user_metadata?.username ? `, ${user.user_metadata.username}` : ""}!
+                  Welcome{user?.user_metadata?.username ? `, ${user.user_metadata.username}` : ""}!
                 </p>
                 <p className="text-[1.5rem] font-[AeonikArabic] text-[#C5C5C5] w-130  text-white/90">
                   Your personal dashboard of all the curated foods that we specifically designed for you.
@@ -186,12 +185,12 @@ const calculateStreak = (meals: any[]) => {
           />
         </div>
 
-        <div className="bg-[#364840] rounded-2xl p-2 flex gap-4 mb-8 justify-between">
+        <div className="bg-[#364840] rounded-2xl p-2 [@media(min-width:1400px)]: flex [@media(min-width:1500px)]:flex gap-4 mb-8 justify-between">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-25 py-2 rounded-2xl text-sm font-medium transition ${
+              className={`rounded-2xl text-sm font-medium transition [@media(min-width:1400px)]:px-17 py-4 [@media(min-width:1500px)]:px-25 py-2 px-25 ${
                 activeTab === tab.id
                   ? "bg-[#212C27] text-white font-[AeonikArabic]"
                   : "bg-[#304039] text-gray-300 font-normal hover:bg-white/10 hover:text-white font-[AeonikArabic]"

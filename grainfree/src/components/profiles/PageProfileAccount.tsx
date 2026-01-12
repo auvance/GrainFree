@@ -52,6 +52,13 @@ export default function PageProfileAccount() {
       };
       const { error } = await supabase.from("profiles").upsert(updates);
       if (error) throw error;
+
+      // Keep Supabase auth metadata in sync so dashboard sees the username
+      const { error: authError } = await supabase.auth.updateUser({
+        data: { username },
+      });
+      if (authError) throw authError;
+
       setMessage("✅ Profile updated successfully!");
     } catch (err) {
       console.error("Error updating profile:", err);

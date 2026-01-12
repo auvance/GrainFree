@@ -3,10 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "locomotive-scroll/dist/locomotive-scroll.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import "./globals.css";
-
-import Header from "@/components/layout/Header";
 // import Footer from "@/components/layout/Footer" // if you've built this
-import AuthWatcher from "@/components/providers/AuthWatcher";
+import { PreferencesProvider } from "@/components/providers/PreferencesProvider";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -21,8 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="antialiased bg-[#FAFAF5] text-black">
         <AuthProvider>
-          
+        <PreferencesProvider>
           <main className="min-h-screen">{children}</main>
+          </PreferencesProvider>
         </AuthProvider>
       </body>
     </html>

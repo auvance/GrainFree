@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import Header from "../layout/Header";
 
 type Answer = string | string[] | null;
 
@@ -31,7 +30,12 @@ type StepConfig = {
 
 // Step definitions
 const steps: StepConfig[] = [
-  { id: "goal", label: "Primary goal", type: "single", options: ["Gain healthy weight", "Reduce bloating", "Energy & stamina", "General clean eating"] },
+  {
+    id: "goal",
+    label: "Primary goal(s)",
+    type: "multi",
+    options: ["Gain healthy weight", "Reduce bloating", "Energy & stamina", "General clean eating"],
+  },
   { id: "dietary_restrictions", label: "Dietary restrictions", type: "multi", options: ["Gluten-free", "Lactose-free", "Nut-free", "Soy-free", "Halal", "Vegan"] },
   { id: "symptoms", label: "Current symptoms (if any)", type: "multi", options: ["Brain fog", "Bloating", "Fatigue", "Indigestion", "Nausea", "Skin flare-ups"] },
   { id: "activity_level", label: "Activity level", type: "single", options: ["Low", "Moderate", "High"] },
@@ -56,7 +60,7 @@ export default function BuildWizard() {
   const [stepIndex, setStepIndex] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<Step, Answer>>({
-    goal: null,
+    goal: [],
     dietary_restrictions: [],
     symptoms: [],
     activity_level: null,
@@ -145,8 +149,9 @@ export default function BuildWizard() {
       await supabase.from("healthplans_drafts").delete().eq("user_id", userId);
 
       router.push("/dash?newPlan=1");
-    } catch (e: any) {
-      console.error(e.message);
+  } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error(message);
       setLoading(false);
     }
   };
@@ -157,17 +162,17 @@ export default function BuildWizard() {
     (step.type !== "text" && answers[step.id] !== null);
 
   return (
-   
+   <>
     <main>
-   
-    <section className="mt-40 rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-30  mx-auto mt-10">
+    
+    <section className="rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-25  mx-auto mt-10 [@media(min-width:1500px)]:mt-40">
       {!started ? (
         <div className="flex flex-col items-center text-center space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-white font-[AeonikArabic]">
+          <h1 className="w-150 text-3xl md:text-4xl font-bold text-white font-[AeonikArabic]">
             Ready To Build Your Personal<span className="italic"> Gluten Free</span> Guide?
           </h1>
           <p className="text-white/80 max-w-lg font-[AeonikArabic]">
-            We'll ask a few quick questions and create your personalized results, products, meals, and tools to get you started.
+            We&apos;ll ask a few quick questions and create your personalized results, products, meals, and tools to get you started.
           </p>
           <button
             onClick={() => setStarted(true)}
@@ -264,5 +269,6 @@ export default function BuildWizard() {
       )}
     </section>
     </main>
+    </>
   );
 }

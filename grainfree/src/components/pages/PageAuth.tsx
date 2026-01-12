@@ -1,18 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Image from "next/image";
 
 export default function PageAuth() {
+  const router = useRouter();
+
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+
   const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Redirect away if already logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) router.push("/");
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" && !isRedirecting) {
+        router.push("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router, isRedirecting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isRedirecting) return;
+
     setMessage("");
+    setSuccess(false);
 
     if (mode === "signup") {
       const { error } = await supabase.auth.signUp({
@@ -20,153 +47,226 @@ export default function PageAuth() {
         password,
         options: { data: { username } },
       });
-      if (error) setMessage(error.message);
-      else setMessage("Check your email to confirm your account.");
+
+      if (error) {
+        setMessage(error.message);
+      } else {
+        setSuccess(true);
+        setMessage("Account created! Check your email to confirm.");
+      }
     }
 
     if (mode === "signin") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setMessage(error.message);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setMessage(error.message);
+      } else {
+        setSuccess(true);
+        setIsRedirecting(true);
+        setMessage("Success! Logging you in, redirecting…");
+
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      }
     }
 
     if (mode === "forgot") {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: "http://localhost:3000/auth/reset",
       });
-      if (error) setMessage(error.message);
-      else setMessage("We’ve sent you a password reset email.");
+
+      if (error) {
+        setMessage(error.message);
+      } else {
+        setSuccess(true);
+        setMessage("Password reset email sent.");
+      }
     }
   };
 
   const handleGoogle = async () => {
+    if (isRedirecting) return;
     await supabase.auth.signInWithOAuth({ provider: "google" });
   };
 
   return (
-    <main className="min-h-screen bg-[#475845] flex flex-col items-center justify-center px-4">
-      {/* Top heading */}
-      <div className="text-center mb-8">
-        <h2 className="text-[3rem] font-bold text-white font-[AeonikArabic]">
-          Welcome to{" "}
-          <span className="text-[#4A4A4A]">Grain</span>
-          <span className="text-[#008509]">Free!</span>
-        </h2>
-        <p className="text-[1.2rem] font-[AeonikArabic] text-white/80 mt-2">
-          Sign up or log in to continue
+    <main className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+      {/* LEFT — BRAND PANEL */}
+      <section className="hidden lg:flex flex-col justify-around p-16 bg-gradient-to-br from-[#0F2A1D] to-[#1E3B32] text-white">
+        <div>
+          <h1 className="text-[6rem] font-bold font-[AeonikArabic] ">
+            Grain<span className="text-[#00A76F] font-[AeonikArabic]">Free</span>
+          </h1>
+          <p className="max-w-md text-white/80 text-lg leading-relaxed font-[AeonikArabic]">
+            Discover safe meals, track nutrition, and explore allergen-friendly
+            foods, powered by real data and AI-driven health plans.
+          </p>
+        </div>
+
+        <p className="text-sm text-white/40 font-[AeonikArabic]">
+          © {new Date().getFullYear()} GrainFree. All rights reserved.
         </p>
-      </div>
+      </section>
 
-      {/* Glassy card */}
-      <section className="w-full max-w-md rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-8">
-        <h1 className="font-[AeonikArabic] text-xl font-semibold text-center text-white mb-4">
-          {mode === "signup"
-            ? "Create Account"
-            : mode === "signin"
-            ? "Sign In"
-            : "Forgot Password"}
-        </h1>
+      {/* RIGHT — AUTH PANEL */}
+      <section className="flex items-center justify-center px-6">
+        <div className="w-full max-w-md">
+        
+        <div className="flex gap-5">
+          <div className="mb-6">
+            <Image 
+              src="/LeafLogo.svg" 
+              alt="GrainFree Logo" 
+              width={60} 
+              height={60}
+            />
+          </div>
+          <div>
+            <h2 className="text-3xl font-semibold mb-2 font-[AeonikArabic]">
+            {mode === "signup"
+              ? "Create account"
+              : mode === "signin"
+              ? "Welcome back"
+              : "Reset password"}
+            </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            type="email"
-            placeholder="Email"
-            className="font-[AeonikArabic] w-full rounded-lg border border-white/20 bg-white/20 placeholder-white/60 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#008509]"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-           
-          />
+            <p className="text-gray-500 mb-6 font-[AeonikArabic]">
+            {mode === "signup"
+              ? "It’s free and takes less than a minute."
+              : mode === "signin"
+              ? "Sign in to continue to your dashboard."
+              : "We’ll email you a reset link."}
+            </p>
+          </div>
+        </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email"
+              disabled={isRedirecting}
+              className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#00A76F] font-[AeonikArabic]"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            {mode !== "forgot" && (
+              <input
+                type="password"
+                placeholder="Password"
+                disabled={isRedirecting}
+                className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#00A76F] font-[AeonikArabic]"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            )}
+
+            {mode === "signup" && (
+              <input
+                type="text"
+                placeholder="Username"
+                disabled={isRedirecting}
+                className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#00A76F] font-[AeonikArabic]"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            )}
+
+            {message && (
+              <p
+                className={`text-sm px-3 py-2 rounded font-[AeonikArabic] ${
+                  success
+                    ? "text-green-700 bg-green-50"
+                    : "text-red-500 bg-red-50"
+                }`}
+              >
+                {message}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isRedirecting}
+              className={`w-full py-3 rounded-md transition font-[AeonikArabic] ${
+                isRedirecting
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-black text-white hover:opacity-90"
+              }`}
+            >
+              {isRedirecting
+                ? "Logging you in…"
+                : mode === "signup"
+                ? "Create account"
+                : mode === "signin"
+                ? "Login now"
+                : "Send reset link"}
+            </button>
+          </form>
 
           {mode !== "forgot" && (
-            <input
-              type="password"
-              placeholder="Password"
-              className="font-[AeonikArabic] w-full rounded-lg border border-white/20 bg-white/20 placeholder-white/60 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#008509]"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <button
+              onClick={handleGoogle}
+              disabled={isRedirecting}
+              className="w-full mt-4 border border-gray-300 py-3 rounded-md flex items-center justify-center gap-2 hover:bg-blue-50 font-[AeonikArabic]"
+            >
+              Continue with Google
+            </button>
           )}
 
-          {mode === "signup" && (
-            <input
-              type="text"
-              placeholder="Username"
-              className="font-[AeonikArabic] w-full rounded-lg border border-white/20 bg-white/20 placeholder-white/60 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#008509]"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          )}
+          {/* SWITCH MODES */}
+          <div className="mt-6 text-sm text-gray-600 font-[AeonikArabic]">
+            {mode === "signin" && (
+              <>
+                Don’t have an account?{" "}
+                <button
+                  onClick={() => setMode("signup")}
+                  className="text-[#00A76F] underline"
+                >
+                  Create one
+                </button>
+                <br />
+                <button
+                  onClick={() => setMode("forgot")}
+                  className="text-[#00A76F] underline mt-2 inline-block"
+                >
+                  Forgot password?
+                </button>
+              </>
+            )}
 
-          {message && (
-            <p className="font-[AeonikArabic] text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded">
-              {message}
-            </p>
-          )}
+            {mode === "signup" && (
+              <>
+                Already have an account?{" "}
+                <button
+                  onClick={() => setMode("signin")}
+                  className="text-[#00A76F] underline"
+                >
+                  Sign in
+                </button>
+              </>
+            )}
 
-          <button
-            type="submit"
-            className="font-[AeonikArabic] cursor-pointer w-full rounded-lg bg-[#008509] py-2 text-white font-medium hover:bg-green-700 transition"
-          >
-            {mode === "signup"
-              ? "Sign Up"
-              : mode === "signin"
-              ? "Sign In"
-              : "Send Reset Link"}
-          </button>
-        </form>
-
-        {mode !== "forgot" && (
-          <button
-            onClick={handleGoogle}
-            className="font-[AeonikArabic] cursor-pointer mt-3 w-full rounded-lg bg-white/20 text-white py-2 hover:bg-white/30 transition"
-          >
-            Continue with Google
-          </button>
-        )}
-
-        {/* Switch states */}
-        <p className="mt-4 text-center text-xs text-white/70">
-          {mode === "signup" && (
-            <>
-              Already have an account?{" "}
-              <button
-                onClick={() => setMode("signin")}
-                className="font-[AeonikArabic] cursor-pointer text-[#00A76F] underline"
-              >
-                Sign In
-              </button>
-            </>
-          )}
-          {mode === "signin" && (
-            <>
-              Don’t have an account?{" "}
-              <button
-                onClick={() => setMode("signup")}
-                className="font-[AeonikArabic] cursor-pointer text-[#00A76F] underline"
-              >
-                Sign Up
-              </button>
-              <br />
-              Forgot password?{" "}
-              <button
-                onClick={() => setMode("forgot")}
-                className="font-[AeonikArabic] cursor-pointer text-[#00A76F] underline"
-              >
-                Reset
-              </button>
-            </>
-          )}
-          {mode === "forgot" && (
-            <>
-              Remembered your password?{" "}
-              <button
-                onClick={() => setMode("signin")}
-                className="font-[AeonikArabic] text-[#00A76F] underline"
-              >
-                Sign In
-              </button>
-            </>
-          )}
-        </p>
+            {mode === "forgot" && (
+              <>
+                Remembered your password?{" "}
+                <button
+                  onClick={() => setMode("signin")}
+                  className="text-[#00A76F] underline"
+                >
+                  Sign in
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </section>
     </main>
   );

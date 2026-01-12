@@ -1,8 +1,9 @@
-import Header from "../layout/Header"
+import Header from "../layout/Header/Header"
 import Footer from "../layout/Footer"
 import Image from "next/image"
 import SmoothScroll from "@/styles/SmoothScroll"
 import ScrollHorizonal from "@/styles/ScrollHorziontal"
+
 
 export default function PageAbout() {
     return (
