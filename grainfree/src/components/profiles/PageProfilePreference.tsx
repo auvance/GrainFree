@@ -96,21 +96,21 @@ export default function PageProfilePreferences() {
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold">Diet & Allergens</h1>
-        <p className="text-white/50 mt-2">
+        <h1 className="text-3xl font-semibold font-[AeonikArabic]">Diet & Allergens</h1>
+        <p className="text-white/50 mt-2 font-[AeonikArabic]">
           These rules automatically apply to GrainFreeHub, product search, and AI recommendations.
         </p>
       </div>
 
       {isLoading ? (
-        <p className="text-gray-300">Loading your preferences…</p>
+        <p className="text-gray-300 font-[AeonikArabic]">Loading your preferences…</p>
       ) : (
         <div className="space-y-6">
           {/* Toast */}
           {toast && (
             <div
               className={[
-                "rounded-xl border px-4 py-3 text-sm",
+                "rounded-xl border px-4 py-3 text-sm font-[AeonikArabic]",
                 toast.type === "success"
                   ? "border-[#00B84A]/30 bg-[#00B84A]/10 text-white"
                   : "border-red-500/30 bg-red-500/10 text-white",
@@ -125,7 +125,7 @@ export default function PageProfilePreferences() {
             <select
               value={diet}
               onChange={(e) => setDiet(e.target.value)}
-              className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none focus:ring-2 focus:ring-[#00B84A]/60 transition"
+              className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none focus:ring-2 focus:ring-[#00B84A]/60 transition font-[AeonikArabic]"
             >
               {DIET_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -148,7 +148,7 @@ export default function PageProfilePreferences() {
                     key={a.value}
                     onClick={() => toggleAllergen(a.value)}
                     className={[
-                      "px-4 py-2 rounded-full border text-sm transition-all duration-150 ease-out",
+                      "px-4 py-2 rounded-full border text-sm transition-all duration-150 ease-out font-[AeonikArabic]",
                       "active:scale-95",
                       active
                         ? "bg-[#00B84A] border-[#00B84A] text-black font-semibold"
@@ -166,18 +166,18 @@ export default function PageProfilePreferences() {
           <Card title="Nutrition Defaults" subtitle="Used for stats and goal tracking.">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-white/50 mb-2">Daily Calories</label>
+                <label className="block text-xs text-white/50 mb-2 font-[AeonikArabic]">Daily Calories</label>
                 <input
                   type="number"
                   min={1000}
                   value={calorieGoal}
                   onChange={(e) => setCalorieGoal(Number(e.target.value))}
-                  className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none focus:ring-2 focus:ring-[#00B84A]/60 transition"
+                  className="w-full rounded-xl px-4 py-3 bg-black/30 border border-white/10 outline-none focus:ring-2 focus:ring-[#00B84A]/60 transition font-[AeonikArabic]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-white/50 mb-2">Units</label>
+                <label className="block text-xs text-white/50 mb-2 font-[AeonikArabic]">Units</label>
                 <div className="flex gap-2">
                   {(["metric", "imperial"] as const).map((u) => {
                     const active = unit === u;
@@ -186,7 +186,7 @@ export default function PageProfilePreferences() {
                         key={u}
                         onClick={() => setUnit(u)}
                         className={[
-                          "flex-1 px-4 py-3 rounded-xl border text-sm transition-all duration-150 ease-out",
+                          "flex-1 px-4 py-3 rounded-xl border text-sm transition-all duration-150 ease-out font-[AeonikArabic]",
                           "active:scale-[0.99]",
                           active
                             ? "bg-[#00B84A] border-[#00B84A] text-black font-semibold"
@@ -205,7 +205,7 @@ export default function PageProfilePreferences() {
           {/* Sticky Save Bar */}
           <div className="pt-2">
             <div className="flex items-center justify-between gap-4 border border-white/10 bg-black/20 rounded-2xl px-4 py-4">
-              <div className="text-sm text-white/60">
+              <div className="text-sm text-white/60 font-[AeonikArabic]">
                 {dirty ? "You have unsaved changes." : "All changes saved."}
               </div>
 
@@ -213,7 +213,7 @@ export default function PageProfilePreferences() {
                 onClick={handleSave}
                 disabled={!dirty || saving || !user}
                 className={[
-                  "px-6 py-3 rounded-xl font-semibold transition-all duration-150 ease-out",
+                  "px-6 py-3 rounded-xl font-semibold transition-all duration-150 ease-out font-[AeonikArabic]",
                   "active:scale-[0.99]",
                   !dirty || saving || !user
                     ? "bg-white/10 text-white/40 cursor-not-allowed"
@@ -242,8 +242,8 @@ function Card({
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        {subtitle && <p className="text-sm text-white/45 mt-1">{subtitle}</p>}
+        <h2 className="text-lg font-semibold font-[AeonikArabic]">{title}</h2>
+        {subtitle && <p className="text-sm text-white/45 mt-1 font-[AeonikArabic]">{subtitle}</p>}
       </div>
       {children}
     </div>

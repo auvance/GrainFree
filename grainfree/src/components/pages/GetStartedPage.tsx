@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Header from "@/components/layout/Header/Header";
 
 export default function GetStartedPage() {
   const router = useRouter();

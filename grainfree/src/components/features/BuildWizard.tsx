@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Header from "@/components/layout/Header/Header";
 
 type Answer = string | string[] | null;
 
@@ -162,10 +163,15 @@ export default function BuildWizard() {
     (step.type !== "text" && answers[step.id] !== null);
 
   return (
-   <>
-    <main>
-    
-    <section className="rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-25  mx-auto mt-10 [@media(min-width:1500px)]:mt-40">
+    <div className="min-h-screen flex flex-col bg-[#475845]">
+      {/* Header */}
+      <div className="bg-[#475845]">
+        <Header />
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-1 flex items-center justify-center">
+        <section className="rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-25 w-full max-w-4xl mx-4">
       {!started ? (
         <div className="flex flex-col items-center text-center space-y-6">
           <h1 className="w-150 text-3xl md:text-4xl font-bold text-white font-[AeonikArabic]">
@@ -267,8 +273,8 @@ export default function BuildWizard() {
           <p className="text-lg font-semibold font-[AeonikArabic] text-white">Building your meal plan for a better life…</p>
         </div>
       )}
-    </section>
-    </main>
-    </>
+        </section>
+      </main>
+    </div>
   );
 }
