@@ -11,7 +11,6 @@ type Tile = {
 };
 
 type Props = {
-  // replace these with your real assets
   tile1?: Tile; // small left
   tile2?: Tile; // tall behind wordmark
   tile3?: Tile; // right top
@@ -161,7 +160,7 @@ export default function GrainFreeWordmark({
 }: Props) {
   return (
     <section className="relative overflow-hidden rounded-xl bg-[#FAFAF5]">
-      {/* Optional subtle ambient (does NOT move tiles) */}
+      {/* Ambient (kept as-is). You can choose to reduce this on mobile if desired. */}
       <div className="pointer-events-none absolute inset-0">
         <motion.div
           className="absolute left-1/2 top-[-220px] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#517F58]/10 blur-[120px]"
@@ -176,127 +175,223 @@ export default function GrainFreeWordmark({
       </div>
 
       <div className="relative mx-auto w-full max-w-[1500px] px-4 sm:px-8 lg:px-10">
-        {/* Canvas (entire hero reveals in) */}
+        {/* =========================================================
+            MOBILE + TABLET ( < lg )
+            - Grid layout, no absolute chaos
+            - Same assets + sticker + wordmark
+           ========================================================= */}
         <motion.div
-          className="relative h-[420px] sm:h-[520px] lg:h-[680px]"
           variants={canvasReveal}
           initial="hidden"
           animate="show"
+          className="block lg:hidden py-10 sm:py-12"
         >
-          {/* ---------------------------
-              TILE 1 — small (left)
-          --------------------------- */}
-          <HoverTile
-            strength={8}
-            className="absolute left-4 sm:left-8 lg:left-14 top-10 sm:top-14 lg:top-35 z-10"
-          >
-            <motion.div
-              custom={0}
-              variants={tileReveal}
-              initial="hidden"
-              animate="show"
-              className="relative h-[150px] w-[150px] sm:h-[190px] sm:w-[190px] lg:h-[270px] lg:w-[220px] overflow-hidden bg-black/5"
-            >
-              <div className="absolute inset-0 bg-black/10" />
-              <Media tile={tile1} />
-              <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
-            </motion.div>
-          </HoverTile>
+          {/* Media grid */}
+          <div className="relative">
+            <div className="grid grid-cols-2 gap-4 sm:gap-5">
+              {/* tile2 big-ish */}
+              <motion.div
+                custom={0}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="col-span-2 sm:col-span-1 relative overflow-hidden bg-black/5 rounded-2xl h-[220px] sm:h-[300px]"
+              >
+                <div className="absolute inset-0 bg-black/10" />
+                <Media tile={tile2} />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+              </motion.div>
 
-          {/* ---------------------------
-              TILE 2 — tall (left-mid)
-              extends behind wordmark
-          --------------------------- */}
-          <HoverTile
-            strength={10}
-            className="absolute left-[190px] sm:left-[250px] lg:left-[305px] top-12 sm:top-14 lg:top-14 z-5"
-          >
-            <motion.div
-              custom={1}
-              variants={tileReveal}
-              initial="hidden"
-              animate="show"
-              className="relative h-[240px] w-[140px] sm:h-[330px] sm:w-[170px] lg:h-[480px] lg:w-[300px] overflow-hidden bg-black/5"
-            >
-              <div className="absolute inset-0 bg-black/10" />
-              <Media tile={tile2} />
-              <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
-            </motion.div>
-          </HoverTile>
+              {/* tile1 */}
+              <motion.div
+                custom={1}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative overflow-hidden bg-black/5 rounded-2xl h-[220px] sm:h-[300px]"
+              >
+                <div className="absolute inset-0 bg-black/10" />
+                <Media tile={tile1} />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+              </motion.div>
 
-          {/* ---------------------------
-              RIGHT STACK — tile 3 + tile 4
-          --------------------------- */}
-          <div className="absolute right-4 sm:right-8 lg:right-14 top-12 sm:top-16 lg:top-16 z-10 flex items-end flex-col gap-7">
-            <HoverTile strength={8} className="relative">
+              {/* tile3 */}
               <motion.div
                 custom={2}
                 variants={tileReveal}
                 initial="hidden"
                 animate="show"
-                className="relative h-[90px] w-[170px] sm:h-[120px] sm:w-[240px] lg:h-[180px] lg:w-[400px] overflow-hidden bg-black/5"
+                className="relative overflow-hidden bg-black/5 rounded-2xl h-[160px] sm:h-[200px]"
               >
                 <div className="absolute inset-0 bg-black/10" />
                 <Media tile={tile3} />
                 <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
               </motion.div>
-            </HoverTile>
 
-            <HoverTile strength={8} className="relative">
+              {/* tile4 */}
               <motion.div
                 custom={3}
                 variants={tileReveal}
                 initial="hidden"
                 animate="show"
-                className="relative h-[105px] w-[170px] sm:h-[135px] sm:w-[240px] lg:h-[155px] lg:w-[340px] overflow-hidden bg-black/5"
+                className="relative overflow-hidden bg-black/5 rounded-2xl h-[160px] sm:h-[200px]"
               >
                 <div className="absolute inset-0 bg-black/10" />
                 <Media tile={tile4} />
                 <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
               </motion.div>
-            </HoverTile>
-          </div>
+            </div>
 
-          {/* ---------------------------
-              STICKER — independent hover motion + reveal
-          --------------------------- */}
-          <HoverTile
-            strength={6}
-            className="absolute left-1/2 top-[140px] sm:top-[165px] lg:top-[175px] z-20 -translate-x-1/2"
-          >
+            {/* Sticker centered between tiles (mobile/tablet) */}
             <motion.div
               variants={stickerReveal}
               initial="hidden"
               animate="show"
-              className="rounded bg-[#517F58] px-4 py-2 text-white drop-shadow-[6px_6px_0px_#3D4F46]"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             >
-              <p className="text-[18px] leading-tight font-[AeonikArabic]">
-                The No BS <span className="italic">&apos;Gluten Free&apos;</span>{" "}
-                Guide.
-              </p>
-              <p className="text-[18px] leading-tight font-[AeonikArabic]">
-                All in one, right in your pocket.
-              </p>
+              <div className="rounded-xl bg-[#517F58] px-4 py-3 text-white drop-shadow-[6px_6px_0px_#3D4F46]">
+                <p className="text-[14px] sm:text-[16px] leading-tight font-[AeonikArabic]">
+                  The No BS <span className="italic">&apos;Gluten Free&apos;</span>{" "}
+                  Guide.
+                </p>
+                <p className="text-[14px] sm:text-[16px] leading-tight font-[AeonikArabic]">
+                  All in one, right in your pocket.
+                </p>
+              </div>
             </motion.div>
-          </HoverTile>
+          </div>
 
-          {/* ---------------------------
-              WORDMARK — on top
-              Tile 2 runs behind this (z-5 vs z-30)
-          --------------------------- */}
+          {/* Wordmark below (same background, same type feel, responsive clamp) */}
           <motion.h1
-            className="absolute left-4 sm:left-8 lg:left-14 bottom-10 sm:bottom-12 lg:bottom-14 z-30 font-[AeonikArabic] font-bold leading-[0.85] tracking-tight text-[clamp(4.8rem,16vw,17rem)]"
+            className="mt-10 sm:mt-12 font-[AeonikArabic] font-bold leading-[0.85] tracking-tight text-[clamp(3.6rem,14vw,7.5rem)]"
             initial={{ clipPath: "inset(0 0 100% 0)", opacity: 0.95 }}
             animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }}
             transition={{
               duration: 0.9,
               ease: [0.22, 1, 0.36, 1],
-              delay: 0.85,
+              delay: 0.55,
             }}
           >
             <span className="text-[#3D4F46]">Grain</span>
-            <span className="relative inline-block text-[#008509]">Free</span>
+            <span className="text-[#008509]">Free</span>
           </motion.h1>
+        </motion.div>
+
+        {/* =========================================================
+            DESKTOP ( lg+ )
+            - Your original absolute canvas preserved
+           ========================================================= */}
+        <motion.div
+          className="hidden lg:block"
+          variants={canvasReveal}
+          initial="hidden"
+          animate="show"
+        >
+          {/* Canvas (desktop) */}
+          <div className="relative h-[680px]">
+            {/* TILE 1 — small (left) */}
+            <HoverTile
+              strength={8}
+              className="absolute left-14 top-35 z-10"
+            >
+              <motion.div
+                custom={0}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative h-[270px] w-[220px] overflow-hidden bg-black/5"
+              >
+                <div className="absolute inset-0 bg-black/10" />
+                <Media tile={tile1} />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+              </motion.div>
+            </HoverTile>
+
+            {/* TILE 2 — tall (left-mid) extends behind wordmark */}
+            <HoverTile
+              strength={10}
+              className="absolute left-[305px] top-14 z-5"
+            >
+              <motion.div
+                custom={1}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative h-[480px] w-[300px] overflow-hidden bg-black/5"
+              >
+                <div className="absolute inset-0 bg-black/10" />
+                <Media tile={tile2} />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+              </motion.div>
+            </HoverTile>
+
+            {/* RIGHT STACK — tile 3 + tile 4 */}
+            <div className="absolute right-14 top-16 z-10 flex items-end flex-col gap-7">
+              <HoverTile strength={8} className="relative">
+                <motion.div
+                  custom={2}
+                  variants={tileReveal}
+                  initial="hidden"
+                  animate="show"
+                  className="relative h-[180px] w-[400px] overflow-hidden bg-black/5"
+                >
+                  <div className="absolute inset-0 bg-black/10" />
+                  <Media tile={tile3} />
+                  <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+                </motion.div>
+              </HoverTile>
+
+              <HoverTile strength={8} className="relative">
+                <motion.div
+                  custom={3}
+                  variants={tileReveal}
+                  initial="hidden"
+                  animate="show"
+                  className="relative h-[155px] w-[340px] overflow-hidden bg-black/5"
+                >
+                  <div className="absolute inset-0 bg-black/10" />
+                  <Media tile={tile4} />
+                  <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+                </motion.div>
+              </HoverTile>
+            </div>
+
+            {/* STICKER */}
+            <HoverTile
+              strength={6}
+              className="absolute left-1/2 top-[175px] z-20 -translate-x-1/2"
+            >
+              <motion.div
+                variants={stickerReveal}
+                initial="hidden"
+                animate="show"
+                className="rounded bg-[#517F58] px-4 py-2 text-white drop-shadow-[6px_6px_0px_#3D4F46]"
+              >
+                <p className="text-[18px] leading-tight font-[AeonikArabic]">
+                  The No BS <span className="italic">&apos;Gluten Free&apos;</span>{" "}
+                  Guide.
+                </p>
+                <p className="text-[18px] leading-tight font-[AeonikArabic]">
+                  All in one, right in your pocket.
+                </p>
+              </motion.div>
+            </HoverTile>
+
+            {/* WORDMARK */}
+            <motion.h1
+              className="absolute left-14 bottom-14 z-30 font-[AeonikArabic] font-bold leading-[0.85] tracking-tight text-[17rem]"
+              initial={{ clipPath: "inset(0 0 100% 0)", opacity: 0.95 }}
+              animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }}
+              transition={{
+                duration: 0.9,
+                ease: [0.22, 1, 0.36, 1],
+                delay: 0.85,
+              }}
+            >
+              <span className="text-[#3D4F46]">Grain</span>
+              <span className="relative inline-block text-[#008509]">Free</span>
+            </motion.h1>
+          </div>
         </motion.div>
       </div>
     </section>
