@@ -11,13 +11,47 @@ import {
 } from "framer-motion";
 
 /* ---------------------------------
-   Shared helpers (same as home hero)
+   Shared helpers (same behavior as home hero)
 ---------------------------------- */
 
 type Tile = {
   kind: "image" | "video";
   src: string;
   alt?: string;
+};
+
+type Props = {
+  tile1?: Tile; // small
+  tile2?: Tile; // tall
+  tile3?: Tile; // wide
+};
+
+/* -----------------------------
+   One-time reveal choreography
+------------------------------ */
+const canvasReveal = {
+  hidden: { opacity: 0, y: 10, filter: "blur(10px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const tileReveal = {
+  hidden: { opacity: 0, y: 14, clipPath: "inset(0 0 100% 0)", scale: 0.985 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    clipPath: "inset(0 0 0% 0)",
+    transition: {
+      duration: 0.75,
+      ease: [0.22, 1, 0.36, 1],
+      delay: 0.12 + i * 0.12,
+    },
+  }),
 };
 
 function Media({ tile }: { tile: Tile }) {
@@ -30,6 +64,7 @@ function Media({ tile }: { tile: Tile }) {
         muted
         loop
         playsInline
+        preload="metadata"
       />
     );
   }
@@ -40,7 +75,8 @@ function Media({ tile }: { tile: Tile }) {
       alt={tile.alt ?? "About tile"}
       fill
       className="object-cover"
-      sizes="(max-width: 1024px) 50vw, 320px"
+      sizes="(max-width: 1024px) 100vw, 520px"
+      priority={false}
     />
   );
 }
@@ -70,24 +106,35 @@ function HoverTile({
   const ty = useTransform(sy, [-0.5, 0.5], [-6, 6]);
 
   function onMove(e: React.MouseEvent) {
-    if (reduceMotion || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
+    const el = ref.current;
+    if (!el) return;
+
+    // ignore touch + reduced motion
+    if (reduceMotion) return;
+    if (typeof window !== "undefined") {
+      const isCoarse = window.matchMedia?.("(pointer: coarse)")?.matches;
+      if (isCoarse) return;
+    }
+
+    const r = el.getBoundingClientRect();
     mx.set((e.clientX - r.left) / r.width - 0.5);
     my.set((e.clientY - r.top) / r.height - 0.5);
+  }
+
+  function onLeave() {
+    mx.set(0);
+    my.set(0);
   }
 
   return (
     <motion.div
       ref={ref}
       onMouseMove={onMove}
-      onMouseLeave={() => {
-        mx.set(0);
-        my.set(0);
-      }}
+      onMouseLeave={onLeave}
       style={
         reduceMotion
           ? undefined
-          : { rotateX: rx, rotateY: ry, x: tx, y: ty }
+          : { rotateX: rx, rotateY: ry, x: tx, y: ty, transformStyle: "preserve-3d" }
       }
       className={className}
     >
@@ -100,56 +147,156 @@ function HoverTile({
    About Hero
 ---------------------------------- */
 
-export default function AboutHero() {
+export default function AboutHero({
+  tile1 = { kind: "image", src: "/about/tile-1.jpg", alt: "Tile 1" },
+  tile2 = { kind: "image", src: "/about/tile-2.jpg", alt: "Tile 2" },
+  tile3 = { kind: "video", src: "/about/tile-3.mp4", alt: "Tile 3" },
+}: Props) {
   return (
     <section className="relative overflow-hidden rounded-xl bg-[#BFDFC7]">
       <div className="relative mx-auto w-full max-w-[1500px] px-4 sm:px-8 lg:px-10">
-        {/* Canvas — SAME HEIGHT LOGIC AS HOME HERO */}
-        <div className="relative h-[420px] sm:h-[520px] lg:h-[680px]">
-          {/* ---------------------------
-              RIGHT MEDIA CLUSTER
-          --------------------------- */}
+        {/* =========================================================
+            MOBILE + TABLET ( < lg )
+            - Grid layout, no absolute chaos
+            - Same assets + wordmark
+           ========================================================= */}
+        <motion.div
+          variants={canvasReveal}
+          initial="hidden"
+          animate="show"
+          className="block lg:hidden py-10 sm:py-12"
+        >
+          {/* Media grid */}
+          <div className="relative">
+            <div className="grid grid-cols-2 gap-4 sm:gap-5">
+              {/* tile2 big-ish */}
+              <motion.div
+                custom={0}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="col-span-2 relative overflow-hidden bg-black/5 rounded-2xl h-[240px] sm:h-[320px]"
+              >
+                <div className="absolute inset-0 bg-black/10" />
+                <Media tile={tile2} />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+              </motion.div>
 
-          {/* Small tile */}
-          <HoverTile className="absolute left-10 top-16 z-10">
-            <div className="relative h-[450px] w-[400px] overflow-hidden bg-black/10">
-              <Media tile={{ kind: "image", src: "/about/tile-1.jpg" }} />
+              {/* tile1 */}
+              <motion.div
+                custom={1}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative overflow-hidden bg-black/5 rounded-2xl h-[190px] sm:h-[240px]"
+              >
+                <div className="absolute inset-0 bg-black/10" />
+                <Media tile={tile1} />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+              </motion.div>
+
+              {/* tile3 */}
+              <motion.div
+                custom={2}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative overflow-hidden bg-black/5 rounded-2xl h-[190px] sm:h-[240px]"
+              >
+                <div className="absolute inset-0 bg-black/10" />
+                <Media tile={tile3} />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
+              </motion.div>
             </div>
-          </HoverTile>
+          </div>
 
-          {/* Tall tile */}
-          <HoverTile className="absolute left-[600px] top-32 z-[5]">
-            <div className="relative h-[360px] w-[360px] overflow-hidden bg-black/10">
-              <Media tile={{ kind: "image", src: "/about/tile-2.jpg" }} />
-            </div>
-          </HoverTile>
-
-          {/* Wide tile */}
-          <HoverTile className="absolute right-6 bottom-10 z-10">
-            <div className="relative h-[300px] w-[420px] overflow-hidden bg-black/10">
-              <Media tile={{ kind: "video", src: "/about/tile-3.mp4" }} />
-            </div>
-          </HoverTile>
-
-          {/* ---------------------------
-              WORDMARK — SAME SCALE
-          --------------------------- */}
+          {/* Wordmark below (responsive clamp, same type feel) */}
           <motion.div
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-4 sm:left-8 lg:left-14 bottom-10 sm:bottom-12 lg:bottom-14 z-30"
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.55 }}
+            className="mt-10 sm:mt-12"
           >
-            <h2 className="text-[#3D4F46] font-bold font-[AeonikArabic] leading-[0.85] tracking-tight text-[clamp(2.6rem,8vw,7rem)]">
+            <h2 className="text-[#3D4F46] font-bold font-[AeonikArabic] leading-[0.9] tracking-tight text-[clamp(2.2rem,8.5vw,4.2rem)]">
               Why I built
             </h2>
 
-            <h1 className="font-bold font-[AeonikArabic] leading-[0.85] tracking-tight text-[clamp(4.8rem,16vw,17rem)]">
+            <h1 className="font-bold font-[AeonikArabic] leading-[0.85] tracking-tight text-[clamp(3.8rem,14vw,7.8rem)]">
               <span className="text-[#3D4F46]">Grain</span>
               <span className="text-[#008509]">Free</span>
             </h1>
           </motion.div>
-        </div>
+        </motion.div>
+
+        {/* =========================================================
+            DESKTOP ( lg+ )
+            - Your absolute canvas preserved (UNCHANGED)
+           ========================================================= */}
+        <motion.div
+          variants={canvasReveal}
+          initial="hidden"
+          animate="show"
+          className="hidden lg:block"
+        >
+          {/* Canvas — SAME HEIGHT LOGIC AS HOME HERO */}
+          <div className="relative h-[420px] sm:h-[520px] lg:h-[680px]">
+            {/* Small tile */}
+            <HoverTile className="absolute left-10 top-16 z-10">
+              <motion.div
+                custom={0}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative h-[450px] w-[400px] overflow-hidden bg-black/10"
+              >
+                <Media tile={tile1} />
+              </motion.div>
+            </HoverTile>
+
+            {/* Tall tile */}
+            <HoverTile className="absolute left-[450px] top-32 z-[5]">
+              <motion.div
+                custom={1}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative h-[330px] w-[360px] overflow-hidden bg-black/10"
+              >
+                <Media tile={tile2} />
+              </motion.div>
+            </HoverTile>
+
+            {/* Wide tile */}
+            <HoverTile className="absolute left-[820px] bottom-40 z-10">
+              <motion.div
+                custom={2}
+                variants={tileReveal}
+                initial="hidden"
+                animate="show"
+                className="relative h-[300px] w-[420px] overflow-hidden bg-black/10"
+              >
+                <Media tile={tile3} />
+              </motion.div>
+            </HoverTile>
+
+            {/* WORDMARK — SAME SCALE */}
+            <motion.div
+              initial={{ clipPath: "inset(0 0 100% 0)" }}
+              animate={{ clipPath: "inset(0 0 0% 0)" }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute left-4 sm:left-8 lg:left-14 bottom-10 sm:bottom-12 lg:bottom-14 z-30"
+            >
+              <h2 className="text-[#3D4F46] font-bold font-[AeonikArabic] leading-[0.85] tracking-tight text-[clamp(2.6rem,8vw,7rem)]">
+                Why I built
+              </h2>
+
+              <h1 className="font-bold font-[AeonikArabic] leading-[0.85] tracking-tight text-[clamp(4.8rem,16vw,17rem)]">
+                <span className="text-[#3D4F46]">Grain</span>
+                <span className="text-[#008509]">Free</span>
+              </h1>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
