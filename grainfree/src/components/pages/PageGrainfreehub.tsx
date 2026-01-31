@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import BarcodeScannerModal from "@/components/features/BarcodeScannerModal";
 
 type Item = {
   id?: number;
@@ -57,6 +59,9 @@ export default function PageGrainfreehub() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(false);
+
+  const router = useRouter();
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const SPOONACULAR_KEY = process.env.NEXT_PUBLIC_SPOONACULAR_KEY;
 
@@ -129,7 +134,8 @@ export default function PageGrainfreehub() {
       url.searchParams.set("addRecipeNutrition", "true");
       url.searchParams.set("apiKey", String(SPOONACULAR_KEY));
       if (dietParam) url.searchParams.set("diet", dietParam);
-      if (intolerancesParam) url.searchParams.set("intolerances", intolerancesParam);
+      if (intolerancesParam)
+        url.searchParams.set("intolerances", intolerancesParam);
 
       const res = await fetch(url.toString());
 
@@ -222,7 +228,8 @@ export default function PageGrainfreehub() {
         </h1>
 
         <p className="mt-4 text-[1rem] sm:text-[1.2rem] lg:text-[1.5rem] font-[AeonikArabic] font-bold text-gray-600 max-w-3xl mx-auto">
-          Search, filter and find what works for you - meals, snacks and everything in between.
+          Search, filter and find what works for you - meals, snacks and
+          everything in between.
         </p>
 
         {/* SEARCH BAR */}
@@ -235,7 +242,7 @@ export default function PageGrainfreehub() {
             mx-auto
             grid
             grid-cols-1
-            sm:grid-cols-[1fr_auto_auto]
+            sm:grid-cols-[1fr_auto_auto_auto]
             gap-3
             font-[AeonikArabic]
           "
@@ -293,8 +300,45 @@ export default function PageGrainfreehub() {
               <option key={f}>{f}</option>
             ))}
           </select>
+
+          {/* Scan Barcode */}
+          <button
+            type="button"
+            onClick={() => {
+              if (source !== "products") {
+                setSource("products");
+                setScannerOpen(true);
+                return;
+              }
+              setScannerOpen(true);
+            }}
+            className="
+              w-full sm:w-auto
+              rounded-full
+              border border-gray-300
+              px-4
+              py-3
+              bg-white
+              text-[#12241A]
+              font-semibold
+              hover:bg-gray-50
+              transition
+            "
+          >
+            Scan
+          </button>
         </form>
       </section>
+
+      {/* Scanner Modal (place once, anywhere inside main) */}
+      <BarcodeScannerModal
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onDetected={(barcode) => {
+          router.push(`/product?id=${encodeURIComponent(barcode)}`);
+        }}
+        title="Scan product barcode"
+      />
 
       {/* RESULTS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
@@ -320,12 +364,14 @@ export default function PageGrainfreehub() {
               API Limit Reached
             </h2>
             <p className="text-gray-600 mb-6 font-[AeonikArabic] max-w-xl mx-auto">
-              Spoonacular or OpenFoodFacts has stopped responding. Support the project to keep data flowing ❤️
+              Spoonacular or OpenFoodFacts has stopped responding. Support the
+              project to keep data flowing ❤️
             </p>
             <a
               href="https://buymeacoffee.com/auvance"
               target="_blank"
               className="inline-flex items-center justify-center px-6 py-3 bg-[#009B3E] text-white rounded-full font-semibold hover:bg-[#007d32] transition font-[AeonikArabic]"
+              rel="noreferrer"
             >
               Support GrainFreeHub
             </a>
@@ -418,7 +464,9 @@ export default function PageGrainfreehub() {
                         <span>Ready in {item.readyInMinutes} min</span>
                       ) : (
                         <span className="italic">
-                          {item.type === "product" ? "Food database item" : "Recipe result"}
+                          {item.type === "product"
+                            ? "Food database item"
+                            : "Recipe result"}
                         </span>
                       )}
 
