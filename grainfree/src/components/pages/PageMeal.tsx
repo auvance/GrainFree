@@ -110,17 +110,17 @@ export default function PageMeal() {
         return;
       }
 
-      const calories = meal.nutrition?.nutrients?.find(
+      const caloriesVal = meal.nutrition?.nutrients?.find(
         (n) => n.name === "Calories"
       );
 
       const { error: insertError } = await supabase.from("saved_meals").insert([
         {
           user_id: user.id,
-          meal_id: meal.id,
+          meal_id: Number(meal.id),
           title: meal.title,
-          image: meal.image,
-          calories: calories?.amount || null,
+          image: meal.image ?? null,
+          calories: caloriesVal?.amount ?? null,
         },
       ]);
 
@@ -128,8 +128,20 @@ export default function PageMeal() {
 
       setSaved(true);
     } catch (err) {
-      console.error("Save meal error:", err);
-      alert("Could not save meal. Try again.");
+      const msg =
+        err && typeof err === "object" && "message" in err
+          ? (err as { message?: string }).message
+          : String(err);
+      const code =
+        err && typeof err === "object" && "code" in err
+          ? (err as { code?: string }).code
+          : undefined;
+      console.error("Save meal error:", msg || err, code ? { code } : "");
+      alert(
+        msg
+          ? `Could not save meal: ${msg}`
+          : "Could not save meal. Try again."
+      );
     } finally {
       setSaving(false);
     }
