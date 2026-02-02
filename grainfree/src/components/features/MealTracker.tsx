@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -10,9 +10,13 @@ type Meal = {
   type: "Breakfast" | "Lunch" | "Dinner" | "Snack";
   calories: number;
   time?: string;
-  eaten_at?: string;
+  eaten_at?: string | null;
   completed?: boolean;
 };
+
+function cn(...c: Array<string | false | undefined | null>) {
+  return c.filter(Boolean).join(" ");
+}
 
 export default function MealTracker({
   meals = [],
@@ -22,22 +26,34 @@ export default function MealTracker({
   onMealAdded?: (m: Meal) => void;
 }) {
   const { user } = useAuth();
-  const mealTypes: Meal["type"][] = ["Breakfast", "Lunch", "Dinner", "Snack"];
+  const mealTypes: Meal["type"][] = useMemo(
+    () => ["Breakfast", "Lunch", "Dinner", "Snack"],
+    []
+  );
+
   const [showForm, setShowForm] = useState(false);
   const [newMeal, setNewMeal] = useState<Partial<Meal>>({});
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingSuggest, setLoadingSuggest] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const SPOONACULAR_KEY = process.env.NEXT_PUBLIC_SPOONACULAR_KEY;
 
-  // ─── Fetch meal suggestions ───────────────────────────────
+  // Suggestions (debounced)
   useEffect(() => {
-    if (!newMeal.name || newMeal.name.length < 3) return;
+    const q = (newMeal.name || "").trim();
+    if (!q || q.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+
     const fetchSuggestions = async () => {
       try {
-        setLoading(true);
+        setLoadingSuggest(true);
         const res = await fetch(
-          `https://api.spoonacular.com/recipes/complexSearch?query=${newMeal.name}&number=5&addRecipeNutrition=true&apiKey=${SPOONACULAR_KEY}`,
+          `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(
+            q
+          )}&number=6&addRecipeNutrition=true&apiKey=${SPOONACULAR_KEY}`,
           { next: { revalidate: 3600 } }
         );
         const data = await res.json();
@@ -45,239 +61,283 @@ export default function MealTracker({
       } catch (err) {
         console.error("Error fetching recipes", err);
       } finally {
-        setLoading(false);
+        setLoadingSuggest(false);
       }
     };
-    const debounce = setTimeout(fetchSuggestions, 400);
-    return () => clearTimeout(debounce);
-  }, [newMeal.name]);
 
-  // ─── Add Meal (Pending) ─────────────────────────────────────
+    const t = setTimeout(fetchSuggestions, 350);
+    return () => clearTimeout(t);
+  }, [newMeal.name, SPOONACULAR_KEY]);
+
+  const pendingMeals = useMemo(
+    () => meals.filter((m) => !m.completed),
+    [meals]
+  );
+
+  const resetForm = () => {
+    setNewMeal({});
+    setSuggestions([]);
+    setShowForm(false);
+  };
+
   const handleAddMeal = async () => {
     if (!user || !newMeal.name || !newMeal.type) return;
 
-    const mealToAdd = {
-      ...newMeal,
-      user_id: user.id,
-      completed: false,
-      eaten_at: null,
-    };
+    setSaving(true);
+    try {
+      const mealToAdd = {
+        name: newMeal.name,
+        type: newMeal.type,
+        calories: Number(newMeal.calories || 0),
+        time: newMeal.time || null,
+        user_id: user.id,
+        completed: false,
+        eaten_at: null,
+      };
 
+      const { data, error } = await supabase
+        .from("completed_meals")
+        .insert([mealToAdd])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        return;
+      }
+
+      onMealAdded?.(data);
+      resetForm();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const markAsEaten = async (mealId: string) => {
     const { data, error } = await supabase
       .from("completed_meals")
-      .insert([mealToAdd])
+      .update({ completed: true, eaten_at: new Date().toISOString() })
+      .eq("id", mealId)
       .select()
       .single();
 
     if (error) {
-      console.error("Supabase insert error:", error);
+      console.error("Supabase update error:", error);
       return;
     }
 
     onMealAdded?.(data);
-    setShowForm(false);
-    setNewMeal({});
-    setSuggestions([]);
   };
 
- // ─── Mark as Completed ─────────────────────────────────────
-const markAsEaten = async (mealId: string) => {
-  const { data, error } = await supabase
-    .from("completed_meals")
-    .update({ completed: true, eaten_at: new Date().toISOString() })
-    .eq("id", mealId)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Supabase update error:", error);
-    return;
-  }
-
-  // ✅ Remove the meal instantly from local list
-  onMealAdded?.(data); // this updates stats in parent
-
-  // Trigger local UI update without reload
-  setSuggestions([]);
-  setShowForm(false);
-
-  // Remove the completed meal from displayed pending meals
-  const updated = meals.filter((m) => m.id !== mealId);
-  // @ts-ignore — safe to call this way for your structure
-  onMealAdded?.({ ...data, _refreshMeals: updated });
-};
-
-
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-
-      <div className=" bg-[#2C4435] pt-10 pb-10 pl-15 pr-15 mb-6 rounded-[20px]">
-        <div className="flex items-center justify-between">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-[2rem] font-[AeonikArabic] font-semibold">Today's Meals</h2>
-            <p className="text-[1.2rem] font-[AeonikArabic] text-gray-300">
-              Track your daily meals and mark them when eaten.
+            <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
+              meal tracker
+            </p>
+            <h2 className="mt-2 font-[AeonikArabic] text-[1.7rem] sm:text-[2.1rem] font-semibold leading-tight">
+              Today’s Meals
+            </h2>
+            <p className="mt-2 font-[AeonikArabic] text-white/75 max-w-[62ch]">
+              Add meals as “pending”, then mark them eaten to update your stats.
             </p>
           </div>
+
           <button
-            onClick={() => setShowForm(true)}
-            className="px-10 py-5 text-sm rounded-lg bg-[#223528] text-[1rem] font-[AeonikArabic]"
+            onClick={() => setShowForm((s) => !s)}
+            className="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/8 px-5 py-3 font-[AeonikArabic] text-sm text-white hover:bg-white/12 transition"
           >
-            Create New Meal
+            {showForm ? "Close" : "Add Meal"}
           </button>
         </div>
 
-      {/* Add Meal Form */}
-      {showForm && (
-      <div className="mt-6 relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              type="text"
-              placeholder="Enter Meal Name"
-              value={newMeal.name || ""}
-              onChange={(e) => setNewMeal({ ...newMeal, name: e.target.value })}
-              className="px-3 py-2 rounded bg-[#3A5340]"
-            />
-            <input
-              type="number"
-              placeholder="Calories (optional)"
-              value={newMeal.calories || ""}
-              onChange={(e) =>
-                setNewMeal({ ...newMeal, calories: Number(e.target.value) })
-              }
-              className="px-3 py-2 rounded bg-[#3A5340]"
-            />
-            {suggestions.length > 0 && (
-              <div className="absolute top-12 left-0 w-full bg-[#223528] border border-white/10 rounded-lg z-50">
-                {suggestions.map((s) => (
-                  <div
-                    key={s.id}
-                    onClick={() => {
-                      const macros = s.nutrition?.nutrients?.reduce(
-                        (acc: any, n: any) => {
-                          if (n.name === "Protein") acc.protein = n.amount;
-                          if (n.name === "Carbohydrates") acc.carbs = n.amount;
-                          if (n.name === "Fat") acc.fat = n.amount;
-                          return acc;
-                        },
-                        { protein: 0, carbs: 0, fat: 0 }
-                      );
-                    
-                      setNewMeal({
-                        ...newMeal,
-                        name: s.title,
-                        calories: Math.round(
-                          s.nutrition?.nutrients?.find((n: any) => n.name === "Calories")?.amount ||
-                            0
-                        ),
-                        ...macros,
-                      });
-                    }}
-                    className="px-3 py-2 text-sm hover:bg-white/10 cursor-pointer"
-                  >
-                    {s.title}
+        {/* Form */}
+        {showForm ? (
+          <div className="relative mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+              <div className="md:col-span-5 relative">
+                <input
+                  type="text"
+                  placeholder="Meal name (e.g., quinoa salad)"
+                  value={newMeal.name || ""}
+                  onChange={(e) =>
+                    setNewMeal((p) => ({ ...p, name: e.target.value }))
+                  }
+                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                />
+
+                {/* Suggestions */}
+                {(loadingSuggest || suggestions.length > 0) && (
+                  <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-[#1f2a24]/95 backdrop-blur-xl shadow-[0_22px_60px_rgba(0,0,0,0.35)]">
+                    {loadingSuggest ? (
+                      <div className="px-4 py-3 text-sm font-[AeonikArabic] text-white/70">
+                        Searching…
+                      </div>
+                    ) : (
+                      suggestions.map((s) => {
+                        const kcal =
+                          Math.round(
+                            s.nutrition?.nutrients?.find((n: any) => n.name === "Calories")
+                              ?.amount || 0
+                          ) || 0;
+
+                        return (
+                          <button
+                            type="button"
+                            key={s.id}
+                            onClick={() =>
+                              setNewMeal((p) => ({
+                                ...p,
+                                name: s.title,
+                                calories: kcal,
+                              }))
+                            }
+                            className="w-full text-left px-4 py-3 hover:bg-white/10 transition"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="font-[AeonikArabic] text-sm text-white">
+                                {s.title}
+                              </span>
+                              <span className="font-[AeonikArabic] text-xs text-white/60">
+                                {kcal ? `${kcal} kcal` : ""}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
                   </div>
-                ))}
+                )}
               </div>
-            )}
 
-            <select
-              value={newMeal.type || ""}
-              onChange={(e) =>
-                setNewMeal({ ...newMeal, type: e.target.value as Meal["type"] })
-              }
-              className="px-3 py-2 rounded bg-[#3A5340] "
-            >
-              <option value="">Select Type</option>
-              {mealTypes.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
+              <div className="md:col-span-2">
+                <select
+                  value={newMeal.type || ""}
+                  onChange={(e) =>
+                    setNewMeal((p) => ({
+                      ...p,
+                      type: e.target.value as Meal["type"],
+                    }))
+                  }
+                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                >
+                  <option value="">Type</option>
+                  {mealTypes.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <input
-              type="time"
-              value={newMeal.time || ""}
-              onChange={(e) => setNewMeal({ ...newMeal, time: e.target.value })}
-              className="px-3 py-2 rounded bg-[#3A5340]"
-            />
+              <div className="md:col-span-2">
+                <input
+                  type="number"
+                  placeholder="Calories"
+                  value={newMeal.calories ?? ""}
+                  onChange={(e) =>
+                    setNewMeal((p) => ({ ...p, calories: Number(e.target.value) }))
+                  }
+                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                />
+              </div>
+
+              <div className="md:col-span-3">
+                <input
+                  type="time"
+                  value={newMeal.time || ""}
+                  onChange={(e) =>
+                    setNewMeal((p) => ({ ...p, time: e.target.value }))
+                  }
+                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                onClick={handleAddMeal}
+                disabled={saving || !newMeal.name || !newMeal.type}
+                className={cn(
+                  "rounded-xl px-5 py-2.5 font-[AeonikArabic] text-sm transition",
+                  "border border-white/10",
+                  saving || !newMeal.name || !newMeal.type
+                    ? "bg-white/5 text-white/50 cursor-not-allowed"
+                    : "bg-[#008509] hover:bg-green-700 text-white"
+                )}
+              >
+                {saving ? "Adding…" : "Add Meal"}
+              </button>
+
+              <button
+                onClick={resetForm}
+                className="rounded-xl px-5 py-2.5 font-[AeonikArabic] text-sm border border-white/10 bg-white/5 hover:bg-white/10 transition"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-
-          <div className="flex gap-3 mt-4">
-            <button
-              onClick={handleAddMeal}
-              className="px-13 py-2 font-[AeonikArabic] rounded-[10px] bg-[#008509] hover:bg-green-700 text-white"
-            >
-              Add Meal
-            </button>
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setNewMeal({});
-                setSuggestions([]);
-              }}
-              className="px-13 py-2 font-[AeonikArabic] rounded-[10px] bg-[#352225] hover:bg-red-900/70 text-white"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+        ) : null}
       </div>
 
-      
-
-      {/* Meals Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Meal columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         {mealTypes.map((mealType) => {
-          const logged = meals.filter(
-            (m) => m.type === mealType && !m.completed
-          );
+          const logged = pendingMeals.filter((m) => m.type === mealType);
 
           return (
             <div
               key={mealType}
-              className="bg-[#2C4435] text-[1.5rem] border border-white/10 pt-10 pb-10 pl-15 pr-15 rounded-[20px]"
+              className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-5 sm:p-6"
             >
-              <h3 className="font-semibold mb-2 font-[AeonikArabic]">{mealType}</h3>
-              {logged.length > 0 ? (
-                logged.map((meal) => (
-                  <div
-                    key={meal.id}
-                    className="flex items-center justify-between mb-2"
-                  >
-                    <div>
-                      <p className="text-sm text-gray-200">
-                        {meal.name} – {meal.calories || "??"} kcal{" "}
-                        {meal.time ? `– ${meal.time}` : ""}
-                      </p>
-                      <p
-                        className={`text-xs italic ${
-                          meal.completed
-                            ? "text-green-400"
-                            : "text-yellow-400"
-                        }`}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-[AeonikArabic] text-lg sm:text-xl font-semibold">
+                    {mealType}
+                  </h3>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-[AeonikArabic] text-white/70">
+                    {logged.length} pending
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {logged.length > 0 ? (
+                    logged.map((meal) => (
+                      <div
+                        key={meal.id}
+                        className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-start justify-between gap-4"
                       >
-                        {meal.completed ? "Completed" : "Added"}
-                      </p>
-                    </div>
-                    {!meal.completed && (
-                      <button
-                        onClick={() => markAsEaten(meal.id!)}
-                        className="text-xs px-3 py-1 rounded bg-[#008509] hover:bg-green-700"
-                      >
-                        Mark as Eaten
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="text-[1rem] font-[AeonikArabic] text-gray-400 ">
-                  No {mealType} logged yet.
-                </p>
-              )}
+                        <div>
+                          <p className="font-[AeonikArabic] text-white">
+                            {meal.name}
+                          </p>
+                          <p className="mt-1 font-[AeonikArabic] text-sm text-white/70">
+                            {meal.calories ? `${meal.calories} kcal` : "Calories N/A"}
+                            {meal.time ? ` • ${meal.time}` : ""}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => markAsEaten(meal.id!)}
+                          className="shrink-0 rounded-xl px-4 py-2 text-xs font-[AeonikArabic] bg-[#008509] hover:bg-green-700 transition"
+                        >
+                          Mark eaten
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="font-[AeonikArabic] text-white/60">
+                      No {mealType.toLowerCase()} pending.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           );
         })}

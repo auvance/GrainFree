@@ -9,11 +9,15 @@ type Goal = {
   progress: number; // 0–100
 };
 
+function clamp(n: number) {
+  if (Number.isNaN(n)) return 0;
+  return Math.max(0, Math.min(100, Math.round(n)));
+}
+
 export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
   const router = useRouter();
   const { user } = useAuth();
 
-  // fallback if no goals passed
   const fallback = [
     { title: "Staying Gluten-Free", progress: 70 },
     { title: "Gain Healthy Weight", progress: 30 },
@@ -30,88 +34,100 @@ export default function GoalsSection({ goals = [] }: { goals?: Goal[] }) {
     }
 
     try {
-      // delete all plans for this user
       const { error } = await supabase
         .from("healthplans")
         .delete()
         .eq("user_id", user.id);
 
-      if (error) {
-        console.error("Supabase delete error:", error);
-      }
+      if (error) console.error("Supabase delete error:", error);
     } catch (err) {
       console.error("Error wiping plan:", err);
     }
 
-    // Redirect to build wizard
     router.push("/system");
   };
 
   return (
-    <div className="space-y-10">
-      {/* Section 1: Your Health Goals */}
-      <section className="bg-[#2C4435] backdrop-blur-md rounded-[20px] pt-10 pb-10 pr-15 pl-15">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
-          <div>
-            <h2 className="font-[AeonikArabic] text-2xl md:text-3xl font-bold mb-2">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+        {/* Goals list */}
+        <section className="lg:col-span-8 relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-7">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+          <div className="relative">
+            <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
+              goals
+            </p>
+            <h2 className="mt-2 font-[AeonikArabic] text-[1.7rem] sm:text-[2.0rem] font-semibold">
               Your Health Goals
             </h2>
-            <p className="font-[AeonikArabic] italic text-[1.3rem] text-white/90-300 w-105">
-              Track your progress towards achieving your personalized health
-              objectives.
+            <p className="mt-2 font-[AeonikArabic] text-white/75 max-w-[62ch]">
+              Progress is a system. Track it lightly, consistently.
             </p>
+
+            <div className="mt-6 space-y-4">
+              {toRender.map((g) => {
+                const p = clamp(g.progress);
+                return (
+                  <div
+                    key={g.title}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-[AeonikArabic] text-white font-semibold">
+                          {g.title}
+                        </p>
+                        <p className="mt-1 font-[AeonikArabic] text-sm text-white/70">
+                          {p}% progress
+                        </p>
+                      </div>
+
+                      <span className="rounded-full border border-white/10 bg-black/15 px-3 py-1 text-xs font-[AeonikArabic] text-white/70">
+                        active
+                      </span>
+                    </div>
+
+                    <div className="mt-3 h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-[#9DE7C5]/90"
+                        style={{ width: `${p}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="mt-4 md:mt-0 text-right max-w-sm">
-            <p className="font-[AeonikArabic] text-[1.1rem] text-white mb-2">★ Want to Start Over?</p>
-            <p className="font-[AeonikArabic] text-[0.85rem] text-white/90 w-75 mb-2">
-              Your needs change — and so should your plan. If you’d like to
-              rebuild from scratch, we’ve got you.
+        </section>
+
+        {/* Start Fresh */}
+        <aside className="lg:col-span-4 relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-7">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+          <div className="relative">
+            <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
+              rebuild
             </p>
+            <h3 className="mt-2 font-[AeonikArabic] text-[1.4rem] font-semibold">
+              Start fresh
+            </h3>
+            <p className="mt-2 font-[AeonikArabic] text-white/75 leading-relaxed">
+              If your needs changed, regenerate a plan that fits your current
+              goals and restrictions.
+            </p>
+
             <button
               onClick={handleStartFresh}
-              className="px-8 py-3 mt-5 rounded-lg font-[AeonikArabic] bg-[#3D4F46] hover:bg-[#2d3a34] text-white text-sm"
+              className="mt-5 w-full rounded-xl border border-white/12 bg-white/8 px-5 py-3 font-[AeonikArabic] text-sm hover:bg-white/12 transition"
             >
-              Start Fresh
+              Rebuild my plan
             </button>
+
+            <p className="mt-3 font-[AeonikArabic] text-xs text-white/60">
+              This removes your latest plan and takes you back to the wizard.
+            </p>
           </div>
-        </div>
-
-        {/* Goals as pill-like cards */}
-        <div className="flex justify-center gap-7 mt-20 mb-10">
-          {toRender.map((goal) => (
-            <div
-              key={goal.title}
-              className="px-8 py-5 rounded-lg bg-[#47674E] font-[AeonikArabic] italic text-center text-white/70 text-sm font-normal"
-            >
-              {goal.title}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Section 2: Active Goals */}
-      <section className="bg-[#2C4435]  backdrop-blur-md rounded-[20px] pt-10 pb-10 pr-15 pl-15">
-        <h2 className="font-[AeonikArabic] text-2xl font-bold mb-6">Active Goals</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {toRender.map((goal) => (
-            <div
-              key={goal.title}
-              className="bg-[#334E3D] pt-10 pb-10 pr-13 pl-13 rounded-[10px]"
-            >
-              <h3 className="font-[AeonikArabic] italic font-semibold mb-2">{goal.title}</h3>
-              <p className="font-[AeonikArabic] text-sm italic text-gray-300 mb-2">
-                Progress – {goal.progress}%
-              </p>
-              <div className="w-full bg-[white/10] h-2 rounded-full">
-                <div
-                  className="bg-[#008509] h-2 rounded-full transition-all"
-                  style={{ width: `${goal.progress}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+        </aside>
+      </div>
     </div>
   );
 }

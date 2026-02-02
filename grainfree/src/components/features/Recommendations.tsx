@@ -7,30 +7,51 @@ type Recommendation = {
 
 export default function Recommendations({ items = [] }: { items?: Recommendation[] }) {
   const fallback: Recommendation[] = [
-    { title: "Mediterranean Quinoa Salad" },
-    { title: "Coconut Flour Muffins" },
-    { title: "Zucchini Noodle Pasta" },
+    { title: "Mediterranean Quinoa Salad", why: "Balanced + gluten-free friendly." },
+    { title: "Coconut Flour Muffins", why: "Good option for quick snacks." },
+    { title: "Zucchini Noodle Pasta", why: "Low-gluten-risk comfort meal." },
   ];
 
-const toRender: Recommendation[] = items.length ? items : fallback;
+  const toRender: Recommendation[] = items.length ? items : fallback;
 
   return (
-    <div>
-      <div className="bg-[#2C4435] pt-8 pb-8 pr-15 pl-15 font-[AeonikArabic] mb-6 rounded-[20px]">
-        <h2 className="text-3xl font-semibold">Recommended For You</h2>
-        <p>Based on your dietary preferences and past meals.</p>
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+        <div className="relative">
+          <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
+            suggestions
+          </p>
+          <h2 className="mt-2 font-[AeonikArabic] text-[1.7rem] sm:text-[2.0rem] font-semibold">
+            Recommended for you
+          </h2>
+          <p className="mt-2 font-[AeonikArabic] text-white/75 max-w-[60ch]">
+            Based on your preferences and goals. Keep what works — ignore the rest.
+          </p>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
         {toRender.map((item) => (
           <div
             key={item.title}
-            className="bg-white/5 border border-white/10 p-4 rounded-lg"
+            className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-5"
           >
-            <h3 className="font-semibold mb-2">{item.title}</h3>
-            {item.why && <p className="text-sm text-gray-400 mb-2">{item.why}</p>}
-            <button className="mt-2 px-3 py-1 text-sm rounded bg-[#008509] hover:bg-green-700">
-              Save Recipe
-            </button>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+            <div className="relative">
+              <p className="font-[AeonikArabic] text-white font-semibold text-[1.05rem]">
+                {item.title}
+              </p>
+              {item.why ? (
+                <p className="mt-2 font-[AeonikArabic] text-sm text-white/70 leading-relaxed">
+                  {item.why}
+                </p>
+              ) : null}
+
+              <button className="mt-4 rounded-xl px-4 py-2 text-xs font-[AeonikArabic] bg-[#008509] hover:bg-green-700 transition">
+                Save
+              </button>
+            </div>
           </div>
         ))}
       </div>
