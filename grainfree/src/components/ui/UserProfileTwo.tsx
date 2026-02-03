@@ -4,9 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { LogIn, UserCircle } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
 
 interface UserProfileProps {
-  user: any;
+  user: User | null;
   loading: boolean;
 }
 

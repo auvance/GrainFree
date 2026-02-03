@@ -147,7 +147,7 @@ export default function PageGrainfreehub() {
 
       const data = await res.json();
       setItems(
-        (data.results || []).map((r: any) => ({
+        (data.results || []).map((r: Record<string, unknown>) => ({
           ...r,
           type: "meal",
         }))
@@ -182,7 +182,7 @@ export default function PageGrainfreehub() {
       const data = await res.json();
 
       setItems(
-        (data.products || []).map((p: any) => ({
+        (data.products || []).map((p: Record<string, unknown>) => ({
           ...p,
           type: "product",
         }))
@@ -200,7 +200,8 @@ export default function PageGrainfreehub() {
   // ────────────────────────────────────────────────────────────
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    source === "products" ? fetchProducts(query) : fetchRecipes(query, filter);
+    if (source === "products") fetchProducts(query);
+    else fetchRecipes(query, filter);
   };
 
   const handleFilterChange = (value: string) => {
@@ -212,7 +213,8 @@ export default function PageGrainfreehub() {
   // Load initial data
   // ────────────────────────────────────────────────────────────
   useEffect(() => {
-    source === "products" ? fetchProducts() : fetchRecipes();
+    if (source === "products") fetchProducts();
+    else fetchRecipes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source]);
 

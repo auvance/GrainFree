@@ -15,17 +15,30 @@ import Recommendations from "@/components/features/Recommendations";
 import SavedMeals from "@/components/features/SavedMeals";
 import SavedProducts from "@/components/features/SavedProducts";
 
+type CompletedMeal = {
+  id: string;
+  completed?: boolean;
+  eaten_at?: string;
+  calories?: number;
+};
+
+type HealthPlan = {
+  goals?: unknown[];
+  recommendations?: unknown[];
+  [key: string]: unknown;
+} | null;
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const sp = useSearchParams();
 
-  const [plan, setPlan] = useState<any>(null);
+  const [plan, setPlan] = useState<HealthPlan>(null);
   const [activeTab, setActiveTab] = useState<
     "meals" | "goals" | "recommendations" | "savedMeals" | "savedProducts"
   >("meals");
 
-  const [showModal, setShowModal] = useState(false);
-  const [meals, setMeals] = useState<any[]>([]);
+  const [, setShowModal] = useState(false);
+  const [meals, setMeals] = useState<CompletedMeal[]>([]);
   const [stats, setStats] = useState({
     caloriesToday: 0,
     goal: 2000,
@@ -40,7 +53,7 @@ export default function DashboardPage() {
   }, [sp]);
 
   // ─── Calculate streak based on consecutive days with completed meals ──────────────
-  const calculateStreak = (allMeals: any[]) => {
+  const calculateStreak = (allMeals: CompletedMeal[]) => {
     const completedMeals = allMeals.filter((m) => m.completed && m.eaten_at);
     if (completedMeals.length === 0) return 0;
 
@@ -62,7 +75,7 @@ export default function DashboardPage() {
   };
 
   // ─── Update Stats ─────────────────────────────────────────────
-  const updateStats = (allMeals: any[]) => {
+  const updateStats = (allMeals: CompletedMeal[]) => {
     const today = new Date().toDateString();
 
     const todaysMeals = allMeals.filter(
@@ -121,12 +134,12 @@ export default function DashboardPage() {
   }, [user]);
 
   // ─── Handle meal add/update from MealTracker ───────────────────
-  const handleMealAdded = (newMeal: any) => {
+  const handleMealAdded = (newMeal: CompletedMeal) => {
     setMeals((prev) => {
       // if meal is completed, we keep it in the list (so stats can track),
       // but MealTracker will show pending meals only.
       const existingIndex = prev.findIndex((m) => m.id === newMeal.id);
-      let updated: any[];
+      let updated: CompletedMeal[];
 
       if (existingIndex >= 0) {
         updated = [...prev];
@@ -207,11 +220,12 @@ export default function DashboardPage() {
               <div className="rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl p-2 ">
                 <div className="flex justify-evenly gap-2 overflow-x-auto scrollbar-hide py-1">
                   {tabs.map((tab) => {
-                    const active = activeTab === (tab.id as any);
+                    const tabId = tab.id as typeof activeTab;
+                    const active = activeTab === tabId;
                     return (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tabId)}
                         className={[
                           "shrink-0 rounded-xl px-4 py-2.5 text-sm font-[AeonikArabic] transition",
                           active

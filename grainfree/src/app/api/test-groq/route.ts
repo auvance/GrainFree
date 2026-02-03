@@ -38,12 +38,19 @@ ${JSON.stringify(answers, null, 2)}
 
     const text = response.choices?.[0]?.message?.content?.trim() || "{}";
 
-    let parsed: any;
+    type PlanJson = {
+      title?: string;
+      description?: string;
+      goals?: unknown[];
+      meals?: unknown[];
+      recommendations?: unknown[];
+    };
+    let parsed: PlanJson;
     try {
-      parsed = JSON.parse(text);
+      parsed = JSON.parse(text) as PlanJson;
     } catch {
       const match = text.match(/\{[\s\S]*\}/);
-      parsed = match ? JSON.parse(match[0]) : {};
+      parsed = match ? (JSON.parse(match[0]) as PlanJson) : {};
     }
 
     // 🎯 Derive calorie target from answers
@@ -75,11 +82,9 @@ ${JSON.stringify(answers, null, 2)}
       .upsert({ id: userId, calorie_target: calorieTarget }, { onConflict: "id" });
 
     return NextResponse.json({ success: true, plan: data });
-  } catch (err: any) {
+  } catch (err) {
     console.error("generate-plan error:", err);
-    return NextResponse.json(
-      { error: err.message || "Server error" },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

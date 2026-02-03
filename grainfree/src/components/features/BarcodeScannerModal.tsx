@@ -93,9 +93,9 @@ export default function BarcodeScannerModal({
 
         controlsRef.current = controls;
         setStatus("ready");
-      } catch (e: any) {
-        const name = e?.name || "";
-        const msg = e?.message || "Failed to start camera.";
+      } catch (e) {
+        const name = e instanceof Error ? e.name : "";
+        const msg = e instanceof Error ? e.message : "Failed to start camera.";
 
         if (name === "NotAllowedError" || name === "SecurityError") {
           setStatus("permission_denied");

@@ -115,8 +115,8 @@ export default function ProductSearchPage() {
       const list = (data.products || []) as OFFProduct[];
       setProducts(list);
       setCount(Number(data.count || 0));
-    } catch (e: any) {
-      setError(e?.message || "Something went wrong.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong.");
       setProducts([]);
       setCount(0);
     } finally {
