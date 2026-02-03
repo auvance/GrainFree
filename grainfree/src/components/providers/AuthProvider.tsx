@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 type User = {
   id: string;
-  email: string;
+  email?: string;
   user_metadata?: Record<string, unknown>;
 } | null;
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/providers/AuthProvider";
 
-type Meal = {
+export type Meal = {
   id?: string;
   name: string;
   type: "Breakfast" | "Lunch" | "Dinner" | "Snack";

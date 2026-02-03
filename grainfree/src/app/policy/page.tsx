@@ -1,5 +1,5 @@
-import PagePrivacy from '@/components/pages/PageMeal'
+import PagePrivacy from "@/components/pages/PagePrivacy";
 
-export default function AboutPage() {
-    return <PagePrivacy />
-  }
+export default function PolicyPage() {
+  return <PagePrivacy />;
+}
