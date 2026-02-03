@@ -242,32 +242,40 @@ export default function DashboardPage() {
 
         {/* Content Panel */}
         <div className="mt-8 sm:mt-10">
-          <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-7">
-            <div className="pointer-events-none absolute inset-0 opacity-70 bg-gradient-to-b from-white/8 to-transparent" />
+          <div className="relative rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-7">
+            <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-70 bg-gradient-to-b from-white/8 to-transparent" />
 
-            {!plan ? (
-              <div className="text-center py-10 sm:py-14">
-                <p className="font-[AeonikArabic] font-semibold text-[1.2rem]">
-                  No plan yet.
-                </p>
-                <p className="mt-2 font-[AeonikArabic] text-white/70">
-                  Build your plan first — then your dashboard becomes your daily
-                  system.
-                </p>
-              </div>
-            ) : (
-              <>
-                {activeTab === "meals" && (
-                  <MealTracker meals={meals} onMealAdded={handleMealAdded} />
-                )}
-                {activeTab === "goals" && <GoalsSection goals={plan.goals} />}
-                {activeTab === "recommendations" && (
-                  <Recommendations items={plan.recommendations} />
-                )}
-                {activeTab === "savedMeals" && <SavedMeals />}
-                {activeTab === "savedProducts" && <SavedProducts />}
-              </>
+            {activeTab === "meals" && (
+              <MealTracker meals={meals} onMealAdded={handleMealAdded} />
             )}
+            {activeTab === "goals" &&
+              (plan?.goals ? (
+                <GoalsSection goals={plan.goals} />
+              ) : (
+                <div className="relative text-center py-10 sm:py-14">
+                  <p className="font-[AeonikArabic] font-semibold text-[1.2rem]">
+                    No plan yet.
+                  </p>
+                  <p className="mt-2 font-[AeonikArabic] text-white/70">
+                    Build your plan first to see your goals here.
+                  </p>
+                </div>
+              ))}
+            {activeTab === "recommendations" &&
+              (plan?.recommendations ? (
+                <Recommendations items={plan.recommendations} />
+              ) : (
+                <div className="relative text-center py-10 sm:py-14">
+                  <p className="font-[AeonikArabic] font-semibold text-[1.2rem]">
+                    No plan yet.
+                  </p>
+                  <p className="mt-2 font-[AeonikArabic] text-white/70">
+                    Build your plan first to get recommendations.
+                  </p>
+                </div>
+              ))}
+            {activeTab === "savedMeals" && <SavedMeals />}
+            {activeTab === "savedProducts" && <SavedProducts />}
           </div>
         </div>
       </div>

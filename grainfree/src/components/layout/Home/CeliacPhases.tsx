@@ -88,7 +88,7 @@ function StoryBlock({
       <div
         className={cn(
           "lg:col-span-7 relative overflow-hidden rounded-3xl border border-white/12 bg-white/8 backdrop-blur-xl",
-          "shadow-[0_30px_90px_rgba(0,0,0,0.22)]",
+          "shadow-[0_30px_90px_rgba(0,0,0,0.1)]",
           flip ? "order-2 lg:order-1" : "order-2 lg:order-2"
         )}
       >
@@ -109,7 +109,7 @@ function StoryBlock({
 
         {/* Corner stamp */}
         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/14 bg-black/20 px-3 py-2 backdrop-blur-md">
-          <span className="h-2 w-2 rounded-full bg-[#9DE7C5]/90 shadow-[0_0_22px_rgba(157,231,197,0.5)]" />
+          <span className="h-2 w-2 rounded-full bg-[#9DE7C5]/90 shadow-[0_0_22px_rgba(157,231,197,0.1)]" />
           <span className="font-[AeonikArabic] text-[11px] tracking-[0.18em] uppercase text-white/75">
             {kicker}
           </span>
@@ -240,7 +240,7 @@ export default function CeliacPhases() {
                       key={t}
                       className="flex gap-3 font-[AeonikArabic] text-white/80"
                     >
-                      <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-[#9DE7C5]/90 shadow-[0_0_22px_rgba(157,231,197,0.5)]" />
+                      <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-[#9DE7C5]/90 shadow-[0_0_22px_rgba(157,231,197,0.1)]" />
                       <span>{t}</span>
                     </li>
                   )

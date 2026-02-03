@@ -207,7 +207,7 @@ export default function WhyBuiltSection({
             {/* empathy bridge card */}
             <motion.div
               variants={fadeUp}
-              className="mt-7 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-5 sm:p-6 shadow-[0_20px_70px_rgba(0,0,0,0.25)]"
+              className="mt-7 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-5 sm:p-6 shadow-[0_20px_70px_rgba(0,0,0,0.1)]"
             >
               <p className="font-[AeonikArabic] text-white/90 text-[1.05rem] sm:text-[1.15rem] leading-relaxed">
                 {empathyLine}
@@ -289,7 +289,7 @@ export default function WhyBuiltSection({
 
               {/* small label tag */}
               <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/18 bg-black/15 px-4 py-2 backdrop-blur-md">
-                <span className="h-2 w-2 rounded-full bg-[#9DE7C5] shadow-[0_0_18px_rgba(157,231,197,0.5)]" />
+                <span className="h-2 w-2 rounded-full bg-[#9DE7C5] shadow-[0_0_18px_rgba(157,231,197,0.1)]" />
                 <span className="text-xs tracking-[0.18em] uppercase text-white/75 font-[AeonikArabic]">
                   built with empathy
                 </span>
@@ -343,7 +343,7 @@ export default function WhyBuiltSection({
           >
             <motion.div
               variants={fadeUp}
-              className="rounded-3xl border border-white/16 bg-black/15 backdrop-blur-xl p-6 sm:p-7 shadow-[0_30px_90px_rgba(0,0,0,0.25)]"
+              className="rounded-3xl border border-white/16 bg-black/15 backdrop-blur-xl p-6 sm:p-7 shadow-[0_30px_90px_rgba(0,0,0,0.1)]"
             >
               <p className="font-[AeonikArabic] text-white/90 text-[1.05rem] sm:text-[1.12rem] leading-relaxed">
                 There&apos;s no pricing, no spam, no BS. Just real food, smart tools,

@@ -167,7 +167,7 @@ export default function FeatureBento() {
               {/* Set radius via CSS var (no nested style tags) */}
               <div className="gf-stage relative mx-auto aspect-square w-full max-w-[620px] [--r:190px] lg:[--r:250px]">
                 {/* Outer ring */}
-                <div className="absolute inset-0 rounded-full border border-white/12 bg-white/5 backdrop-blur-xl shadow-[0_30px_90px_rgba(0,0,0,0.24)]" />
+                <div className="absolute inset-0 rounded-full border border-white/12 bg-white/5 backdrop-blur-xl shadow-[0_30px_90px_rgba(0,0,0,0.1)]" />
                 <div className="pointer-events-none absolute inset-0 rounded-full border border-white/10 opacity-40" />
 
                 {/* Rotating ring */}
