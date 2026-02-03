@@ -184,7 +184,7 @@ export default function GrainFreeWordmark({
           variants={canvasReveal}
           initial="hidden"
           animate="show"
-          className="block lg:hidden py-10 sm:py-12"
+          className="block flex flex-col-reverse gap-10 lg:hidden py-10 sm:py-12"
         >
           {/* Media grid */}
           <div className="relative">
@@ -263,7 +263,7 @@ export default function GrainFreeWordmark({
 
           {/* Wordmark below (same background, same type feel, responsive clamp) */}
           <motion.h1
-            className="mt-10 sm:mt-12 font-[AeonikArabic] font-bold leading-[0.85] tracking-tight text-[clamp(3.6rem,14vw,7.5rem)]"
+            className="mt-10 sm:mt-12 font-[AeonikArabic] font-bold leading-[0.85] tracking-tight text-[clamp(5rem,14vw,7.5rem)]"
             initial={{ clipPath: "inset(0 0 100% 0)", opacity: 0.95 }}
             animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }}
             transition={{

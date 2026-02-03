@@ -160,25 +160,28 @@ export default function Header() {
         <div className="absolute inset-0 bg-black/35 backdrop-blur-sm" />
       </div>
 
-      {/* SLIDE PANEL (starts BELOW the header so it doesn't look broken) */}
+      {/* SLIDE PANEL (starts BELOW the header; uses svh so it never gets cut off by mobile browser chrome) */}
       <aside
-        style={{ top: panelTop }}
+        style={{
+          top: panelTop,
+          height: "calc(100svh - 120px)",
+        }}
         className={cn(
           "fixed right-4 sm:right-6 z-[95]",
-          "h-[calc(100vh-120px)]",
+          "h-[calc(100vh-120px)]", // fallback when svh not supported
           "w-[88%] max-w-[420px]",
           "rounded-2xl",
           "bg-[#0E1513] text-white",
           "border border-white/10",
           "shadow-2xl",
-          "overflow-hidden",
+          "overflow-y-auto overflow-x-hidden",
           "transition-transform duration-300 ease-out",
           "font-[AeonikArabic]",
           menuOpen ? "translate-x-0" : "translate-x-[110%]"
         )}
         aria-hidden={!menuOpen}
       >
-        <div className="h-full flex flex-col">
+        <div className="min-h-full flex flex-col">
           {/* Panel top */}
           <div className="px-5 pt-5 pb-4 border-b border-white/10">
             <p className="text-white/50 text-xs uppercase tracking-wider">

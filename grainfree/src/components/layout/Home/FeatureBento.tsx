@@ -150,7 +150,7 @@ export default function FeatureBento() {
         <div
           ref={wrapRef}
           onMouseMove={onMove}
-          className="relative mt-14 sm:mt-16 lg:mt-20"
+          className="relative mt-34 sm:mt-16 lg:mt-20"
           style={
             {
               ["--mx" as string]: "50%",
@@ -161,11 +161,11 @@ export default function FeatureBento() {
           {/* Soft mouse glow */}
           
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-30 lg:gap-12 items-center">
             {/* LEFT: Orbit Stage */}
             <div className="lg:col-span-7">
               {/* Set radius via CSS var (no nested style tags) */}
-              <div className="gf-stage relative mx-auto aspect-square w-full max-w-[620px] [--r:190px] lg:[--r:250px]">
+              <div className="gf-stage relative mx-auto aspect-square w-full max-w-[620px] [--r:200px] md:[--r:250px] lg:[--r:250px]">
                 {/* Outer ring */}
                 <div className="absolute inset-0 rounded-full border border-white/12 bg-white/5 backdrop-blur-xl shadow-[0_30px_90px_rgba(0,0,0,0.1)]" />
                 <div className="pointer-events-none absolute inset-0 rounded-full border border-white/10 opacity-40" />
@@ -189,7 +189,7 @@ export default function FeatureBento() {
                           <button
                             type="button"
                             onClick={() => setActiveId(f.id)}
-                            onMouseEnter={() => setActiveId(f.id)}
+                            onMouseEnter={() => setActiveId (f.id)}
                             aria-pressed={isActive}
                             className={cn(
                               "rounded-2xl border backdrop-blur-xl text-left transition",
@@ -224,7 +224,7 @@ export default function FeatureBento() {
                 </div>
 
                 {/* Center core card — ALWAYS ABOVE orbit nodes */}
-                <div className="absolute left-1/2 top-1/2 z-20 w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/12 bg-[#617862]/55 backdrop-blur-xl p-7 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.28)]">
+                <div className="absolute left-1/2 top-1/2 z-20 w-[100%] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/12 bg-[#617862]/55 backdrop-blur-xl p-7 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.28)] lg:w-[70%]">
                   <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-white/10 to-transparent opacity-70" />
 
                   <div className="relative">
