@@ -5,8 +5,10 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { LogIn, UserCircle } from "lucide-react";
 
+type AuthUser = { id: string; email?: string; user_metadata?: Record<string, unknown> } | null;
+
 interface UserProfileProps {
-  user: any;
+  user: AuthUser;
   loading: boolean;
 }
 
@@ -37,10 +39,10 @@ export default function UserProfileTwo({ user, loading }: UserProfileProps) {
               {/* Header with username + email */}
               <div className="px-4 py-3 border-b border-gray-200">
                 <p className="text-sm font-medium text-gray-900">
-                  {user.user_metadata?.username || "Anonymous"}
+                  {String(user.user_metadata?.username ?? "Anonymous")}
                 </p>
                 <p className="text-xs text-gray-500 truncate">
-                  {user.email}
+                  {user.email ?? ""}
                 </p>
               </div>
 

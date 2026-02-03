@@ -171,7 +171,7 @@ export default function PageMeal() {
         <div className="max-w-2xl mx-auto px-6 md:px-16 py-20 text-center">
           <h1 className="text-3xl font-semibold mb-2">Meal not found</h1>
           <p className="text-gray-600 mb-8">
-            We couldn't load this meal right now. Try again or go back.
+            We couldn&apos;t load this meal right now. Try again or go back.
           </p>
           <Link
             href="/grainhub"

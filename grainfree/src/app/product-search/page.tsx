@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 // IMPORTANT: this should be your working modal component file
@@ -41,7 +41,7 @@ function clamp(str: string, max = 56) {
   return str.length > max ? `${str.slice(0, max - 1)}…` : str;
 }
 
-export default function ProductSearchPage() {
+function ProductSearchContent() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -115,8 +115,8 @@ export default function ProductSearchPage() {
       const list = (data.products || []) as OFFProduct[];
       setProducts(list);
       setCount(Number(data.count || 0));
-    } catch (e: any) {
-      setError(e?.message || "Something went wrong.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong.");
       setProducts([]);
       setCount(0);
     } finally {
@@ -423,5 +423,13 @@ export default function ProductSearchPage() {
         title="Scan product barcode"
       />
     </main>
+  );
+}
+
+export default function ProductSearchPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-[#FAFAF5] p-6 flex items-center justify-center">Loading…</main>}>
+      <ProductSearchContent />
+    </Suspense>
   );
 }

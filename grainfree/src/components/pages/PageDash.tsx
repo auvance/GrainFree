@@ -9,23 +9,31 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import Header from "@/components/layout/Header/Header";
 
 import StatsGrid from "@/components/features/StatsGrid";
-import MealTracker from "@/components/features/MealTracker";
+import MealTracker, { type Meal } from "@/components/features/MealTracker";
 import GoalsSection from "@/components/features/GoalsSection";
 import Recommendations from "@/components/features/Recommendations";
 import SavedMeals from "@/components/features/SavedMeals";
 import SavedProducts from "@/components/features/SavedProducts";
 
+type CompletedMeal = Meal & { id: string; completed?: boolean; eaten_at?: string };
+
+type HealthPlan = {
+  goals?: unknown[];
+  recommendations?: unknown[];
+  [key: string]: unknown;
+} | null;
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const sp = useSearchParams();
 
-  const [plan, setPlan] = useState<any>(null);
+  const [plan, setPlan] = useState<HealthPlan>(null);
   const [activeTab, setActiveTab] = useState<
     "meals" | "goals" | "recommendations" | "savedMeals" | "savedProducts"
   >("meals");
 
-  const [showModal, setShowModal] = useState(false);
-  const [meals, setMeals] = useState<any[]>([]);
+  const [, setShowModal] = useState(false);
+  const [meals, setMeals] = useState<CompletedMeal[]>([]);
   const [stats, setStats] = useState({
     caloriesToday: 0,
     goal: 2000,
@@ -40,12 +48,12 @@ export default function DashboardPage() {
   }, [sp]);
 
   // ─── Calculate streak based on consecutive days with completed meals ──────────────
-  const calculateStreak = (allMeals: any[]) => {
+  const calculateStreak = (allMeals: CompletedMeal[]) => {
     const completedMeals = allMeals.filter((m) => m.completed && m.eaten_at);
     if (completedMeals.length === 0) return 0;
 
     const uniqueDates = [
-      ...new Set(completedMeals.map((m) => new Date(m.eaten_at).toDateString())),
+      ...new Set(completedMeals.map((m) => new Date(m.eaten_at!).toDateString())),
     ].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
     let streak = 1;
@@ -62,14 +70,14 @@ export default function DashboardPage() {
   };
 
   // ─── Update Stats ─────────────────────────────────────────────
-  const updateStats = (allMeals: any[]) => {
+  const updateStats = (allMeals: CompletedMeal[]) => {
     const today = new Date().toDateString();
 
     const todaysMeals = allMeals.filter(
       (m) =>
         m.completed &&
         m.eaten_at &&
-        new Date(m.eaten_at).toDateString() === today
+        new Date(m.eaten_at!).toDateString() === today
     );
 
     const totalCalories = todaysMeals.reduce(
@@ -121,18 +129,18 @@ export default function DashboardPage() {
   }, [user]);
 
   // ─── Handle meal add/update from MealTracker ───────────────────
-  const handleMealAdded = (newMeal: any) => {
+  const handleMealAdded = (newMeal: Meal) => {
     setMeals((prev) => {
       // if meal is completed, we keep it in the list (so stats can track),
       // but MealTracker will show pending meals only.
       const existingIndex = prev.findIndex((m) => m.id === newMeal.id);
-      let updated: any[];
+      let updated: CompletedMeal[];
 
       if (existingIndex >= 0) {
         updated = [...prev];
-        updated[existingIndex] = { ...updated[existingIndex], ...newMeal };
+        updated[existingIndex] = { ...updated[existingIndex], ...newMeal } as CompletedMeal;
       } else {
-        updated = [newMeal, ...prev];
+        updated = [{ ...newMeal, id: newMeal.id ?? "" } as CompletedMeal, ...prev];
       }
 
       updateStats(updated);
@@ -151,9 +159,9 @@ export default function DashboardPage() {
     []
   );
 
-  const username =
-    user?.user_metadata?.username ||
-    user?.user_metadata?.full_name ||
+  const username: string =
+    (user?.user_metadata?.username as string | undefined) ||
+    (user?.user_metadata?.full_name as string | undefined) ||
     user?.email?.split("@")?.[0] ||
     "there";
 
@@ -207,11 +215,12 @@ export default function DashboardPage() {
               <div className="rounded-2xl border border-white/10 bg-black/15 backdrop-blur-xl p-2 ">
                 <div className="flex justify-evenly gap-2 overflow-x-auto scrollbar-hide py-1">
                   {tabs.map((tab) => {
-                    const active = activeTab === (tab.id as any);
+                    const tabId = tab.id as typeof activeTab;
+                    const active = activeTab === tabId;
                     return (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tabId)}
                         className={[
                           "shrink-0 rounded-xl px-4 py-2.5 text-sm font-[AeonikArabic] transition",
                           active
@@ -250,7 +259,7 @@ export default function DashboardPage() {
             )}
             {activeTab === "goals" &&
               (plan?.goals ? (
-                <GoalsSection goals={plan.goals} />
+                <GoalsSection goals={plan.goals as { title: string; progress: number }[]} />
               ) : (
                 <div className="relative text-center py-10 sm:py-14">
                   <p className="font-[AeonikArabic] font-semibold text-[1.2rem]">
@@ -263,7 +272,7 @@ export default function DashboardPage() {
               ))}
             {activeTab === "recommendations" &&
               (plan?.recommendations ? (
-                <Recommendations items={plan.recommendations} />
+                <Recommendations items={plan.recommendations as { title: string; why?: string }[]} />
               ) : (
                 <div className="relative text-center py-10 sm:py-14">
                   <p className="font-[AeonikArabic] font-semibold text-[1.2rem]">

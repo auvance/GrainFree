@@ -34,7 +34,7 @@ const tileReveal = {
     clipPath: "inset(0 0 0% 0)",
     transition: {
       duration: 0.75,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as const,
       delay: 0.12 + i * 0.12,
     },
   }),
@@ -48,7 +48,7 @@ const stickerReveal = {
     scale: 1,
     transition: {
       duration: 0.55,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as const,
       delay: 0.72,
     },
   },
@@ -59,7 +59,7 @@ const canvasReveal = {
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
@@ -268,7 +268,7 @@ export default function GrainFreeWordmark({
             animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }}
             transition={{
               duration: 0.9,
-              ease: [0.22, 1, 0.36, 1],
+              ease: [0.22, 1, 0.36, 1] as const,
               delay: 0.55,
             }}
           >
@@ -384,7 +384,7 @@ export default function GrainFreeWordmark({
               animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }}
               transition={{
                 duration: 0.9,
-                ease: [0.22, 1, 0.36, 1],
+                ease: [0.22, 1, 0.36, 1] as const,
                 delay: 0.85,
               }}
             >

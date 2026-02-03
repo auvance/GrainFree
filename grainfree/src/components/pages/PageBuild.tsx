@@ -4,7 +4,7 @@ import { useState } from "react";
 import QuestionCard from "@/components/features/QuestionCard";
 import LoadingScreen from "@/components/features/LoadingScreen";
 import { useRouter } from "next/navigation";
-import Header from "../layout/Header";
+import Header from "@/components/layout/Header/Header";
 
 type Question = {
   id: number;

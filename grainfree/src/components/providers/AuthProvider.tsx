@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabaseClient";
 
 type User = {
   id: string;
-  email: string;
-  user_metadata?: Record<string, any>;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
 } | null;
 
 const AuthContext = createContext<{ user: User; loading: boolean }>({

@@ -35,7 +35,7 @@ const canvasReveal = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
@@ -48,7 +48,7 @@ const tileReveal = {
     clipPath: "inset(0 0 0% 0)",
     transition: {
       duration: 0.75,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as const,
       delay: 0.12 + i * 0.12,
     },
   }),
@@ -214,7 +214,7 @@ export default function AboutHero({
           <motion.div
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.55 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] as const, delay: 0.55 }}
             className="mt-10 sm:mt-12"
           >
             <h2 className="text-[#3D4F46] font-bold font-[AeonikArabic] leading-[0.9] tracking-tight text-[clamp(2.2rem,8.5vw,4.2rem)]">
@@ -283,7 +283,7 @@ export default function AboutHero({
             <motion.div
               initial={{ clipPath: "inset(0 0 100% 0)" }}
               animate={{ clipPath: "inset(0 0 0% 0)" }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] as const }}
               className="absolute left-4 sm:left-8 lg:left-14 bottom-10 sm:bottom-12 lg:bottom-14 z-30"
             >
               <h2 className="text-[#3D4F46] font-bold font-[AeonikArabic] leading-[0.85] tracking-tight text-[clamp(2.6rem,8vw,7rem)]">

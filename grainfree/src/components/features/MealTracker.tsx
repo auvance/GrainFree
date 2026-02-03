@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/providers/AuthProvider";
 
-type Meal = {
+export type Meal = {
   id?: string;
   name: string;
   type: "Breakfast" | "Lunch" | "Dinner" | "Snack";
@@ -33,7 +33,7 @@ export default function MealTracker({
 
   const [showForm, setShowForm] = useState(false);
   const [newMeal, setNewMeal] = useState<Partial<Meal>>({});
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<{ id: number; title: string; nutrition?: { nutrients?: { name: string; amount?: number }[] } }[]>([]);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -181,7 +181,7 @@ export default function MealTracker({
                       suggestions.map((s) => {
                         const kcal =
                           Math.round(
-                            s.nutrition?.nutrients?.find((n: any) => n.name === "Calories")
+                            s.nutrition?.nutrients?.find((n: { name: string; amount?: number }) => n.name === "Calories")
                               ?.amount || 0
                           ) || 0;
 
