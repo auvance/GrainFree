@@ -161,7 +161,7 @@ export default function CeliacPhases() {
               <span className="font-semibold">Struggling with</span>
 
               {/* Allergen swipe */}
-              <span className="relative ml-3 inline-flex h-[1.15em] overflow-hidden align-baseline">
+              <span className=" relative ml-3 inline-flex h-[1.15em] overflow-hidden align-baseline">
                 <motion.span
                   className="block font-semibold italic text-white"
                   initial={{ y: "0%" }}
@@ -175,8 +175,8 @@ export default function CeliacPhases() {
                   }}
                 >
                   <span className="block h-[1.15em]">Celiac Disease?</span>
-                  <span className="block h-[1.15em]">Nut Allergies?</span>
-                  <span className="block h-[1.15em]">Lactose Intolerance?</span>
+                  <span className="block h-[1.15em]">Nut Allergy?</span>
+                  <span className="block h-[1.15em]">Lacto Intolerance?</span>
                 </motion.span>
 
                 <motion.span

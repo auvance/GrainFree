@@ -108,6 +108,15 @@ export default function FeatureBento() {
             animation: none !important;
           }
         }
+
+        /* Mobile snap scrollbar polish */
+        .gf-snap::-webkit-scrollbar {
+          height: 8px;
+        }
+        .gf-snap::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.16);
+          border-radius: 999px;
+        }
       `}</style>
 
       {/* Atmosphere */}
@@ -146,11 +155,152 @@ export default function FeatureBento() {
           </p>
         </header>
 
-        {/* ORBIT SYSTEM */}
+        {/* ========================= */}
+        {/* MOBILE UX (below md)      */}
+        {/* ========================= */}
+        <div className="md:hidden mt-10">
+          {/* Core card (mobile) */}
+          <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-[#617862]/55 backdrop-blur-xl p-6 shadow-[0_30px_90px_rgba(0,0,0,0.22)]">
+            <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-white/10 to-transparent opacity-70" />
+            <div className="relative">
+              <p className="font-[AeonikArabic] text-white/80 text-xs tracking-[0.16em] uppercase">
+                your safe-food operating system
+              </p>
+
+              <h3 className="mt-3 font-[AeonikArabic] font-semibold text-[1.55rem] leading-[1.12]">
+                Less second-guessing.
+                <br />
+                More confidence.
+              </h3>
+
+              <p className="mt-3 font-[AeonikArabic] text-white/85 text-[1.02rem] leading-relaxed">
+                A system that helps you discover meals, verify products, and build habits —
+                around your exact restrictions.
+              </p>
+
+              <div className="mt-5 flex flex-col gap-3">
+                <Link
+                  href="/system"
+                  className="inline-flex items-center justify-center rounded-xl border border-white/18 bg-[#8EB397] px-6 py-3 font-[AeonikArabic] font-medium text-[#1f2a24] shadow-[0_18px_50px_rgba(0,0,0,0.20)] transition-all duration-300 active:scale-[0.99]"
+                >
+                  Get Started
+                </Link>
+                <span className="font-[AeonikArabic] text-white/70 text-sm text-center">
+                  Free. No pricing. No traps.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature scroller */}
+          <div className="mt-6">
+            <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
+              explore features
+            </p>
+
+            <div className="mt-3 gf-snap flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3">
+              {FEATURES.map((f) => {
+                const isActive = f.id === activeId;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setActiveId(f.id)}
+                    className={cn(
+                      "snap-start shrink-0 w-[78%] max-w-[340px]",
+                      "rounded-3xl border backdrop-blur-xl text-left transition",
+                      "px-5 py-4",
+                      "shadow-[0_18px_45px_rgba(0,0,0,0.18)]",
+                      isActive
+                        ? "border-white/22 bg-white/12"
+                        : "border-white/12 bg-white/6 active:bg-white/10"
+                    )}
+                    aria-pressed={isActive}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "h-2 w-2 rounded-full transition shadow-[0_0_22px_rgba(157,231,197,0.5)]",
+                          isActive ? "bg-[#9DE7C5]/95" : "bg-white/35"
+                        )}
+                      />
+                      <span className="font-[AeonikArabic] text-[11px] tracking-[0.18em] uppercase text-white/70">
+                        {f.tag}
+                      </span>
+                    </div>
+                    <p className="mt-2 font-[AeonikArabic] text-[1.05rem] font-semibold text-white">
+                      {f.title}
+                    </p>
+                    <p className="mt-2 font-[AeonikArabic] text-white/75 text-[0.98rem] leading-relaxed">
+                      {f.desc}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active detail panel (mobile) */}
+            <div className="mt-4 rounded-3xl border border-white/12 bg-white/8 backdrop-blur-xl p-5 shadow-[0_30px_90px_rgba(0,0,0,0.20)]">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
+                  {active.tag}
+                </p>
+                <span className="h-px flex-1 bg-white/10" />
+                <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/55">
+                  active
+                </p>
+              </div>
+
+              <h3 className="mt-3 font-[AeonikArabic] text-[1.35rem] font-semibold leading-tight">
+                {active.title}
+              </h3>
+
+              {active.metric ? (
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl border border-white/10 bg-black/18 p-4">
+                    <p className="font-[AeonikArabic] text-xs tracking-[0.14em] uppercase text-white/65">
+                      {active.metric.label}
+                    </p>
+                    <p className="mt-2 font-[AeonikArabic] text-lg font-semibold text-white">
+                      {active.metric.value}
+                    </p>
+                    <p className="mt-1 font-[AeonikArabic] text-white/70 text-sm">
+                      {active.metric.sub}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/10 bg-black/18 p-4">
+                    <p className="font-[AeonikArabic] text-xs tracking-[0.14em] uppercase text-white/65">
+                      outcome
+                    </p>
+                    <p className="mt-2 font-[AeonikArabic] text-lg font-semibold text-[#9DE7C5]">
+                      more certainty
+                    </p>
+                    <p className="mt-1 font-[AeonikArabic] text-white/70 text-sm">
+                      less cognitive load
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              <p className="mt-4 font-[AeonikArabic] text-white/70 text-sm">
+                Swipe cards above to explore. Tap to set the active feature.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-6 text-center font-[AeonikArabic] text-white/80 text-lg">
+            Built to feel calm when food doesn&apos;t.
+          </p>
+        </div>
+
+        {/* ========================= */}
+        {/* DESKTOP/TABLET (md+)      */}
+        {/* ========================= */}
         <div
           ref={wrapRef}
           onMouseMove={onMove}
-          className="relative mt-34 sm:mt-16 lg:mt-20"
+          className="hidden md:block relative mt-16 lg:mt-20"
           style={
             {
               ["--mx" as string]: "50%",
@@ -158,14 +308,10 @@ export default function FeatureBento() {
             } as React.CSSProperties
           }
         >
-          {/* Soft mouse glow */}
-          
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-30 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             {/* LEFT: Orbit Stage */}
             <div className="lg:col-span-7">
-              {/* Set radius via CSS var (no nested style tags) */}
-              <div className="gf-stage relative mx-auto aspect-square w-full max-w-[620px] [--r:200px] md:[--r:250px] lg:[--r:250px]">
+              <div className="gf-stage relative mx-auto aspect-square w-full max-w-[620px] [--r:220px] md:[--r:250px] lg:[--r:250px]">
                 {/* Outer ring */}
                 <div className="absolute inset-0 rounded-full border border-white/12 bg-white/5 backdrop-blur-xl shadow-[0_30px_90px_rgba(0,0,0,0.1)]" />
                 <div className="pointer-events-none absolute inset-0 rounded-full border border-white/10 opacity-40" />
@@ -184,12 +330,11 @@ export default function FeatureBento() {
                           transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(var(--r)) rotate(${-angle}deg)`,
                         }}
                       >
-                        {/* Counter rotate so it stays upright */}
                         <div className="gf-orbit-counter">
                           <button
                             type="button"
                             onClick={() => setActiveId(f.id)}
-                            onMouseEnter={() => setActiveId (f.id)}
+                            onMouseEnter={() => setActiveId(f.id)}
                             aria-pressed={isActive}
                             className={cn(
                               "rounded-2xl border backdrop-blur-xl text-left transition",
@@ -223,8 +368,8 @@ export default function FeatureBento() {
                   })}
                 </div>
 
-                {/* Center core card — ALWAYS ABOVE orbit nodes */}
-                <div className="absolute left-1/2 top-1/2 z-20 w-[100%] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/12 bg-[#617862]/55 backdrop-blur-xl p-7 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.28)] lg:w-[70%]">
+                {/* Center core card */}
+                <div className="absolute left-1/2 top-1/2 z-20 w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/12 bg-[#617862]/55 backdrop-blur-xl p-7 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.28)]">
                   <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-white/10 to-transparent opacity-70" />
 
                   <div className="relative">
@@ -313,7 +458,9 @@ export default function FeatureBento() {
 
                 <div className="mt-7 inline-flex items-center gap-2 text-sm font-[AeonikArabic] text-white/75">
                   <span className="h-[1px] w-7 bg-white/25" />
-                  <span className="text-white/85">Hover the orbit to pause • tap nodes to explore</span>
+                  <span className="text-white/85">
+                    Hover the orbit to pause • tap nodes to explore
+                  </span>
                 </div>
               </div>
 
