@@ -1,13 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function PageProfileAccount() {
   const { user } = useAuth();
-  const router = useRouter();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -78,13 +76,7 @@ export default function PageProfileAccount() {
 
   return (
     <div className="max-w-2xl">
-      {/* Back Button */}
-      <button
-        onClick={() => router.back()}
-        className="mb-6 flex items-center gap-2 text-sm text-gray-300 hover:text-white transition font-[AeonikArabic]"
-      >
-        <span className="text-xl leading-none">←</span> Back to Main
-      </button>
+      
 
       <h1 className="text-3xl font-semibold mb-6 font-[AeonikArabic]">Profile Settings</h1>
 
