@@ -164,7 +164,7 @@ export default function AboutHero({
           variants={canvasReveal}
           initial="hidden"
           animate="show"
-          className="block lg:hidden py-10 sm:py-12"
+          className="block flex flex-col-reverse gap-10 lg:hidden py-10 sm:py-12"
         >
           {/* Media grid */}
           <div className="relative">
