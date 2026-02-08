@@ -1,29 +1,11 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { createClient } from "@supabase/supabase-js";
-
-/**
- * IMPORTANT:
- * Use a server Supabase client here (service role) so inserts/upserts work reliably.
- * Make sure these env vars exist in Vercel:
- * - SUPABASE_URL
- * - SUPABASE_SERVICE_ROLE_KEY
- */
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
-
-const client = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 type Incoming = {
   userId?: string;
   answers?: Record<string, unknown>;
-  payload?: unknown; // from BuildWizard v2
+  payload?: unknown;
 };
 
 type GuidePayload = {
@@ -41,41 +23,52 @@ type PlanJSON = {
   profileSummary: string;
 
   safetyRules: { title: string; bullets: string[] }[];
-
   safeSwaps: { category: string; swaps: { from: string; to: string; note?: string }[] }[];
 
   sevenDayStarterPlan: {
     day: number;
-    meals: { type: "Breakfast" | "Lunch" | "Dinner" | "Snack"; name: string; calories?: number; notes?: string }[];
+    meals: {
+      type: "Breakfast" | "Lunch" | "Dinner" | "Snack";
+      name: string;
+      calories?: number;
+      notes?: string;
+    }[];
   }[];
 
   groceryList: { section: string; items: string[] }[];
 
   eatingOutPlaybook?: { title: string; bullets: string[] }[];
-
   symptomTrackingRoutine?: { title: string; bullets: string[] }[];
-
   budgetStrategy?: { title: string; bullets: string[] }[];
 
   nextSteps: { title: string; bullets: string[] }[];
 
-  // Keep compatibility with your existing dashboard assumptions
   goals: { title: string; progress: number }[];
   meals: { name: string; type: "Breakfast" | "Lunch" | "Dinner" | "Snack"; calories: number }[];
   recommendations: { title: string; why: string }[];
 };
 
+function getSupabaseAdmin(): SupabaseClient | null {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !serviceKey) return null;
+
+  return createClient(url, serviceKey, { auth: { persistSession: false } });
+}
+
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
+
 function safeJsonExtract(text: string) {
   const trimmed = text.trim();
-
-  // If it's already JSON
   try {
     return JSON.parse(trimmed);
   } catch {
-    // Attempt to extract the largest JSON block
     const match = trimmed.match(/\{[\s\S]*\}/);
     if (!match) return null;
-
     try {
       return JSON.parse(match[0]);
     } catch {
@@ -84,10 +77,6 @@ function safeJsonExtract(text: string) {
   }
 }
 
-/**
- * Simple calorie target heuristic (non-medical).
- * Uses goal + macro_goal + activity-ish signals if present.
- */
 function deriveCalorieTarget(payload: GuidePayload | null | undefined, fallback = 2000) {
   const goal = String(payload?.user_profile?.goal ?? "");
   const macroGoal = String(payload?.user_profile?.macro_goal ?? "");
@@ -113,17 +102,26 @@ function deriveCalorieTarget(payload: GuidePayload | null | undefined, fallback 
 
 export async function POST(req: Request) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        {
+          error:
+            "Missing Supabase env. Set SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY.",
+        },
+        { status: 500 }
+      );
+    }
+
     const body = (await req.json()) as Incoming;
     const userId = body.userId;
-    const payload = body.payload; // prefer payload
-    const answers = body.answers ?? {}; // fallback
+    const payload = body.payload;
+    const answers = body.answers ?? {};
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Hard requirement: we want the new payload
-    // but we won't fail if it isn't present (backward compatible)
     const effectivePayload = payload ?? { user_profile: { legacy_answers: answers } };
 
     const system = `
@@ -133,7 +131,7 @@ You provide safety-first guidance, swaps, routines, and meal/product suggestions
 
 Return STRICT JSON only. No markdown. No prose outside JSON.
 If you are uncertain, include safe defaults and clearly label unknowns.
-`;
+`.trim();
 
     const userPrompt = `
 Generate a personalized ALLERGEN-SAFE GUIDE.
@@ -153,62 +151,25 @@ OUTPUT FORMAT (STRICT JSON):
   "title": string,
   "description": string,
   "profileSummary": string,
-
-  "safetyRules": [
-    { "title": string, "bullets": string[] }
-  ],
-
-  "safeSwaps": [
-    { "category": string, "swaps": [ { "from": string, "to": string, "note"?: string } ] }
-  ],
-
-  "sevenDayStarterPlan": [
-    {
-      "day": 1,
-      "meals": [
-        { "type": "Breakfast"|"Lunch"|"Dinner"|"Snack", "name": string, "calories"?: number, "notes"?: string }
-      ]
-    }
-  ],
-
-  "groceryList": [
-    { "section": string, "items": string[] }
-  ],
-
-  "eatingOutPlaybook": [
-    { "title": string, "bullets": string[] }
-  ],
-
-  "symptomTrackingRoutine": [
-    { "title": string, "bullets": string[] }
-  ],
-
-  "budgetStrategy": [
-    { "title": string, "bullets": string[] }
-  ],
-
-  "nextSteps": [
-    { "title": string, "bullets": string[] }
-  ],
-
+  "safetyRules": [{ "title": string, "bullets": string[] }],
+  "safeSwaps": [{ "category": string, "swaps": [{ "from": string, "to": string, "note"?: string }] }],
+  "sevenDayStarterPlan": [{ "day": 1, "meals": [{ "type": "Breakfast"|"Lunch"|"Dinner"|"Snack", "name": string, "calories"?: number, "notes"?: string }] }],
+  "groceryList": [{ "section": string, "items": string[] }],
+  "eatingOutPlaybook": [{ "title": string, "bullets": string[] }],
+  "symptomTrackingRoutine": [{ "title": string, "bullets": string[] }],
+  "budgetStrategy": [{ "title": string, "bullets": string[] }],
+  "nextSteps": [{ "title": string, "bullets": string[] }],
   "goals": [{ "title": string, "progress": number }],
   "meals": [{ "name": string, "type": "Breakfast"|"Lunch"|"Dinner"|"Snack", "calories": number }],
   "recommendations": [{ "title": string, "why": string }]
 }
-
-Rules for compatibility fields:
-- "meals" should include ~6-10 items total (mix of types).
-- "goals" 3-6 items, progress 0-100.
-- "recommendations" 5-10 items.
-- If eating out is rare, keep eatingOutPlaybook short but still include basics.
-- Calories: if unknown, omit in sevenDayStarterPlan meals; BUT in compatibility "meals" include calories numbers.
-`;
+`.trim();
 
     const response = await client.chat.completions.create({
       model: "llama-3.1-8b-instant",
       messages: [
-        { role: "system", content: system.trim() },
-        { role: "user", content: userPrompt.trim() },
+        { role: "system", content: system },
+        { role: "user", content: userPrompt },
       ],
       temperature: 0.35,
     });
@@ -217,16 +178,11 @@ Rules for compatibility fields:
     const parsed = safeJsonExtract(text) as Partial<PlanJSON> | null;
 
     if (!parsed) {
-      return NextResponse.json(
-        { error: "AI returned invalid JSON. Try again." },
-        { status: 502 }
-      );
+      return NextResponse.json({ error: "AI returned invalid JSON. Try again." }, { status: 502 });
     }
 
-    // Derive calorie target more robustly from payload
-    const calorieTarget = deriveCalorieTarget(effectivePayload, 2000);
+    const calorieTarget = deriveCalorieTarget(effectivePayload as GuidePayload, 2000);
 
-    // Normalize fields for DB insert
     const planToSave = {
       user_id: userId,
       title: parsed.title ?? "Personalized Allergen-Safe Guide",
@@ -235,18 +191,6 @@ Rules for compatibility fields:
       meals: parsed.meals ?? [],
       recommendations: parsed.recommendations ?? [],
       status: "active",
-
-      // Optional: store rich content if your table has jsonb columns
-      // If you don't have these columns yet, comment these out
-      // profile_summary: parsed.profileSummary ?? "",
-      // safety_rules: parsed.safetyRules ?? [],
-      // safe_swaps: parsed.safeSwaps ?? [],
-      // seven_day_plan: parsed.sevenDayStarterPlan ?? [],
-      // grocery_list: parsed.groceryList ?? [],
-      // eating_out_playbook: parsed.eatingOutPlaybook ?? [],
-      // symptom_tracking: parsed.symptomTrackingRoutine ?? [],
-      // budget_strategy: parsed.budgetStrategy ?? [],
-      // next_steps: parsed.nextSteps ?? [],
     };
 
     const { data, error } = await supabaseAdmin
@@ -257,7 +201,6 @@ Rules for compatibility fields:
 
     if (error) throw error;
 
-    // Update profile calorie target
     await supabaseAdmin
       .from("profiles")
       .upsert({ id: userId, calorie_target: calorieTarget }, { onConflict: "id" });
