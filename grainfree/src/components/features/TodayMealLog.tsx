@@ -133,16 +133,15 @@ export default function TodayMealLog({
     onMealAdded?.(data);
   };
 
-  const countForType = (t: Meal["type"]) =>
-    pendingMeals.filter((m) => m.type === t).length;
+ 
 
   return (
-    <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-br from-[#2F5A47] via-[#284338] to-[#1B2C26]">
+    <section className="relative overflow-hidden rounded-tr-[20px] rounded-bl-[20px] border border-white/10 bg-gradient-to-br from-[#2F5A47] via-[#284338] to-[#1B2C26]">
       {/* tonality overlay (hero-like but different green) */}
       <div className="pointer-events-none absolute inset-0 opacity-45 bg-[radial-gradient(circle_at_25%_15%,rgba(157,231,197,0.25),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_75%_70%,rgba(0,184,74,0.18),transparent_60%)]" />
 
-      <div className="relative p-6 sm:p-7">
+      <div className="relative p-3 sm:p-7">
         {/* Header row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -167,21 +166,6 @@ export default function TodayMealLog({
         </div>
 
         {/* Pills (sub-structure signal) */}
-        <div className="mt-5 flex flex-wrap gap-2">
-          {mealTypes.map((t) => (
-            <div
-              key={t}
-              className="rounded-full border border-white/12 bg-black/20 px-3 py-2"
-            >
-              <span className="font-[AeonikArabic] text-xs text-white/85">
-                {t}
-              </span>
-              <span className="ml-2 font-[AeonikArabic] text-xs text-white/60">
-                {countForType(t)} pending
-              </span>
-            </div>
-          ))}
-        </div>
 
         {/* Form */}
         {showForm ? (
@@ -317,20 +301,20 @@ export default function TodayMealLog({
         ) : null}
 
         {/* ONE container holding all meal types (no big separate cards) */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-2 gap-1  ">
           {mealTypes.map((mealType) => {
             const logged = pendingMeals.filter((m) => m.type === mealType);
 
             return (
               <div
                 key={mealType}
-                className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5"
+                className="flex flex-col items-start rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col items-left gap-3 lg:flex items-center justify-between">
                   <h3 className="font-[AeonikArabic] text-base sm:text-lg font-semibold">
                     {mealType}
                   </h3>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-[AeonikArabic] text-white/70">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-align-left font-[AeonikArabic] text-white/70">
                     {logged.length} pending
                   </span>
                 </div>

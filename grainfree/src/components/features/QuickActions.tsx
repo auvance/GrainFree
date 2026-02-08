@@ -23,7 +23,7 @@ export default function QuickActions({
         Quick actions
       </h3>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-col gap-2">
         <button className={btn} onClick={onDiscover}>
           Discover
         </button>
