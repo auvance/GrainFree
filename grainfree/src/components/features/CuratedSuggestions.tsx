@@ -1,113 +1,114 @@
 "use client";
 
+import { useMemo } from "react";
+
 type Rec = { title: string; why?: string };
 
 export default function CuratedSuggestions({
-  items,
-  variant = "full",
+  items = [],
+  variant = "preview",
   limit = 6,
   onViewAll,
   onBuildGuide,
-  onSave,
-  onAddToToday,
 }: {
   items: Rec[];
-  variant?: "full" | "preview";
+  variant?: "preview" | "full";
   limit?: number;
   onViewAll?: () => void;
   onBuildGuide?: () => void;
-  onSave?: (rec: Rec) => void;
-  onAddToToday?: (rec: Rec) => void;
 }) {
-  const isPreview = variant === "preview";
-  const list = (items ?? []).slice(0, isPreview ? limit : items.length);
+  const shown = useMemo(() => {
+    const clean = Array.isArray(items) ? items : [];
+    return variant === "full" ? clean : clean.slice(0, limit);
+  }, [items, limit, variant]);
+
+  const empty = shown.length === 0;
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-7">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#1F332B] via-[#182720] to-[#111A16] p-5 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_20%_25%,rgba(157,231,197,0.18),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-25 bg-[radial-gradient(circle_at_85%_75%,rgba(0,184,74,0.16),transparent_55%)]" />
+
       <div className="relative">
+        {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
-              curated
+            <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/55">
+              guidance
             </p>
-            <h2 className="mt-2 font-[AeonikArabic] text-[1.45rem] font-semibold">
+            <h3 className="mt-2 font-[AeonikArabic] text-[1.35rem] font-semibold">
               Recommended for you
-            </h2>
-            {isPreview ? (
-              <p className="mt-2 font-[AeonikArabic] text-sm text-white/70 leading-relaxed">
-                These should feel picked for your exact situation.
-              </p>
-            ) : null}
+            </h3>
+            <p className="mt-1 font-[AeonikArabic] text-sm text-white/70">
+              High-impact suggestions tailored to your guide.
+            </p>
           </div>
 
-          {isPreview ? (
-            <button
-              onClick={onViewAll}
-              className="rounded-xl border border-white/12 bg-white/8 hover:bg-white/12 transition px-4 py-2 text-xs font-[AeonikArabic]"
-              type="button"
-            >
-              View all
-            </button>
-          ) : null}
-        </div>
-
-        {(!items || items.length === 0) ? (
-          <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="font-[AeonikArabic] text-white/85 font-semibold">
-              No recommendations yet.
-            </p>
-            <p className="mt-1 font-[AeonikArabic] text-sm text-white/70">
-              Build/rebuild your guide to generate personalized suggestions.
-            </p>
-            {onBuildGuide ? (
+          <div className="flex items-center gap-2">
+            {onViewAll && (
+              <button
+                onClick={onViewAll}
+                className="rounded-xl border border-white/12 bg-white/5 hover:bg-white/10 transition px-3 py-2 text-xs font-[AeonikArabic] text-white/85"
+              >
+                View all
+              </button>
+            )}
+            {onBuildGuide && (
               <button
                 onClick={onBuildGuide}
-                className="mt-4 rounded-xl bg-[#008509] hover:bg-green-700 transition px-4 py-2 text-sm font-[AeonikArabic]"
-                type="button"
+                className="rounded-xl border border-white/12 bg-white/5 hover:bg-white/10 transition px-3 py-2 text-xs font-[AeonikArabic] text-white/85"
               >
-                Build my guide
+                Rebuild guide
               </button>
-            ) : null}
+            )}
           </div>
-        ) : (
-          <div className={isPreview ? "mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3" : "mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"}>
-            {list.map((r) => (
-              <div key={r.title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="font-[AeonikArabic] text-white font-semibold">{r.title}</p>
-                {r.why ? (
-                  <p className="mt-1 font-[AeonikArabic] text-sm text-white/70 leading-relaxed">
-                    {r.why}
+        </div>
+
+        {/* Body */}
+        <div className="mt-5">
+          {empty ? (
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <p className="font-[AeonikArabic] text-sm text-white/80">
+                No recommendations yet.
+              </p>
+              <p className="mt-1 font-[AeonikArabic] text-xs text-white/60">
+                Build a guide to generate personalized suggestions.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {shown.map((r, idx) => (
+                <div
+                  key={`${r.title}-${idx}`}
+                  className="rounded-2xl border border-white/10 bg-black/15 p-4 hover:bg-black/20 transition"
+                >
+                  <p className="font-[AeonikArabic] text-sm font-medium text-white/90">
+                    {r.title}
                   </p>
-                ) : null}
+                  <p className="mt-2 font-[AeonikArabic] text-xs text-white/65 leading-relaxed line-clamp-3">
+                    {r.why || "A practical next step aligned to your guide and safety rules."}
+                  </p>
 
-                {/* Buttons become optional hooks */}
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onSave?.(r)}
-                    className="rounded-xl bg-[#008509] hover:bg-green-700 transition px-3 py-2 text-xs font-[AeonikArabic]"
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onAddToToday?.(r)}
-                    className="rounded-xl border border-white/12 bg-white/8 hover:bg-white/12 transition px-3 py-2 text-xs font-[AeonikArabic]"
-                  >
-                    Add to today
-                  </button>
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[11px] font-[AeonikArabic] text-white/75">
+                      Next step
+                    </span>
+                    <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[11px] font-[AeonikArabic] text-white/75">
+                      Curated
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
 
-        {isPreview && items && items.length > limit ? (
-          <p className="mt-3 font-[AeonikArabic] text-xs text-white/60">
-            +{items.length - limit} more
+        {/* Footer */}
+        <div className="mt-5">
+          <p className="font-[AeonikArabic] text-xs text-white/55">
+            Want deeper personalization? Use Coach → ask for swaps, routines, and symptom triggers.
           </p>
-        ) : null}
+        </div>
       </div>
     </section>
   );
