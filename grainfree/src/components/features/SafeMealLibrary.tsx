@@ -15,11 +15,19 @@ type SavedMeal = {
   created_at?: string;
 };
 
-export default function SavedMeals() {
+export default function SafeMealLibrary({
+  variant = "full",
+  limit = 6,
+}: {
+  variant?: "full" | "preview";
+  limit?: number;
+}) {
   const { user } = useAuth();
   const [meals, setMeals] = useState<SavedMeal[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  const isPreview = variant === "preview";
 
   useEffect(() => {
     if (!user) return;
@@ -29,14 +37,18 @@ export default function SavedMeals() {
       setError(false);
 
       try {
-        const { data, error } = await supabase
+        let q = supabase
           .from("saved_meals")
           .select("*")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
+        if (isPreview) q = q.limit(limit);
+
+        const { data, error } = await q;
         if (error) throw error;
-        setMeals(data || []);
+
+        setMeals((data || []) as SavedMeal[]);
       } catch (err) {
         console.error("Error fetching saved meals:", err);
         setError(true);
@@ -46,25 +58,7 @@ export default function SavedMeals() {
     };
 
     fetchSavedMeals();
-  }, [user]);
-
-  const handleRemove = async (mealId: string) => {
-    if (!confirm("Remove this meal from your saved list?")) return;
-
-    try {
-      const { error } = await supabase
-        .from("saved_meals")
-        .delete()
-        .eq("id", mealId)
-        .eq("user_id", user?.id);
-
-      if (error) throw error;
-      setMeals((prev) => prev.filter((m) => m.id !== mealId));
-    } catch (err) {
-      console.error("Error removing meal:", err);
-      alert("Failed to remove this meal. Please try again.");
-    }
-  };
+  }, [user, isPreview, limit]);
 
   if (!user) {
     return (
@@ -90,6 +84,72 @@ export default function SavedMeals() {
     );
   }
 
+  // ✅ PREVIEW MODE (small, dashboard-friendly)
+  if (isPreview) {
+    return (
+      <div className="rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-7 relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
+        <div className="relative">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
+                library
+              </p>
+              <h3 className="mt-2 font-[AeonikArabic] text-[1.35rem] font-semibold">
+                Your safe meals
+              </h3>
+            </div>
+
+            <Link
+              href="/dash?view=saved-meals"
+              className="rounded-xl border border-white/12 bg-white/8 hover:bg-white/12 transition px-4 py-2 text-xs font-[AeonikArabic]"
+            >
+              View all
+            </Link>
+          </div>
+
+          {meals.length === 0 ? (
+            <p className="mt-4 font-[AeonikArabic] text-sm text-white/70">
+              No saved meals yet — save meals to build your safe list.
+            </p>
+          ) : (
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {meals.slice(0, limit).map((meal) => (
+                <Link
+                  key={meal.id}
+                  href={`/meal?id=${meal.meal_id}`}
+                  className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 transition overflow-hidden"
+                >
+                  <div className="relative h-20 w-full">
+                    <Image
+                      src={
+                        meal.image ||
+                        "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                      }
+                      alt={meal.title}
+                      fill
+                      className="object-cover"
+                      sizes="200px"
+                    />
+                  </div>
+                  <div className="p-3">
+                    <p className="font-[AeonikArabic] text-xs text-white font-semibold line-clamp-2">
+                      {meal.title}
+                    </p>
+                    <p className="mt-1 font-[AeonikArabic] text-[11px] text-white/60">
+                      {meal.calories ? `${Math.round(meal.calories)} kcal` : "Calories N/A"}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ FULL MODE (your existing “full page” list)
   if (meals.length === 0) {
     return (
       <div className="text-center rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-10">
@@ -127,7 +187,6 @@ export default function SavedMeals() {
             className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl"
           >
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
-
             <div className="relative">
               <div className="relative h-44 w-full overflow-hidden">
                 <Image
@@ -140,32 +199,23 @@ export default function SavedMeals() {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/55 to-transparent" />
               </div>
 
               <div className="p-5">
                 <p className="font-[AeonikArabic] text-white font-semibold truncate">
                   {meal.title}
                 </p>
-
                 <p className="mt-1 font-[AeonikArabic] text-sm text-white/70">
                   {meal.calories ? `${Math.round(meal.calories)} kcal` : "Calories N/A"}
                 </p>
 
-                <div className="mt-4 flex items-center justify-between gap-3">
+                <div className="mt-4">
                   <Link
                     href={`/meal?id=${meal.meal_id}`}
                     className="rounded-xl border border-white/12 bg-white/8 px-4 py-2 text-xs font-[AeonikArabic] hover:bg-white/12 transition"
                   >
                     View
                   </Link>
-
-                  <button
-                    onClick={() => handleRemove(meal.id)}
-                    className="text-xs font-[AeonikArabic] text-red-200 hover:text-red-100 transition"
-                  >
-                    Remove ✕
-                  </button>
                 </div>
               </div>
             </div>

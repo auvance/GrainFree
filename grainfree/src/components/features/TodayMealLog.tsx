@@ -18,7 +18,7 @@ function cn(...c: Array<string | false | undefined | null>) {
   return c.filter(Boolean).join(" ");
 }
 
-export default function MealTracker({
+export default function TodayMealLog({
   meals = [],
   onMealAdded,
 }: {
@@ -26,6 +26,7 @@ export default function MealTracker({
   onMealAdded?: (m: Meal) => void;
 }) {
   const { user } = useAuth();
+
   const mealTypes: Meal["type"][] = useMemo(
     () => ["Breakfast", "Lunch", "Dinner", "Snack"],
     []
@@ -33,7 +34,13 @@ export default function MealTracker({
 
   const [showForm, setShowForm] = useState(false);
   const [newMeal, setNewMeal] = useState<Partial<Meal>>({});
-  const [suggestions, setSuggestions] = useState<{ id: number; title: string; nutrition?: { nutrients?: { name: string; amount?: number }[] } }[]>([]);
+  const [suggestions, setSuggestions] = useState<
+    {
+      id: number;
+      title: string;
+      nutrition?: { nutrients?: { name: string; amount?: number }[] };
+    }[]
+  >([]);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -69,10 +76,7 @@ export default function MealTracker({
     return () => clearTimeout(t);
   }, [newMeal.name, SPOONACULAR_KEY]);
 
-  const pendingMeals = useMemo(
-    () => meals.filter((m) => !m.completed),
-    [meals]
-  );
+  const pendingMeals = useMemo(() => meals.filter((m) => !m.completed), [meals]);
 
   const resetForm = () => {
     setNewMeal({});
@@ -129,35 +133,59 @@ export default function MealTracker({
     onMealAdded?.(data);
   };
 
+  const countForType = (t: Meal["type"]) =>
+    pendingMeals.filter((m) => m.type === t).length;
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-8">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-br from-[#2F5A47] via-[#284338] to-[#1B2C26]">
+      {/* tonality overlay (hero-like but different green) */}
+      <div className="pointer-events-none absolute inset-0 opacity-45 bg-[radial-gradient(circle_at_25%_15%,rgba(157,231,197,0.25),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_75%_70%,rgba(0,184,74,0.18),transparent_60%)]" />
+
+      <div className="relative p-6 sm:p-7">
+        {/* Header row */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
-              meal tracker
+            <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/70">
+              today
             </p>
-            <h2 className="mt-2 font-[AeonikArabic] text-[1.7rem] sm:text-[2.1rem] font-semibold leading-tight">
-              Today’s Meals
+            <h2 className="mt-2 font-[AeonikArabic] text-[1.6rem] sm:text-[1.9rem] font-semibold leading-tight">
+              Today’s meals
             </h2>
-            <p className="mt-2 font-[AeonikArabic] text-white/75 max-w-[62ch]">
-              Add meals as “pending”, then mark them eaten to update your stats.
+            <p className="mt-2 font-[AeonikArabic] text-sm text-white/75 max-w-[64ch]">
+              Add meals as pending, then mark them eaten to update your stats.
             </p>
           </div>
 
           <button
             onClick={() => setShowForm((s) => !s)}
-            className="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/8 px-5 py-3 font-[AeonikArabic] text-sm text-white hover:bg-white/12 transition"
+            className="inline-flex items-center justify-center rounded-xl border border-white/12 bg-black/20 px-5 py-3 font-[AeonikArabic] text-sm text-white hover:bg-white/10 transition"
+            type="button"
           >
-            {showForm ? "Close" : "Add Meal"}
+            {showForm ? "Close" : "Add meal"}
           </button>
+        </div>
+
+        {/* Pills (sub-structure signal) */}
+        <div className="mt-5 flex flex-wrap gap-2">
+          {mealTypes.map((t) => (
+            <div
+              key={t}
+              className="rounded-full border border-white/12 bg-black/20 px-3 py-2"
+            >
+              <span className="font-[AeonikArabic] text-xs text-white/85">
+                {t}
+              </span>
+              <span className="ml-2 font-[AeonikArabic] text-xs text-white/60">
+                {countForType(t)} pending
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* Form */}
         {showForm ? (
-          <div className="relative mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+          <div className="relative mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
               <div className="md:col-span-5 relative">
                 <input
@@ -167,10 +195,9 @@ export default function MealTracker({
                   onChange={(e) =>
                     setNewMeal((p) => ({ ...p, name: e.target.value }))
                   }
-                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                  className="w-full rounded-xl bg-black/25 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/40"
                 />
 
-                {/* Suggestions */}
                 {(loadingSuggest || suggestions.length > 0) && (
                   <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-[#1f2a24]/95 backdrop-blur-xl shadow-[0_22px_60px_rgba(0,0,0,0.35)]">
                     {loadingSuggest ? (
@@ -181,8 +208,10 @@ export default function MealTracker({
                       suggestions.map((s) => {
                         const kcal =
                           Math.round(
-                            s.nutrition?.nutrients?.find((n: { name: string; amount?: number }) => n.name === "Calories")
-                              ?.amount || 0
+                            s.nutrition?.nutrients?.find(
+                              (n: { name: string; amount?: number }) =>
+                                n.name === "Calories"
+                            )?.amount || 0
                           ) || 0;
 
                         return (
@@ -223,7 +252,7 @@ export default function MealTracker({
                       type: e.target.value as Meal["type"],
                     }))
                   }
-                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                  className="w-full rounded-xl bg-black/25 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/40"
                 >
                   <option value="">Type</option>
                   {mealTypes.map((t) => (
@@ -240,9 +269,12 @@ export default function MealTracker({
                   placeholder="Calories"
                   value={newMeal.calories ?? ""}
                   onChange={(e) =>
-                    setNewMeal((p) => ({ ...p, calories: Number(e.target.value) }))
+                    setNewMeal((p) => ({
+                      ...p,
+                      calories: Number(e.target.value),
+                    }))
                   }
-                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                  className="w-full rounded-xl bg-black/25 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/40"
                 />
               </div>
 
@@ -253,7 +285,7 @@ export default function MealTracker({
                   onChange={(e) =>
                     setNewMeal((p) => ({ ...p, time: e.target.value }))
                   }
-                  className="w-full rounded-xl bg-black/20 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/50"
+                  className="w-full rounded-xl bg-black/25 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/40"
                 />
               </div>
             </div>
@@ -263,42 +295,39 @@ export default function MealTracker({
                 onClick={handleAddMeal}
                 disabled={saving || !newMeal.name || !newMeal.type}
                 className={cn(
-                  "rounded-xl px-5 py-2.5 font-[AeonikArabic] text-sm transition",
-                  "border border-white/10",
+                  "rounded-xl px-5 py-2.5 font-[AeonikArabic] text-sm transition border border-white/10",
                   saving || !newMeal.name || !newMeal.type
                     ? "bg-white/5 text-white/50 cursor-not-allowed"
-                    : "bg-[#008509] hover:bg-green-700 text-white"
+                    : "bg-[#00B84A] hover:bg-green-700 text-white"
                 )}
+                type="button"
               >
-                {saving ? "Adding…" : "Add Meal"}
+                {saving ? "Adding…" : "Add meal"}
               </button>
 
               <button
                 onClick={resetForm}
                 className="rounded-xl px-5 py-2.5 font-[AeonikArabic] text-sm border border-white/10 bg-white/5 hover:bg-white/10 transition"
+                type="button"
               >
                 Cancel
               </button>
             </div>
           </div>
         ) : null}
-      </div>
 
-      {/* Meal columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-        {mealTypes.map((mealType) => {
-          const logged = pendingMeals.filter((m) => m.type === mealType);
+        {/* ONE container holding all meal types (no big separate cards) */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {mealTypes.map((mealType) => {
+            const logged = pendingMeals.filter((m) => m.type === mealType);
 
-          return (
-            <div
-              key={mealType}
-              className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-5 sm:p-6"
-            >
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
-
-              <div className="relative">
+            return (
+              <div
+                key={mealType}
+                className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5"
+              >
                 <div className="flex items-center justify-between">
-                  <h3 className="font-[AeonikArabic] text-lg sm:text-xl font-semibold">
+                  <h3 className="font-[AeonikArabic] text-base sm:text-lg font-semibold">
                     {mealType}
                   </h3>
                   <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-[AeonikArabic] text-white/70">
@@ -306,42 +335,43 @@ export default function MealTracker({
                   </span>
                 </div>
 
-                <div className="mt-4 space-y-3">
+                <div className="mt-3 space-y-2.5">
                   {logged.length > 0 ? (
                     logged.map((meal) => (
                       <div
                         key={meal.id}
-                        className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-start justify-between gap-4"
+                        className="rounded-xl border border-white/10 bg-white/5 p-3 flex items-start justify-between gap-3"
                       >
-                        <div>
-                          <p className="font-[AeonikArabic] text-white">
+                        <div className="min-w-0">
+                          <p className="font-[AeonikArabic] text-white truncate">
                             {meal.name}
                           </p>
-                          <p className="mt-1 font-[AeonikArabic] text-sm text-white/70">
+                          <p className="mt-1 font-[AeonikArabic] text-xs text-white/70">
                             {meal.calories ? `${meal.calories} kcal` : "Calories N/A"}
                             {meal.time ? ` • ${meal.time}` : ""}
                           </p>
                         </div>
 
                         <button
-                          onClick={() => markAsEaten(meal.id!)}
-                          className="shrink-0 rounded-xl px-4 py-2 text-xs font-[AeonikArabic] bg-[#008509] hover:bg-green-700 transition"
+                          onClick={() => meal.id && markAsEaten(meal.id)}
+                          className="shrink-0 rounded-lg px-3 py-2 text-xs font-[AeonikArabic] bg-[#00B84A] hover:bg-green-700 transition"
+                          type="button"
                         >
                           Mark eaten
                         </button>
                       </div>
                     ))
                   ) : (
-                    <p className="font-[AeonikArabic] text-white/60">
+                    <p className="font-[AeonikArabic] text-white/60 text-sm">
                       No {mealType.toLowerCase()} pending.
                     </p>
                   )}
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
