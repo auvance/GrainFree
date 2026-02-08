@@ -6,7 +6,7 @@ type HealthPlan = {
   goals?: { title: string; progress: number }[];
   recommendations?: { title: string; why?: string }[];
   created_at?: string;
-  [key: string]: any;
+  extra?: Record<string, unknown>;
 } | null;
 
 function cx(...c: Array<string | false | null | undefined>) {

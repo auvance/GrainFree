@@ -18,6 +18,14 @@ function asArray(v: unknown): string[] {
   return [];
 }
 
+type ProfileSafetyRow = {
+    allergens: string[] | string | null;
+    diet: string[] | string | null;
+    conditions: string[] | string | null;
+    medical_conditions: string[] | string | null;
+    intolerances: string[] | string | null;
+  };
+
 export default function SafetySnapshot({
   title = "Safety snapshot",
   onUpdateGuide,
@@ -43,13 +51,16 @@ export default function SafetySnapshot({
         .eq("id", user.id)
         .maybeSingle();
 
-      setAllergens(asArray((data as any)?.allergens));
-      setDiet(asArray((data as any)?.diet));
-      setConditions([
-        ...asArray((data as any)?.conditions),
-        ...asArray((data as any)?.medical_conditions),
-        ...asArray((data as any)?.intolerances),
-      ]);
+        const row = data as ProfileSafetyRow | null;
+
+        setAllergens(asArray(row?.allergens));
+        setDiet(asArray(row?.diet));
+        setConditions([
+          ...asArray(row?.conditions),
+          ...asArray(row?.medical_conditions),
+          ...asArray(row?.intolerances),
+        ]);
+        
 
       setLoading(false);
     };

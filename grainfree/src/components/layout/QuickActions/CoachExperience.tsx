@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 type ChatMsg = {
@@ -16,7 +15,7 @@ type HealthPlan = {
   description?: string;
   goals?: { title: string; progress: number }[];
   recommendations?: { title: string; why?: string }[];
-  [key: string]: any;
+  extra?: Record<string, unknown>;
 } | null;
 
 function uid() {
@@ -142,7 +141,8 @@ export default function CoachExperience({
         createdAt: Date.now(),
       };
       setMessages((m) => [...m, assistantMsg]);
-    } catch (e) {
+    } catch (err: unknown)   {
+        console.log(err)
       const assistantMsg: ChatMsg = {
         id: uid(),
         role: "assistant",

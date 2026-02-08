@@ -3,13 +3,16 @@
 import SafetySnapshot from "@/components/features/SafetySnapshot";
 import PlanGoals from "@/components/features/PlanGoals";
 
+type PlanGoal = { title: string; progress: number };
+
+
 export default function MegaGuidance({
   planGoals,
   onUpdateGuide,
   onViewAllGoals,
   onAskCoach,
 }: {
-  planGoals: any[];
+  planGoals: PlanGoal[];
   onUpdateGuide: () => void;
   onViewAllGoals: () => void;
   onAskCoach: () => void;

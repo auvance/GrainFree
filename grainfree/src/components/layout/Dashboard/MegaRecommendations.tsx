@@ -1,14 +1,15 @@
 "use client";
 
 import CuratedSuggestions from "@/components/features/CuratedSuggestions";
+type RecommendationItem = { title: string; why?: string };
 
 export default function MegaRecommendations({
   items,
   onViewAll,
   onBuildGuide,
 }: {
-  items: any[];
-  onViewAll: () => void;
+    items: RecommendationItem[];
+    onViewAll: () => void;
   onBuildGuide: () => void;
 }) {
   return (

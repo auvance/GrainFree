@@ -26,6 +26,14 @@ type Incoming = {
   payload?: unknown; // from BuildWizard v2
 };
 
+type GuidePayload = {
+  user_profile?: {
+    goal?: string;
+    macro_goal?: string;
+    cooking_time?: string;
+  };
+};
+
 type PlanJSON = {
   title: string;
   description: string;
@@ -80,7 +88,7 @@ function safeJsonExtract(text: string) {
  * Simple calorie target heuristic (non-medical).
  * Uses goal + macro_goal + activity-ish signals if present.
  */
-function deriveCalorieTarget(payload: any, fallback = 2000) {
+function deriveCalorieTarget(payload: GuidePayload | null | undefined, fallback = 2000) {
   const goal = String(payload?.user_profile?.goal ?? "");
   const macroGoal = String(payload?.user_profile?.macro_goal ?? "");
   const cookingTime = String(payload?.user_profile?.cooking_time ?? "");
@@ -90,16 +98,13 @@ function deriveCalorieTarget(payload: any, fallback = 2000) {
   if (goal.toLowerCase().includes("gain")) target = 2800;
   if (goal.toLowerCase().includes("lose")) target = 1800;
   if (goal.toLowerCase().includes("energy")) target = 2400;
-  if (goal.toLowerCase().includes("reduce symptoms")) target = 2100; // neutral-ish
+  if (goal.toLowerCase().includes("reduce symptoms")) target = 2100;
 
-  // Macro preference nudges
   if (macroGoal.toLowerCase().includes("higher calories")) target = Math.max(target, 2600);
   if (macroGoal.toLowerCase().includes("lower calories")) target = Math.min(target, 1900);
 
-  // If user is doing meal prep, they may tolerate structured calories
   if (cookingTime.toLowerCase().includes("meal prep")) target += 100;
 
-  // Clamp to reasonable range
   if (target < 1600) target = 1600;
   if (target > 3200) target = 3200;
 

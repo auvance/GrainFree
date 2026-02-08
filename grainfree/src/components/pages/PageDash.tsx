@@ -28,14 +28,20 @@ import MegaLibrary from "@/components/layout/Dashboard/MegaLibrary";
 
 type CompletedMeal = Meal & { id: string; completed?: boolean; eaten_at?: string };
 
+type ProfileCalorieRow = { calorie_target: number | null };
+type PlanGoal = { title: string; progress: number };
+type PlanRecommendation = { title: string; why?: string };
+
 type HealthPlan = {
   title?: string;
   description?: string;
-  goals?: { title: string; progress: number }[];
-  recommendations?: { title: string; why?: string }[];
-  plan_json?: any;
-  [key: string]: any;
+  goals?: PlanGoal[];
+  recommendations?: PlanRecommendation[];
+  plan_json?: unknown;
+  // if you want extra fields without "any":
+  extra?: Record<string, unknown>;
 } | null;
+
 
 function calculateStreak(allMeals: CompletedMeal[]) {
   const completedMeals = allMeals.filter((m) => m.completed && m.eaten_at);
@@ -126,7 +132,7 @@ export default function PageDash() {
 
       if (!planRes.error) setPlan(planRes.data ?? null);
 
-      const dailyGoal = (profileRes.data as any)?.calorie_target ?? 2000;
+      const dailyGoal = (profileRes.data as ProfileCalorieRow | null)?.calorie_target ?? 2000;
       setGoal(dailyGoal);
 
       setSavedMealCount(savedMealsCountRes.count ?? 0);
@@ -140,7 +146,6 @@ export default function PageDash() {
     };
 
     run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const updateTodayStats = (allMeals: CompletedMeal[], dailyGoal: number) => {
@@ -280,8 +285,8 @@ export default function PageDash() {
             <div key={panel} className="animate-[fadeIn_180ms_ease-out]">
               {panel === "guidance" && (
                 <MegaGuidance
-                  planGoals={(plan?.goals as any) ?? []}
-                  onUpdateGuide={() => router.push("/system")}
+                planGoals={plan?.goals ?? []}
+                onUpdateGuide={() => router.push("/system")}
                   onViewAllGoals={() => router.push("/dash?view=goals")}
                   onAskCoach={() => setMode("coach")}
                 />
@@ -289,7 +294,7 @@ export default function PageDash() {
 
               {panel === "recs" && (
                 <MegaRecommendations
-                  items={(plan?.recommendations as any) ?? []}
+                  items={plan?.recommendations ?? []}
                   onViewAll={() => router.push("/dash?view=recs")}
                   onBuildGuide={() => router.push("/system")}
                 />
@@ -325,7 +330,7 @@ export default function PageDash() {
           onClose={() => setMode("dashboard")}
         >
           <ScanExperience
-            onAskCoach={(prefill) => {
+            onAskCoach={() => {
               setMode("coach");
               // later: store prefill and inject into CoachExperience
             }}

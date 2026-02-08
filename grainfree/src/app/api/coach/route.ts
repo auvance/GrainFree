@@ -53,9 +53,11 @@ export async function POST(req: Request) {
     // Optional: enrich with DB context (only if service role key exists)
     const supabaseAdmin = getSupabaseAdmin();
 
-    let profile: any = null;
-    let draftAnswers: any = null;
-    let latestPlan: any = null;
+    let profile: Record<string, unknown> | null = null;
+    let draftAnswers: Record<string, unknown> | null = null;
+    let latestPlan: Record<string, unknown> | null = null;
+
+
 
     if (supabaseAdmin && userId) {
       const [profileRes, draftRes, planRes] = await Promise.all([

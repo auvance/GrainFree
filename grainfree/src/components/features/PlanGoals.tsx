@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 
 type Goal = { title: string; progress: number };
 

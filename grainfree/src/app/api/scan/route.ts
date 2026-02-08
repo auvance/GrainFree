@@ -10,12 +10,53 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey, { auth: { persistSession: false } });
 }
 
+type ProfileRow = {
+  allergens?: string[] | string | null;
+  diet?: string[] | string | null;
+  conditions?: string[] | string | null;
+  medical_conditions?: string[] | string | null;
+  intolerances?: string[] | string | null;
+};
+
 type Reason = { type: "allergen" | "diet"; key: string; label: string; evidence?: string };
 type Verdict = {
   level: "safe" | "caution" | "unsafe";
   reasons: Reason[];
   missingData?: boolean;
-  advice?: string; // extra field (frontend can ignore if you want)
+  advice?: string;
+};
+
+type OpenFoodFactsIngredient = {
+  text?: string;
+};
+
+type OpenFoodFactsProduct = {
+  // text fields
+  product_name?: string;
+  product_name_en?: string;
+  brands?: string;
+  image_url?: string;
+  image_front_url?: string;
+  quantity?: string;
+  countries?: string;
+
+  ingredients_text?: string;
+  ingredients_text_en?: string;
+  ingredients_text_with_allergens?: string;
+
+  allergens?: string;
+  allergens_from_ingredients?: string;
+
+  traces?: string;
+  traces_from_ingredients?: string;
+
+  // tags
+  allergens_tags?: string[];
+  traces_tags?: string[];
+  labels_tags?: string[];
+
+  // array form
+  ingredients?: OpenFoodFactsIngredient[];
 };
 
 function normalizeText(s?: string) {
@@ -41,25 +82,23 @@ function hasAnyTag(tags: string[], matchers: string[]) {
  * Pull more text sources from OFF than just ingredients_text.
  * Also keep structured tags separate.
  */
-function collectProductText(product: any) {
+function collectProductText(product: OpenFoodFactsProduct) {
   const ingredientsText =
-    product?.ingredients_text ||
-    product?.ingredients_text_en ||
-    product?.ingredients_text_with_allergens ||
+    product.ingredients_text ||
+    product.ingredients_text_en ||
+    product.ingredients_text_with_allergens ||
     "";
 
-  const allergensText = product?.allergens || product?.allergens_from_ingredients || "";
-  const tracesText = product?.traces || product?.traces_from_ingredients || "";
+  const allergensText = product.allergens || product.allergens_from_ingredients || "";
+  const tracesText = product.traces || product.traces_from_ingredients || "";
 
-  const allergensTags = asTagArray(product?.allergens_tags);
-  const tracesTags = asTagArray(product?.traces_tags);
-  const labelsTags = asTagArray(product?.labels_tags);
+  const allergensTags = asTagArray(product.allergens_tags);
+  const tracesTags = asTagArray(product.traces_tags);
+  const labelsTags = asTagArray(product.labels_tags);
 
-  // sometimes OFF stores ingredient objects
-  const ingredientsArr =
-    Array.isArray(product?.ingredients)
-      ? product.ingredients.map((i: any) => i?.text).filter(Boolean).join(", ")
-      : "";
+  const ingredientsArr = Array.isArray(product.ingredients)
+    ? product.ingredients.map((i) => i.text).filter(Boolean).join(", ")
+    : "";
 
   const combined = [
     ingredientsText,
@@ -69,8 +108,8 @@ function collectProductText(product: any) {
     allergensTags.join(" "),
     tracesTags.join(" "),
     labelsTags.join(" "),
-    product?.product_name || "",
-    product?.product_name_en || "",
+    product.product_name || "",
+    product.product_name_en || "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -122,7 +161,7 @@ const GLUTEN_TRACE_PHRASES = [
 const OATS_SOFT = ["oats", "en:oats"];
 
 const OFF_GLUTEN_TAGS = ["en:gluten", "en:contains-gluten"];
-const OFF_GLUTEN_TRACE_TAGS = ["en:gluten", "en:gluten-traces"]; // OFF isn't perfectly consistent
+const OFF_GLUTEN_TRACE_TAGS = ["en:gluten", "en:gluten-traces"];
 const OFF_GF_LABELS = ["en:gluten-free", "en:no-gluten"];
 
 /**
@@ -146,7 +185,7 @@ const SAFE_FLOUR_CONTEXT = [
 ];
 
 /**
- * Explicit gluten flour patterns (these ARE unsafe):
+ * Explicit gluten flour patterns (unsafe):
  */
 const GLUTEN_FLOUR_PATTERNS: RegExp[] = [
   /\bwheat\s+flour\b/,
@@ -166,23 +205,16 @@ const FISH = ["fish", "salmon", "tuna", "cod", "anchovy", "en:fish"];
 const SHELLFISH = ["shrimp", "prawn", "crab", "lobster", "shellfish", "en:crustaceans", "en:molluscs"];
 
 function verdictFromProduct(
-  product: any,
+  product: OpenFoodFactsProduct,
   userAllergens: string[] = [],
   userDiet: string[] = [],
   userConditions: string[] = []
 ): Verdict {
-  const {
-    combined,
-    ingredientsText,
-    allergensTags,
-    tracesTags,
-    labelsTags,
-    missingData,
-  } = collectProductText(product);
+  const { combined, ingredientsText, allergensTags, tracesTags, labelsTags, missingData } =
+    collectProductText(product);
 
   const reasons: Reason[] = [];
 
-  // normalize user signals
   const a = userAllergens.map((x) => x.toLowerCase());
   const d = userDiet.map((x) => x.toLowerCase());
   const c = userConditions.map((x) => x.toLowerCase());
@@ -193,22 +225,25 @@ function verdictFromProduct(
     c.includes("celiac") ||
     d.includes("gluten-free") ||
     d.includes("gluten free") ||
-    true; // scanner baseline: always detect gluten
+    true;
 
-  const shouldCheckDairy = a.includes("dairy") || a.includes("milk") || a.includes("lactose") || c.includes("lactose intolerance");
-  const shouldCheckNuts = a.includes("tree nuts") || a.includes("tree_nuts") || a.includes("nuts") || a.includes("peanuts");
+  const shouldCheckDairy =
+    a.includes("dairy") || a.includes("milk") || a.includes("lactose") || c.includes("lactose intolerance");
+  const shouldCheckNuts =
+    a.includes("tree nuts") || a.includes("tree_nuts") || a.includes("nuts") || a.includes("peanuts");
   const shouldCheckSoy = a.includes("soy");
   const shouldCheckEggs = a.includes("eggs") || a.includes("egg");
   const shouldCheckSesame = a.includes("sesame");
   const shouldCheckFish = a.includes("fish");
   const shouldCheckShellfish = a.includes("shellfish");
 
-  // ---------- Gluten detection ----------
+  // ---------- Gluten ----------
   if (shouldCheckGluten) {
     const offAllergenHit = hasAnyTag(allergensTags, OFF_GLUTEN_TAGS);
     const offTraceHit = hasAnyTag(tracesTags, OFF_GLUTEN_TRACE_TAGS);
+
     const explicitlyGF =
-      hasAnyTag(labelsTags, OFF_GF_LABELS) ||
+      Boolean(hasAnyTag(labelsTags, OFF_GF_LABELS)) ||
       combined.includes("gluten-free") ||
       combined.includes("gluten free");
 
@@ -216,34 +251,26 @@ function verdictFromProduct(
     const tracePhraseHit = containsAny(combined, GLUTEN_TRACE_PHRASES);
     const oatsHit = containsAny(combined, OATS_SOFT);
 
-    const explicitGlutenFlourHit = GLUTEN_FLOUR_PATTERNS.find((rx) => rx.test(ingredientsText))?.source;
+    const explicitGlutenFlourHit = Boolean(GLUTEN_FLOUR_PATTERNS.find((rx) => rx.test(ingredientsText)));
+    const safeFlourContextHit = Boolean(containsAny(ingredientsText, SAFE_FLOUR_CONTEXT));
 
-    // IMPORTANT: flour false-positive fix
-    // If "flour" appears but it's in a known safe context, do not treat it as gluten.
-    const safeFlourContextHit = containsAny(ingredientsText, SAFE_FLOUR_CONTEXT);
-
-    // If OFF explicitly labels gluten-free, we avoid hard-flagging on weak evidence.
-    // We still allow "unsafe" when OFF allergen tag says gluten OR clear wheat/barley/rye evidence.
     if (offAllergenHit) {
       if (explicitlyGF) {
-        // conflict: gluten-free label but gluten allergen tag
-        // => keep it CAUTION (user asked: keep it as caution), and tell them to verify label.
         reasons.push({
           type: "allergen",
           key: "gluten",
           label: "Label says gluten-free, but OFF allergen tag indicates gluten — verify the package",
-          evidence: `${offAllergenHit} (labels: ${OFF_GF_LABELS.join(", ")})`,
+          evidence: "en:gluten / en:contains-gluten",
         });
       } else {
         reasons.push({
           type: "allergen",
           key: "gluten",
           label: "Contains gluten (OFF allergen tag)",
-          evidence: `${offAllergenHit}`,
+          evidence: "en:gluten / en:contains-gluten",
         });
       }
     } else if (explicitGlutenFlourHit) {
-      // e.g., "wheat flour"
       reasons.push({
         type: "allergen",
         key: "gluten",
@@ -251,11 +278,7 @@ function verdictFromProduct(
         evidence: "wheat/barley/rye flour",
       });
     } else if (grainHit) {
-      // If grain hit is “oats” handle below; otherwise this is hard.
-      // NOTE: "oats" is not in GLUTEN_GRAINS; we treat oats separately as soft.
       if (explicitlyGF) {
-        // product claims GF but contains a gluten grain word in text
-        // could be misleading text in ingredients copy, but still risky — caution.
         reasons.push({
           type: "allergen",
           key: "gluten",
@@ -271,8 +294,6 @@ function verdictFromProduct(
         });
       }
     } else if (oatsHit || offTraceHit || tracePhraseHit) {
-      // Soft risk: oats/traces
-      // If explicitly GF, we keep it caution (not unsafe) because cross-contam varies.
       reasons.push({
         type: "allergen",
         key: "gluten",
@@ -282,10 +303,8 @@ function verdictFromProduct(
         evidence: oatsHit || offTraceHit || tracePhraseHit,
       });
     } else {
-      // Special case: keyword “flour” appears (generic) — do NOT flag unsafe
-      // Example: “gluten free bisquick” with “rice flour”
+      // "flour" alone => CAUTION, unless we can see it's a safe flour
       if (ingredientsText.includes("flour") && !safeFlourContextHit) {
-        // unknown flour type => caution only (not unsafe)
         reasons.push({
           type: "allergen",
           key: "gluten",
@@ -293,14 +312,11 @@ function verdictFromProduct(
           evidence: "flour",
         });
       }
-
-      // Another special: product name/label contains word “gluten” (gluten-free),
-      // should not create a negative hit by itself.
-      // We do nothing here on purpose.
+      // IMPORTANT: word “gluten” in “gluten-free” should NOT create a negative hit by itself (no action)
     }
   }
 
-  // ---------- Other allergens (only if user indicates them) ----------
+  // ---------- Other allergens ----------
   if (shouldCheckDairy) {
     const hit = containsAny(combined, DAIRY);
     if (hit) reasons.push({ type: "allergen", key: "dairy", label: "Dairy / milk", evidence: hit });
@@ -333,7 +349,7 @@ function verdictFromProduct(
     if (hit) reasons.push({ type: "allergen", key: "shellfish", label: "Shellfish", evidence: hit });
   }
 
-  // ---------- Diet constraints (basic MVP) ----------
+  // ---------- Diet constraints ----------
   if (d.includes("vegan")) {
     const nonVeganHits = ["milk", "whey", "casein", "egg", "honey", "gelatin", "cheese", "butter"];
     const hit = containsAny(combined, nonVeganHits);
@@ -346,20 +362,21 @@ function verdictFromProduct(
   }
 
   // ---------- Level rules ----------
-  // User asked: keep false positives as CAUTION rather than unsafe.
-  // Therefore:
-  // - Any clear allergen conflict => unsafe
-  // - Any “possible/verify/trace/unclear” => caution
-  // - Nothing => safe
-
   const hasUnsafeAllergen = reasons.some((r) => {
     if (r.type !== "allergen") return false;
     const L = r.label.toLowerCase();
-    // “contains gluten” is unsafe, but our “label says gluten-free but tag indicates gluten” stays caution.
     if (L.includes("contains gluten") && !L.includes("label says gluten-free")) return true;
-    if (L.includes("dairy") || L.includes("peanuts") || L.includes("tree nuts") || L.includes("soy") || L.includes("eggs") || L.includes("sesame") || L.includes("fish") || L.includes("shellfish")) {
+    if (
+      L.includes("dairy") ||
+      L.includes("peanuts") ||
+      L.includes("tree nuts") ||
+      L.includes("soy") ||
+      L.includes("eggs") ||
+      L.includes("sesame") ||
+      L.includes("fish") ||
+      L.includes("shellfish")
+    )
       return true;
-    }
     return false;
   });
 
@@ -387,16 +404,14 @@ export async function POST(req: Request) {
 
     const offUrl = `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`;
     const offRes = await fetch(offUrl, { cache: "no-store" });
-    const offJson = await offRes.json();
+    const offJson: unknown = await offRes.json();
 
-    const product = offJson?.product || null;
-    const status = offJson?.status;
+    const status = typeof offJson === "object" && offJson !== null ? (offJson as { status?: number }).status : undefined;
+    const product =
+      typeof offJson === "object" && offJson !== null ? (offJson as { product?: OpenFoodFactsProduct }).product : null;
 
     if (!product || status !== 1) {
-      return NextResponse.json(
-        { found: false, error: "Product not found for this barcode." },
-        { status: 404 }
-      );
+      return NextResponse.json({ found: false, error: "Product not found for this barcode." }, { status: 404 });
     }
 
     const supabaseAdmin = getSupabaseAdmin();
@@ -408,15 +423,18 @@ export async function POST(req: Request) {
     if (supabaseAdmin && userId) {
       const { data: profile } = await supabaseAdmin
         .from("profiles")
-        .select("allergens, diet, intolerances, preferences, conditions, medical_conditions")
+        .select("allergens, diet, intolerances, conditions, medical_conditions")
         .eq("id", userId)
         .maybeSingle();
 
-      userAllergens = asTagArray((profile as any)?.allergens);
-      userDiet = asTagArray((profile as any)?.diet);
+      const row = (profile ?? null) as ProfileRow | null;
+
+      userAllergens = asTagArray(row?.allergens);
+      userDiet = asTagArray(row?.diet);
       userConditions = [
-        ...asTagArray((profile as any)?.conditions),
-        ...asTagArray((profile as any)?.medical_conditions),
+        ...asTagArray(row?.conditions),
+        ...asTagArray(row?.medical_conditions),
+        ...asTagArray(row?.intolerances),
       ];
     }
 
@@ -461,11 +479,10 @@ export async function POST(req: Request) {
       },
       verdict,
       userContext: { allergens: userAllergens, diet: userDiet, conditions: userConditions },
-      // helpful debugging (optional — remove later)
       offSignals: {
-        allergens_tags: asTagArray(product?.allergens_tags),
-        traces_tags: asTagArray(product?.traces_tags),
-        labels_tags: asTagArray(product?.labels_tags),
+        allergens_tags: asTagArray(product.allergens_tags),
+        traces_tags: asTagArray(product.traces_tags),
+        labels_tags: asTagArray(product.labels_tags),
       },
     });
   } catch (err) {

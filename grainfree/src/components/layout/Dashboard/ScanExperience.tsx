@@ -4,6 +4,29 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import BarcodeScannerModal from "@/components/features/BarcodeScannerModal";
 
+type VerdictLevel = "safe" | "caution" | "unsafe";
+
+type VerdictReason = {
+  type: "allergen" | "diet";
+  key: string;
+  label: string;
+  evidence?: string;
+};
+
+type ScanHistoryRow = {
+  id: string;
+  created_at: string;
+  barcode: string;
+  product_name: string | null;
+  brand: string | null;
+  image: string | null;
+  ingredients_text: string | null;
+  allergens: string | null;
+  traces: string | null;
+  verdict_level: VerdictLevel;
+  verdict_reasons: VerdictReason[] | null;
+};
+
 type ScanResult = {
   found: boolean;
   barcode: string;
@@ -43,7 +66,7 @@ export default function ScanExperience({
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
 
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<ScanHistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
   const [saving, setSaving] = useState(false);
@@ -312,25 +335,27 @@ export default function ScanExperience({
               <button
                 key={h.id}
                 onClick={() => {
-                  setResult({
-                    found: true,
-                    barcode: h.barcode,
-                    product: {
-                      name: h.product_name,
-                      brand: h.brand,
-                      image: h.image,
-                      ingredients_text: h.ingredients_text,
-                      allergens: h.allergens,
-                      traces: h.traces,
-                      quantity: "",
-                      countries: "",
-                    },
-                    verdict: {
-                      level: h.verdict_level,
-                      reasons: h.verdict_reasons ?? [],
-                      missingData: false,
-                    },
-                  } as any);
+                    setResult({
+                        found: true,
+                        barcode: h.barcode,
+                        product: {
+                          name: h.product_name ?? "Unknown product",
+                          brand: h.brand ?? "",
+                          image: h.image ?? "",
+                          ingredients_text: h.ingredients_text ?? "",
+                          allergens: h.allergens ?? "",
+                          traces: h.traces ?? "",
+                          quantity: "",
+                          countries: "",
+                        },
+                        verdict: {
+                          level: h.verdict_level,
+                          reasons: h.verdict_reasons ?? [],
+                          missingData: false,
+                        },
+                        userContext: undefined,
+                        error: undefined,
+                      });
                 }}
                 className="text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 transition p-4"
               >
