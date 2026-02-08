@@ -13,6 +13,7 @@ import TodayMealLog, { type Meal } from "@/components/features/TodayMealLog";
 
 // hero actions
 import QuickActions from "@/components/features/QuickActions";
+import DashboardMobileSwitchDeck from "@/components/layout/Dashboard/DashboardMobileSwitchDeck";
 
 // overlays + modes
 import DashboardModeOverlay from "./DashboardModeOverlay";
@@ -259,8 +260,44 @@ export default function PageDash() {
           </div>
         </section>
 
+        {/* MOBILE/TABLET: single-slot switch + swipe UX */}
+        <div className="block lg:hidden">
+          <DashboardMobileSwitchDeck
+            todayMeals={
+              <TodayMealLog meals={meals} onMealAdded={handleMealAdded} />
+            }
+            todayStats={
+              <TodaysStats
+                caloriesToday={stats.caloriesToday}
+                goal={goal}
+                streak={stats.streak}
+                mealsLogged={stats.mealsLogged}
+                savedMeals={savedMealCount}
+                savedProducts={savedProductCount}
+              />
+            }
+            guidance={
+              <MegaGuidance
+                planGoals={plan?.goals ?? []}
+                onUpdateGuide={() => router.push("/system")}
+                onViewAllGoals={() => router.push("/dash?view=goals")}
+                onAskCoach={() => setMode("coach")}
+              />
+            }
+            recommendations={
+              <MegaRecommendations
+                items={plan?.recommendations ?? []}
+                onViewAll={() => router.push("/dash?view=recs")}
+                onBuildGuide={() => router.push("/system")}
+              />
+            }
+            library={<MegaLibrary />}
+          />
+        </div>
+
+
         {/* TOP GRID */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div className="hidden lg:grid grid-cols-12 mt-8 gap-6 gap-8 items-start">
           <div className="lg:col-span-8 space-y-6">
             <TodayMealLog meals={meals} onMealAdded={handleMealAdded} />
           </div>
@@ -278,7 +315,7 @@ export default function PageDash() {
         </div>
 
         {/* SWITCHABLE “MEGA” AREA (this replaces scattered blocks) */}
-        <div className="mt-10 space-y-6">
+        <div className="hidden lg:block mt-10 space-y-6">
           <DashboardPanelSwitch value={panel} onChange={setPanel} />
 
           <div className="relative">
