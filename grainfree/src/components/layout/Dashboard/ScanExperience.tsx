@@ -167,93 +167,7 @@ export default function ScanExperience({
           )}
         </div>
       </div>
-
-      {/* ✅ History always visible */}
-      <section className="rounded-3xl border border-white/10 bg-black/15 p-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/60">
-              history
-            </p>
-            <h3 className="mt-2 font-[AeonikArabic] text-[1.25rem] font-semibold">
-              Recent scans
-            </h3>
-          </div>
-          <button
-            onClick={loadHistory}
-            className="rounded-xl border border-white/12 bg-white/8 hover:bg-white/12 transition px-4 py-2 text-xs font-[AeonikArabic]"
-          >
-            {historyLoading ? "Refreshing…" : "Refresh"}
-          </button>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {history.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-[AeonikArabic] text-white/70">
-              {historyLoading ? "Loading history…" : "No scans yet. Scan your first product."}
-            </div>
-          ) : (
-            history.slice(0, 10).map((h) => (
-              <button
-                key={h.id}
-                onClick={() => {
-                  setResult({
-                    found: true,
-                    barcode: h.barcode,
-                    product: {
-                      name: h.product_name,
-                      brand: h.brand,
-                      image: h.image,
-                      ingredients_text: h.ingredients_text,
-                      allergens: h.allergens,
-                      traces: h.traces,
-                      quantity: "",
-                      countries: "",
-                    },
-                    verdict: {
-                      level: h.verdict_level,
-                      reasons: h.verdict_reasons ?? [],
-                      missingData: false,
-                    },
-                  } as any);
-                }}
-                className="text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 transition p-4"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="font-[AeonikArabic] text-sm text-white/90 line-clamp-2">
-                    {h.product_name || "Unknown product"}
-                  </div>
-                  <span className="rounded-full border border-white/12 bg-black/20 px-3 py-1 text-[11px] font-[AeonikArabic] text-white/75">
-                    {h.verdict_level}
-                  </span>
-                </div>
-                <div className="mt-1 font-[AeonikArabic] text-xs text-white/55">
-                  {new Date(h.created_at).toLocaleString()}
-                </div>
-              </button>
-            ))
-          )}
-        </div>
-      </section>
-
-      {/* Scanner Modal */}
-      <BarcodeScannerModal
-        open={openScanner}
-        onClose={() => setOpenScanner(false)}
-        onDetected={(code) => {
-          setOpenScanner(false);
-          runScan(code);
-        }}
-        title="Scan a product"
-      />
-
-      {/* Loading state */}
-      {loading && (
-        <div className="rounded-3xl border border-white/10 bg-black/20 p-6 font-[AeonikArabic] text-white/80">
-          Checking product safety…
-        </div>
-      )}
-
+      
       {/* Result */}
       {result && !loading && (
         <div className="rounded-3xl border border-white/10 bg-black/20 p-6 sm:p-7">
@@ -368,6 +282,94 @@ export default function ScanExperience({
           )}
         </div>
       )}
+
+      {/* ✅ History always visible */}
+      <section className="rounded-3xl border border-white/10 bg-black/15 p-5 sm:p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/60">
+              history
+            </p>
+            <h3 className="mt-2 font-[AeonikArabic] text-[1.25rem] font-semibold">
+              Recent scans
+            </h3>
+          </div>
+          <button
+            onClick={loadHistory}
+            className="rounded-xl border border-white/12 bg-white/8 hover:bg-white/12 transition px-4 py-2 text-xs font-[AeonikArabic]"
+          >
+            {historyLoading ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {history.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-[AeonikArabic] text-white/70">
+              {historyLoading ? "Loading history…" : "No scans yet. Scan your first product."}
+            </div>
+          ) : (
+            history.slice(0, 10).map((h) => (
+              <button
+                key={h.id}
+                onClick={() => {
+                  setResult({
+                    found: true,
+                    barcode: h.barcode,
+                    product: {
+                      name: h.product_name,
+                      brand: h.brand,
+                      image: h.image,
+                      ingredients_text: h.ingredients_text,
+                      allergens: h.allergens,
+                      traces: h.traces,
+                      quantity: "",
+                      countries: "",
+                    },
+                    verdict: {
+                      level: h.verdict_level,
+                      reasons: h.verdict_reasons ?? [],
+                      missingData: false,
+                    },
+                  } as any);
+                }}
+                className="text-left rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 transition p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-[AeonikArabic] text-sm text-white/90 line-clamp-2">
+                    {h.product_name || "Unknown product"}
+                  </div>
+                  <span className="rounded-full border border-white/12 bg-black/20 px-3 py-1 text-[11px] font-[AeonikArabic] text-white/75">
+                    {h.verdict_level}
+                  </span>
+                </div>
+                <div className="mt-1 font-[AeonikArabic] text-xs text-white/55">
+                  {new Date(h.created_at).toLocaleString()}
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* Scanner Modal */}
+      <BarcodeScannerModal
+        open={openScanner}
+        onClose={() => setOpenScanner(false)}
+        onDetected={(code) => {
+          setOpenScanner(false);
+          runScan(code);
+        }}
+        title="Scan a product"
+      />
+
+      {/* Loading state */}
+      {loading && (
+        <div className="rounded-3xl border border-white/10 bg-black/20 p-6 font-[AeonikArabic] text-white/80">
+          Checking product safety…
+        </div>
+      )}
+
+      
     </div>
   );
 }
