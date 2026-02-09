@@ -218,24 +218,24 @@ export default function PageDash() {
           <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_30%_20%,rgba(157,231,197,0.35),transparent_55%)]" />
           <div className="absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_80%_60%,rgba(0,184,74,0.22),transparent_55%)]" />
 
-          <div className="relative p-6 sm:p-8 lg:p-10">
+          <div className="relative p-5 sm:p-8 lg:p-6">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
               <div className="max-w-2xl">
                 <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/70">
                   command center
                 </p>
 
-                <h1 className="mt-3 font-[AeonikArabic] font-bold leading-[1.02] text-[clamp(2.1rem,4vw,3.4rem)]">
+                <h1 className="mt-3 font-[AeonikArabic] font-bold leading-[1.02] text-[clamp(1.5rem,2.5vw,3.2rem)]">
                   Welcome back, <span className="italic text-[#9DE7C5]">{username}</span>.
                 </h1>
 
-                <p className="mt-3 font-[AeonikArabic] text-white/85 leading-relaxed text-[1.02rem] sm:text-[1.08rem]">
+                <p className="mt-3 font-[AeonikArabic] text-white/85 leading-relaxed text-[0.8rem] sm:text-[1.08rem]">
                   {plan?.title
                     ? `${plan.title} — ${plan.description ?? "your personalized guide is ready."}`
                     : "Build your guide to unlock a truly personalized dashboard: safety rules, swaps, and routines that match your life."}
                 </p>
 
-                <div className="mt-5 flex items-center gap-3">
+                <div className="hidden lg:flex flex-row mt-5 items-center gap-3">
                   <div className="relative h-10 w-10 rounded-2xl border border-white/12 bg-black/20 overflow-hidden">
                     <Image
                       src="/image/Home-SVG.svg"
@@ -285,15 +285,6 @@ export default function PageDash() {
                 onViewAllGoals={() => router.push("/dash?view=goals")}
               />
             }
-
-
-
-
-
-
-
-
-
             guidance={
               <MegaGuidance
                 planGoals={plan?.goals ?? []}
@@ -315,12 +306,12 @@ export default function PageDash() {
 
 
         {/* TOP GRID */}
-        <div className="hidden lg:grid grid-cols-12 mt-8 gap-6 gap-8 items-start">
-          <div className="lg:col-span-8 space-y-6">
+        <div className="hidden lg:grid grid-cols-15 mt-8 gap-6 gap-8 items-start">
+          <div className="lg:col-span-5 space-y-6">
             <TodayMealLog meals={meals} onMealAdded={handleMealAdded} />
           </div>
 
-          <aside className="lg:col-span-4 space-y-6">
+          <aside className="lg:col-span-5 space-y-6">
             <TodaysStats
               caloriesToday={stats.caloriesToday}
               goal={goal}
@@ -329,6 +320,16 @@ export default function PageDash() {
               savedMeals={savedMealCount}
               savedProducts={savedProductCount}
             />
+
+            
+          </aside>
+
+          <aside className="lg:col-span-5 space-y-6">
+            <GoalsUpdate
+                planGoals={plan?.goals ?? []}
+                onUpdateGuide={() => router.push("/system")}
+                onViewAllGoals={() => router.push("/dash?view=goals")}
+              />
           </aside>
 
 

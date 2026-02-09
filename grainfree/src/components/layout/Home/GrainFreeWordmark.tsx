@@ -251,7 +251,7 @@ export default function GrainFreeWordmark({
             >
               <div className="rounded-xl bg-[#517F58] px-4 py-3 text-white drop-shadow-[6px_6px_0px_#3D4F46]">
                 <p className="text-[14px] sm:text-[16px] leading-tight font-[AeonikArabic]">
-                  The No BS <span className="italic">&apos;Gluten Free&apos;</span>{" "}
+                  The No BS <span className="italic">&apos;Allergen Free&apos;</span>{" "}
                   Guide.
                 </p>
                 <p className="text-[14px] sm:text-[16px] leading-tight font-[AeonikArabic]">
@@ -368,7 +368,7 @@ export default function GrainFreeWordmark({
                 className="rounded bg-[#517F58] px-4 py-2 text-white drop-shadow-[6px_6px_0px_#3D4F46]"
               >
                 <p className="text-[18px] leading-tight font-[AeonikArabic]">
-                  The No BS <span className="italic">&apos;Gluten Free&apos;</span>{" "}
+                  The No BS <span className="italic">&apos;Allergen Free&apos;</span>{" "}
                   Guide.
                 </p>
                 <p className="text-[18px] leading-tight font-[AeonikArabic]">

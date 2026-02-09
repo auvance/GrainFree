@@ -100,6 +100,36 @@ function deriveCalorieTarget(payload: GuidePayload | null | undefined, fallback 
   return target;
 }
 
+
+// Allergens
+function asStringArray(v: unknown): string[] {
+  if (!v) return [];
+  if (Array.isArray(v)) return v.map(String).map(s => s.trim()).filter(Boolean);
+  if (typeof v === "string") return v.split(",").map(s => s.trim()).filter(Boolean);
+  return [];
+}
+
+function pickProfileSafetyFromPayload(payload: unknown): {
+  allergens?: string[];
+  diet?: string[];
+  conditions?: string[];
+  medical_conditions?: string[];
+  intolerances?: string[];
+} {
+  const p = payload as Record<string, unknown> | null;
+  const up = (p?.user_profile ?? p) as Record<string, unknown> | null;
+
+  return {
+    allergens: asStringArray(up?.allergens),
+    diet: asStringArray(up?.diet),
+    conditions: asStringArray(up?.conditions),
+    medical_conditions: asStringArray(up?.medical_conditions),
+    intolerances: asStringArray(up?.intolerances),
+  };
+}
+
+
+
 export async function POST(req: Request) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
@@ -201,9 +231,35 @@ OUTPUT FORMAT (STRICT JSON):
 
     if (error) throw error;
 
-    await supabaseAdmin
-      .from("profiles")
-      .upsert({ id: userId, calorie_target: calorieTarget }, { onConflict: "id" });
+    // Update profile calorie target + safety fields (so SafetySnapshot can render)
+    const safety = pickProfileSafetyFromPayload(effectivePayload);
+
+      await supabaseAdmin
+    .from("profiles")
+    .upsert(
+      {
+        id: userId,
+        calorie_target: calorieTarget,
+        ...(safety.allergens?.length ? { allergens: safety.allergens } : {}),
+        ...(safety.diet?.length ? { diet: safety.diet.join(", ") } : {}), // diet column is text in your screenshot
+      },
+      { onConflict: "id" }
+    );
+    // await supabaseAdmin
+    //   .from("profiles")
+    //   .upsert(
+    //     {
+    //       id: userId,
+    //       calorie_target: calorieTarget,
+    //       ...(safety.allergens?.length ? { allergens: safety.allergens } : {}),
+    //       ...(safety.diet?.length ? { diet: safety.diet } : {}),
+    //       ...(safety.conditions?.length ? { conditions: safety.conditions } : {}),
+    //       ...(safety.medical_conditions?.length ? { medical_conditions: safety.medical_conditions } : {}),
+    //       ...(safety.intolerances?.length ? { intolerances: safety.intolerances } : {}),
+    //     },
+    //     { onConflict: "id" }
+    //   );
+
 
     return NextResponse.json({ success: true, plan: data, rich: parsed });
   } catch (err) {

@@ -48,10 +48,10 @@ export default function TodaysStats({
 
   return (
     <section
-      className={`relative h-full overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#2B5446] via-[#223A32] to-[#1B2C26] ${CARD_HEIGHT}`}
+      className={`relative h-full overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#185942] via-[#223A32] to-[#1B2C26] ${CARD_HEIGHT}`}
     >
       <div className="pointer-events-none absolute inset-0 opacity-45 bg-[radial-gradient(circle_at_25%_20%,rgba(157,231,197,0.22),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_80%_70%,rgba(0,184,74,0.16),transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_80%_70%,rgba(68, 104, 82, 0.16),transparent_60%)]" />
 
       <div className="relative h-full p-5 sm:p-7 flex flex-col">
         <div className="flex items-start justify-between gap-4">

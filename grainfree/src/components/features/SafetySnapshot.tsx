@@ -13,18 +13,16 @@ function Chip({ children }: { children: string }) {
 }
 
 function asArray(v: unknown): string[] {
-  if (Array.isArray(v)) return v.map(String).filter(Boolean);
+  if (Array.isArray(v)) return v.map(String).map((s) => s.trim()).filter(Boolean);
   if (typeof v === "string") return v.split(",").map((x) => x.trim()).filter(Boolean);
   return [];
 }
 
 type ProfileSafetyRow = {
-    allergens: string[] | string | null;
-    diet: string[] | string | null;
-    conditions: string[] | string | null;
-    medical_conditions: string[] | string | null;
-    intolerances: string[] | string | null;
-  };
+  allergens: string[] | string | null;
+  diet: string[] | string | null;
+};
+
 
 export default function SafetySnapshot({
   title = "Safety snapshot",
@@ -38,29 +36,29 @@ export default function SafetySnapshot({
 
   const [allergens, setAllergens] = useState<string[]>([]);
   const [diet, setDiet] = useState<string[]>([]);
-  const [conditions, setConditions] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
 
     const run = async () => {
       setLoading(true);
-      const { data } = await supabase
+
+      const { data, error } = await supabase
         .from("profiles")
-        .select("allergens, diet, conditions, medical_conditions, intolerances")
+        .select("allergens, diet")
         .eq("id", user.id)
         .maybeSingle();
 
-        const row = data as ProfileSafetyRow | null;
+      if (error) {
+        console.error("SafetySnapshot profile fetch error:", error);
+        setLoading(false);
+        return;
+      }
 
-        setAllergens(asArray(row?.allergens));
-        setDiet(asArray(row?.diet));
-        setConditions([
-          ...asArray(row?.conditions),
-          ...asArray(row?.medical_conditions),
-          ...asArray(row?.intolerances),
-        ]);
-        
+      const row = data as ProfileSafetyRow | null;
+
+      setAllergens(asArray(row?.allergens));
+      setDiet(asArray(row?.diet));
 
       setLoading(false);
     };
@@ -69,12 +67,12 @@ export default function SafetySnapshot({
   }, [user]);
 
   const chips = useMemo(() => {
-    const merged = [...allergens, ...diet, ...conditions].filter(Boolean);
+    const merged = [...allergens, ...diet].filter(Boolean);
     return Array.from(new Set(merged)).slice(0, 12);
-  }, [allergens, diet, conditions]);
+  }, [allergens, diet]);
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-7">
+    <section className={`relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-7 mr-4 ml-4`}>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
 
       <div className="relative">
@@ -87,7 +85,7 @@ export default function SafetySnapshot({
               {title}
             </h2>
             <p className="mt-2 font-[AeonikArabic] text-sm text-white/70 leading-relaxed">
-              Pulled from your profile (allergens/diet/conditions).
+              Pulled from your profile (allergens/diet).
             </p>
           </div>
 
@@ -102,16 +100,14 @@ export default function SafetySnapshot({
         </div>
 
         {loading ? (
-          <p className="mt-4 font-[AeonikArabic] text-sm text-white/70">
-            Loading…
-          </p>
+          <p className="mt-4 font-[AeonikArabic] text-sm text-white/70">Loading…</p>
         ) : chips.length === 0 ? (
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-[AeonikArabic] text-white/80 font-semibold">
               No safety profile yet.
             </p>
             <p className="mt-1 font-[AeonikArabic] text-sm text-white/70">
-              Add allergens/diet/conditions in your profile or rebuild your guide.
+              Add allergens/diet in your profile or rebuild your guide.
             </p>
           </div>
         ) : (

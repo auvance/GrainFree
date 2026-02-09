@@ -13,48 +13,91 @@ type Props = {
 
 export default function QuestionCard({ question, answer, onAnswer }: Props) {
   return (
-    <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4">{question.question}</h2>
+    <section className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6">
+      <p className="font-[AeonikArabic] text-xs uppercase tracking-[0.22em] text-white/60">
+        question
+      </p>
 
-      {question.type === "multiple" &&
-        question.options?.map((opt) => (
-          <label key={opt} className="block mb-2">
-            <input
-              type="checkbox"
-              checked={Array.isArray(answer) && answer.includes(opt)}
-              onChange={(e) => {
-                let updated = Array.isArray(answer) ? [...answer] : [];
-                if (e.target.checked) updated.push(opt);
-                else updated = updated.filter((a) => a !== opt);
-                onAnswer(question.id, updated);
-              }}
-              className="mr-2"
-            />
-            {opt}
-          </label>
-        ))}
+      <h2 className="mt-2 font-[AeonikArabic] text-xl sm:text-2xl font-semibold text-white leading-tight">
+        {question.question}
+      </h2>
 
-      {question.type === "single" &&
-        question.options?.map((opt) => (
-          <label key={opt} className="block mb-2">
-            <input
-              type="radio"
-              checked={answer === opt}
-              onChange={() => onAnswer(question.id, opt)}
-              className="mr-2"
-            />
-            {opt}
-          </label>
-        ))}
+      <div className="mt-5 space-y-3 font-[AeonikArabic]">
+        {question.type === "multiple" &&
+          question.options?.map((opt) => {
+            const checked = Array.isArray(answer) && answer.includes(opt);
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => {
+                  const current = Array.isArray(answer) ? [...answer] : [];
+                  const set = new Set(current);
+                  if (set.has(opt)) set.delete(opt);
+                  else set.add(opt);
+                  onAnswer(question.id, Array.from(set));
+                }}
+                className={[
+                  "w-full rounded-xl border px-4 py-3 text-left transition",
+                  checked
+                    ? "bg-[#00B84A]/90 border-[#00B84A] text-white"
+                    : "bg-white/5 border-white/10 hover:bg-white/10 text-white/90",
+                ].join(" ")}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-medium">{opt}</span>
+                  <span
+                    className={[
+                      "h-5 w-5 rounded-md border",
+                      checked ? "border-white/80 bg-white/20" : "border-white/25 bg-black/10",
+                    ].join(" ")}
+                  />
+                </div>
+              </button>
+            );
+          })}
 
-      {question.type === "text" && (
-        <textarea
-          className="w-full rounded-lg p-3 bg-white/5 border border-white/20"
-          value={typeof answer === "string" ? answer : ""}
-          onChange={(e) => onAnswer(question.id, e.target.value)}
-          placeholder="Type your answer here..."
-        />
-      )}
-    </div>
+        {question.type === "single" &&
+          question.options?.map((opt) => {
+            const selected = answer === opt;
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => onAnswer(question.id, opt)}
+                className={[
+                  "w-full rounded-xl border px-4 py-3 text-left transition",
+                  selected
+                    ? "bg-[#00B84A]/90 border-[#00B84A] text-white"
+                    : "bg-white/5 border-white/10 hover:bg-white/10 text-white/90",
+                ].join(" ")}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-medium">{opt}</span>
+                  <span
+                    className={[
+                      "h-5 w-5 rounded-full border",
+                      selected ? "border-white/80 bg-white/20" : "border-white/25 bg-black/10",
+                    ].join(" ")}
+                  />
+                </div>
+              </button>
+            );
+          })}
+
+        {question.type === "text" && (
+          <textarea
+            className={[
+              "w-full min-h-[160px] rounded-2xl border border-white/10 bg-white/5",
+              "p-4 outline-none placeholder:text-white/45 font-[AeonikArabic] text-white",
+              "focus:ring-2 focus:ring-[#9DE7C5]/30 resize-none",
+            ].join(" ")}
+            value={typeof answer === "string" ? answer : ""}
+            onChange={(e) => onAnswer(question.id, e.target.value)}
+            placeholder="Type your answer here..."
+          />
+        )}
+      </div>
+    </section>
   );
 }

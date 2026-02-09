@@ -25,13 +25,13 @@ export default function PlanGoals({
   const empty = shown.length === 0;
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#243A31] via-[#1E2F28] to-[#15221D] p-5 sm:p-6">
+    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#243A31] via-[#1E2F28] to-[#15221D] p-5 sm:p-6 mr-4 ml-4 mb-4">
       <div className="pointer-events-none absolute inset-0 opacity-45 bg-[radial-gradient(circle_at_25%_20%,rgba(157,231,197,0.20),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_85%_70%,rgba(0,184,74,0.18),transparent_55%)]" />
 
       <div className="relative">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col items-start justify-between gap-4">
           <div>
             <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/55">
               progress
@@ -97,7 +97,7 @@ function GoalRow({ goal }: { goal: { title: string; progress: number } }) {
   const pct = clamp(Math.round(Number(goal.progress ?? 0)), 0, 100);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/15 p-4">
+    <div className="rounded-2xl border border-white/10 bg-black/15 p-4 ">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="font-[AeonikArabic] text-sm font-medium text-white/90 truncate">

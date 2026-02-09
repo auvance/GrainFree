@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Header from "@/components/layout/Header/Header";
@@ -42,15 +42,20 @@ type StepConfig = {
   type: StepType;
   options?: string[];
   placeholder?: string;
-  /** For scale steps */
   min?: number;
   max?: number;
   minLabel?: string;
   maxLabel?: string;
-  /** Validation */
   required?: boolean;
-  /** Optional: show only if predicate passes */
   when?: (answers: Answers) => boolean;
+
+  /**
+   * ✅ NEW: per-step grid layout for option cards.
+   * Examples:
+   * - "grid-cols-1 md:grid-cols-2"
+   * - "grid-cols-2 md:grid-cols-3 lg:grid-cols-7"
+   */
+  gridClassName?: string;
 };
 
 type Answers = Record<StepId, Answer>;
@@ -159,8 +164,7 @@ function buildSteps(answers: Answers): StepConfig[] {
     {
       id: "goal",
       label: "What’s your #1 goal right now?",
-      helper:
-        "This helps us tailor the guide to what matters most to you.",
+      helper: "This helps us tailor the guide to what matters most to you.",
       type: "single",
       required: true,
       options: [
@@ -170,31 +174,36 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Gain/lose weight safely",
         "Improve energy & performance",
       ],
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "restrictions",
       label: "Which restrictions/allergens should GrainFree protect you from?",
-      helper:
-        "Select everything that applies. We’ll tailor safety rules and swaps.",
+      helper: "Select everything that applies. We’ll tailor safety rules and swaps.",
       type: "multi",
       required: true,
       options: RESTRICTIONS,
+      // ✅ More dense (tweak this anytime)
+      gridClassName: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5",
+      // If you ever want 7 on desktop:
+      // gridClassName: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-7",
     },
+
     {
       id: "other_restrictions",
       label: "Any other restrictions you want us to account for?",
-      helper:
-        "Optional — e.g., corn, oats, nightshades, specific brands/ingredients.",
+      helper: "Optional — e.g., corn, oats, nightshades, specific brands/ingredients.",
       type: "text",
       required: false,
       placeholder: "Type anything important here…",
       when: (a) => hasOtherSelection(a.restrictions as string[]),
     },
+
     {
       id: "reaction_severity",
       label: "How serious are your reactions overall?",
-      helper:
-        "This changes how strict your plan should be (and how we handle eating out).",
+      helper: "This changes how strict your plan should be (and how we handle eating out).",
       type: "single",
       required: true,
       options: [
@@ -204,12 +213,13 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Not sure",
       ],
       when: () => hasRestrictions,
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "cross_contamination",
       label: "How sensitive are you to cross-contamination?",
-      helper:
-        "Think shared fryers, traces, shared cutting boards, etc.",
+      helper: "Think shared fryers, traces, shared cutting boards, etc.",
       type: "single",
       required: true,
       options: [
@@ -219,12 +229,13 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Not sure",
       ],
       when: () => hasRestrictions,
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "kitchen_environment",
       label: "What’s your eating environment like?",
-      helper:
-        "We’ll tailor safety habits to your real life setup.",
+      helper: "We’ll tailor safety habits to your real life setup.",
       type: "single",
       required: true,
       options: [
@@ -233,16 +244,19 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Mostly eating out / takeout",
         "Shared kitchen (roommates/family)",
       ],
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "eating_out_frequency",
       label: "How often do you eat out or order takeout?",
-      helper:
-        "We’ll include an eating-out playbook if this is common.",
+      helper: "We’ll include an eating-out playbook if this is common.",
       type: "single",
       required: true,
       options: ["Rarely", "1–2x/week", "3–5x/week", "Most days"],
+      gridClassName: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2",
     },
+
     {
       id: "biggest_struggles",
       label: "What are your biggest struggles right now?",
@@ -250,9 +264,9 @@ function buildSteps(answers: Answers): StepConfig[] {
       type: "multi",
       required: true,
       options: STRUGGLES,
+      gridClassName: "grid-cols-1 md:grid-cols-3 lg:grid-cols-3",
     },
 
-    // --- Symptoms block (conditional) ---
     {
       id: "symptoms",
       label: "Any current symptoms you want to improve?",
@@ -262,15 +276,15 @@ function buildSteps(answers: Answers): StepConfig[] {
       options: SYMPTOMS,
       when: (a) =>
         a.goal === "Reduce symptoms" ||
-        (a.biggest_struggles as string[])?.includes(
-          "I get symptoms but don’t know why"
-        ),
+        (a.biggest_struggles as string[])?.includes("I get symptoms but don’t know why"),
+      // Symptoms can be dense too
+      gridClassName: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
     },
+
     {
       id: "symptom_pattern",
       label: "When do symptoms usually happen?",
-      helper:
-        "We’ll use this to suggest a practical tracking approach (not medical advice).",
+      helper: "We’ll use this to suggest a practical tracking approach (not medical advice).",
       type: "single",
       required: true,
       options: [
@@ -281,7 +295,9 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Not sure",
       ],
       when: () => hasSymptoms,
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "trigger_suspects",
       label: "Anything you suspect is triggering symptoms?",
@@ -292,12 +308,10 @@ function buildSteps(answers: Answers): StepConfig[] {
       when: () => hasSymptoms,
     },
 
-    // --- Attempts / success ---
     {
       id: "past_attempts",
       label: "What best describes where you’re at?",
-      helper:
-        "We’ll adapt your plan to your experience level and what you’ve tried.",
+      helper: "We’ll adapt your plan to your experience level and what you’ve tried.",
       type: "single",
       required: true,
       options: [
@@ -307,32 +321,36 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Tracking apps didn’t work for me",
         "Working with a clinician",
       ],
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "success_definition",
       label: "What does “success” look like in 2–4 weeks?",
-      helper:
-        "Make it real — less anxiety eating, fewer symptoms, consistent meals, etc.",
+      helper: "Make it real — less anxiety eating, fewer symptoms, consistent meals, etc.",
       type: "text",
       required: true,
       placeholder: "Example: Eat safely all week without anxiety + no bloating.",
     },
 
-    // --- Reality constraints ---
     {
       id: "cooking_time",
       label: "How much time can you spend per meal?",
       type: "single",
       required: true,
       options: ["5–10 min", "15–25 min", "30–45 min", "Meal prep 1x/week", "Mix"],
+      gridClassName: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5",
     },
+
     {
       id: "cooking_skill",
       label: "How comfortable are you cooking?",
       type: "single",
       required: true,
       options: ["Beginner", "Intermediate", "Confident", "I mostly assemble foods"],
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "household",
       label: "Who are you cooking for?",
@@ -340,14 +358,18 @@ function buildSteps(answers: Answers): StepConfig[] {
       type: "single",
       required: true,
       options: ["Just me", "Me + partner", "Family with kids", "Shared household"],
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "budget",
       label: "Weekly grocery budget (approx.)",
       type: "single",
       required: true,
       options: ["<$50", "$50–$100", "$100–$175", "$175–$250", "$250+"],
+      gridClassName: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5",
     },
+
     {
       id: "shopping_style",
       label: "How do you prefer to shop?",
@@ -360,7 +382,9 @@ function buildSteps(answers: Answers): StepConfig[] {
         "I want the simplest defaults (tell me what to buy)",
         "I like exploring options (give me variety)",
       ],
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
+
     {
       id: "cuisine_prefs",
       label: "Preferred cuisines / flavors",
@@ -376,18 +400,18 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Simple / mild flavors",
         "Spicy",
       ],
+      gridClassName: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
     },
+
     {
       id: "hard_avoids_favorites",
       label: "Hard avoids + favorites",
-      helper:
-        "Tell us foods you absolutely avoid and foods you love (so the plan feels like you).",
+      helper: "Tell us foods you absolutely avoid and foods you love (so the plan feels like you).",
       type: "text",
       required: false,
       placeholder: "Avoid: mushrooms. Love: chicken bowls, rice, berries…",
     },
 
-    // --- Nutrition goal (optional but useful) ---
     {
       id: "macro_goal",
       label: "Any nutrition preference you care about?",
@@ -401,9 +425,9 @@ function buildSteps(answers: Answers): StepConfig[] {
         "Lower calories (lose weight)",
         "Balanced / no focus",
       ],
+      gridClassName: "grid-cols-1 md:grid-cols-2",
     },
 
-    // --- Output shaping ---
     {
       id: "plan_includes",
       label: "What do you want your guide to include?",
@@ -411,14 +435,21 @@ function buildSteps(answers: Answers): StepConfig[] {
       type: "multi",
       required: true,
       options: PLAN_INCLUDES,
+      // This is often a “big list” → denser layout feels better
+      gridClassName: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2",
+      // Or if you really want it compressed:
+      // gridClassName: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
     },
+
     {
       id: "coaching_style",
       label: "What tone should GrainFree use?",
       type: "single",
       required: true,
       options: COACHING_STYLE,
+      gridClassName: "grid-cols-1 md:grid-cols-3",
     },
+
     {
       id: "final_notes",
       label: "Anything else we should know to personalize this?",
@@ -429,7 +460,6 @@ function buildSteps(answers: Answers): StepConfig[] {
     },
   ];
 
-  // Apply `when` conditions
   return base.filter((s) => (s.when ? s.when(answers) : true));
 }
 
@@ -444,11 +474,12 @@ function RecapCard({ answers }: { answers: Answers }) {
   if (!goal && restrictions.length === 0 && struggles.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
-      <p className="font-[AeonikArabic] text-xs uppercase tracking-widest text-white/60">
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <p className="font-[AeonikArabic] text-[0.7rem] uppercase tracking-[0.22em] text-white/60">
         Your personalization so far
       </p>
-      <div className="mt-2 space-y-2 font-[AeonikArabic] text-white/85">
+
+      <div className="mt-3 space-y-2 font-[AeonikArabic] text-white/85 text-sm">
         {goal ? (
           <div>
             <span className="text-white/60">Goal:</span>{" "}
@@ -457,18 +488,18 @@ function RecapCard({ answers }: { answers: Answers }) {
         ) : null}
 
         {topRestrictions.length ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-white/60">Protect from:</span>
             {topRestrictions.map((r) => (
               <span
                 key={r}
-                className="rounded-full bg-[#00B84A]/15 border border-[#00B84A]/25 px-3 py-1 text-xs text-[#9DE7C5]"
+                className="rounded-full bg-[#00B84A]/15 border border-[#00B84A]/25 px-3 py-1 text-[0.72rem] text-[#9DE7C5]"
               >
                 {r}
               </span>
             ))}
             {restrictions.length > 3 ? (
-              <span className="text-white/60 text-xs">
+              <span className="text-white/60 text-[0.72rem]">
                 +{restrictions.length - 3} more
               </span>
             ) : null}
@@ -476,12 +507,12 @@ function RecapCard({ answers }: { answers: Answers }) {
         ) : null}
 
         {topStruggles.length ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-white/60">Focus areas:</span>
             {topStruggles.map((s) => (
               <span
                 key={s}
-                className="rounded-full bg-white/10 border border-white/15 px-3 py-1 text-xs text-white/85"
+                className="rounded-full bg-white/10 border border-white/15 px-3 py-1 text-[0.72rem] text-white/85"
               >
                 {s}
               </span>
@@ -495,20 +526,24 @@ function RecapCard({ answers }: { answers: Answers }) {
 
 export default function BuildWizard() {
   const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Answers>(defaultAnswers);
 
+  const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
+  const pendingIndexRef = useRef<number | null>(null);
+
   const steps = useMemo(() => buildSteps(answers), [answers]);
   const step = steps[stepIndex];
+
   const progress = useMemo(
     () => Math.round(((stepIndex + 1) / steps.length) * 100),
     [stepIndex, steps.length]
   );
 
-  // session + draft
   useEffect(() => {
     const init = async () => {
       const { data } = await supabase.auth.getSession();
@@ -531,7 +566,6 @@ export default function BuildWizard() {
     init();
   }, [router]);
 
-  // autosave
   useEffect(() => {
     if (!userId) return;
     const saveDraft = async () => {
@@ -540,11 +574,41 @@ export default function BuildWizard() {
     saveDraft();
   }, [answers, userId]);
 
-  // Keep stepIndex in bounds if steps change due to branching
   useEffect(() => {
     if (stepIndex > steps.length - 1) setStepIndex(steps.length - 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [steps.length]);
+  }, [steps.length, stepIndex]);
+
+  const canNext = useMemo(() => {
+    if (!step) return false;
+    const a = answers[step.id];
+
+    if (!step.required) return true;
+    if (step.type === "text") return typeof a === "string" && a.trim().length > 0;
+    if (step.type === "multi") return selectedCount(a) > 0;
+    if (step.type === "single") return a !== null && a !== "";
+    if (step.type === "scale") return typeof a === "number";
+    return false;
+  }, [answers, step]);
+
+  const isLast = stepIndex === steps.length - 1;
+
+  const transitionTo = (nextIndex: number) => {
+    if (phase !== "idle") return;
+    pendingIndexRef.current = nextIndex;
+
+    setPhase("out");
+
+    window.setTimeout(() => {
+      const idx = pendingIndexRef.current;
+      if (typeof idx === "number") setStepIndex(idx);
+      setPhase("in");
+
+      window.setTimeout(() => {
+        setPhase("idle");
+        pendingIndexRef.current = null;
+      }, 170);
+    }, 170);
+  };
 
   const onSelect = (value: string) => {
     if (!step) return;
@@ -556,7 +620,6 @@ export default function BuildWizard() {
 
     if (step.type === "multi") {
       const current = (answers[step.id] as string[]) || [];
-      // Special rule: struggles = max 2 (premium, not overwhelming)
       const maxPick = step.id === "biggest_struggles" ? 2 : 99;
 
       const set = new Set(current);
@@ -564,7 +627,6 @@ export default function BuildWizard() {
         set.delete(value);
       } else {
         if (set.size >= maxPick) {
-          // Replace last selection to avoid “blocked” feel
           const arr = Array.from(set);
           arr.shift();
           setAnswers((s) => ({ ...s, [step.id]: [...arr, value] }));
@@ -573,50 +635,21 @@ export default function BuildWizard() {
         set.add(value);
       }
       setAnswers((s) => ({ ...s, [step.id]: Array.from(set) }));
-      return;
     }
   };
 
   const onScale = (n: number) => {
+    if (!step) return;
     setAnswers((s) => ({ ...s, [step.id]: n }));
   };
 
   const onNext = () => {
-    if (stepIndex < steps.length - 1) setStepIndex((i) => i + 1);
+    if (stepIndex < steps.length - 1) transitionTo(stepIndex + 1);
   };
 
   const onPrev = () => {
-    if (stepIndex > 0) setStepIndex((i) => i - 1);
+    if (stepIndex > 0) transitionTo(stepIndex - 1);
   };
-
-  const isLast = stepIndex === steps.length - 1;
-
-  const canNext = useMemo(() => {
-    if (!step) return false;
-
-    const a = answers[step.id];
-
-    if (!step.required) return true;
-
-    if (step.type === "text") {
-      // required text must be non-empty
-      return typeof a === "string" && a.trim().length > 0;
-    }
-
-    if (step.type === "multi") {
-      return selectedCount(a) > 0;
-    }
-
-    if (step.type === "single") {
-      return a !== null && a !== "";
-    }
-
-    if (step.type === "scale") {
-      return typeof a === "number";
-    }
-
-    return false;
-  }, [answers, step]);
 
   const buildPayloadForAI = (answers: Answers) => {
     const restrictions = (answers.restrictions as string[]) || [];
@@ -627,14 +660,14 @@ export default function BuildWizard() {
     return {
       user_profile: {
         goal: answers.goal,
-        restrictions: restrictions,
+        restrictions,
         other_restrictions: answers.other_restrictions,
         reaction_severity: answers.reaction_severity,
         cross_contamination: answers.cross_contamination,
         kitchen_environment: answers.kitchen_environment,
         eating_out_frequency: answers.eating_out_frequency,
-        struggles: struggles,
-        symptoms: symptoms,
+        struggles,
+        symptoms,
         symptom_pattern: answers.symptom_pattern,
         trigger_suspects: answers.trigger_suspects,
         past_attempts: answers.past_attempts,
@@ -653,20 +686,6 @@ export default function BuildWizard() {
       output_preferences: {
         plan_includes: planIncludes,
         tone: answers.coaching_style,
-      },
-      output_schema_hint: {
-        // This helps your Groq prompt return consistent JSON.
-        sections: [
-          "profileSummary",
-          "safetyRules",
-          "safeSwaps",
-          "7DayStarterPlan",
-          "groceryList",
-          "eatingOutPlaybook",
-          "symptomTrackingRoutine",
-          "budgetStrategy",
-          "nextSteps",
-        ],
       },
     };
   };
@@ -701,181 +720,247 @@ export default function BuildWizard() {
     }
   };
 
+  const contentOpacity =
+    phase === "out" ? "opacity-0" : "opacity-100";
+
+  const contentTransform =
+    phase === "out" ? "translate-y-[2px]" : "translate-y-0";
+
+  // ✅ NEW: step-specific grid layout fallback
+  const optionGridCols = step?.gridClassName ?? "grid-cols-1 md:grid-cols-2";
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#475845]">
-      <div className="bg-[#475845]">
-        <Header />
-      </div>
+    <div className="min-h-screen text-white">
+      <Header />
 
-      <main className="flex-1 flex items-center justify-center">
-        <section className="rounded-2xl bg-[#2C4435] backdrop-blur-md border border-white/15 p-6 md:p-10 w-full max-w-4xl mx-4">
-          {!started ? (
-            <div className="flex flex-col items-center text-center space-y-6">
-              <h1 className="text-3xl md:text-4xl font-bold text-white font-[AeonikArabic]">
-                Build Your Personal <span className="italic">Allergen-Free</span> Guide
-              </h1>
-              <p className="text-white/80 max-w-lg font-[AeonikArabic]">
-                Answer a few questions and we’ll generate a safety-first plan: safe meals, safe products, swaps,
-                and a routine that fits your real life.
-              </p>
+      <main className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#2E3F36]">
+          <div className="relative p-5 sm:p-6 md:p-8">
+            <div className="mx-auto w-full max-w-4xl">
+              <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-5 sm:p-6 md:p-8 flex flex-col">
+                {!started ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center">
+                    <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/70">
+                      build wizard
+                    </p>
+                    <h1 className="mt-3 font-[AeonikArabic] text-3xl md:text-4xl font-bold">
+                      Build Your Personal{" "}
+                      <span className="italic text-[#9DE7C5]">Allergen-Safe</span>{" "}
+                      Guide
+                    </h1>
+                    <p className="mt-4 font-[AeonikArabic] text-white/80 max-w-xl leading-relaxed">
+                      Answer a few questions and we’ll generate a safety-first plan: safe meals,
+                      safe products, swaps, and a routine that fits your real life.
+                    </p>
 
-              <button
-                onClick={() => setStarted(true)}
-                className="font-[AeonikArabic] px-10 py-3 rounded-lg bg-[#65A775] hover:bg-[#3E824F] text-[#25332A] text-lg font-normal shadow"
-              >
-                Start
-              </button>
+                    <button
+                      onClick={() => setStarted(true)}
+                      className="mt-8 rounded-xl bg-[#00B84A] hover:bg-green-700 transition px-8 py-3 font-[AeonikArabic] text-sm text-white"
+                    >
+                      Start
+                    </button>
 
-              <div className="max-w-xl w-full pt-2">
-                <div className="rounded-2xl bg-white/5 border border-white/10 p-4 text-left">
-                  <p className="font-[AeonikArabic] text-white/80 text-sm">
-                    <span className="font-semibold text-white">Privacy note:</span> This is for personalization.
-                    GrainFree doesn’t diagnose — it provides practical safety guidance and routines.
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* Title + Progress */}
-              <header className="mb-6 space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="font-[AeonikArabic] text-sm uppercase tracking-widest text-white/70">
-                    Question {stepIndex + 1} of {steps.length}
-                  </p>
-                  <p className="font-[AeonikArabic] text-sm text-white/60">
-                    {progress}%
-                  </p>
-                </div>
-
-                <h1 className="font-[AeonikArabic] text-2xl md:text-3xl font-bold text-white">
-                  {step?.label}
-                </h1>
-                {step?.helper ? (
-                  <p className="font-[AeonikArabic] text-white/70">{step.helper}</p>
-                ) : null}
-
-                <div className="w-full h-2 bg-white/10 rounded">
-                  <div
-                    className="h-2 bg-[#4B7C57] rounded"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-
-                {/* Recap card after early steps */}
-                {stepIndex >= 3 ? <RecapCard answers={answers} /> : null}
-              </header>
-
-              {/* Content */}
-              <div className="space-y-4">
-                {step?.type === "text" ? (
-                  <textarea
-                    value={(answers[step.id] as string) || ""}
-                    onChange={(e) =>
-                      setAnswers((s) => ({ ...s, [step.id]: e.target.value }))
-                    }
-                    placeholder={step.placeholder}
-                    rows={5}
-                    className="w-full rounded-lg border border-white/10 bg-white/5 p-3 outline-none placeholder:text-white/50 font-[AeonikArabic] text-white"
-                  />
-                ) : step?.type === "scale" ? (
-                  <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-center justify-between mb-2 font-[AeonikArabic] text-white/70 text-sm">
-                      <span>{step.minLabel ?? "Low"}</span>
-                      <span>{step.maxLabel ?? "High"}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={step.min ?? 1}
-                      max={step.max ?? 5}
-                      value={(answers[step.id] as number) ?? (step.min ?? 1)}
-                      onChange={(e) => onScale(Number(e.target.value))}
-                      className="w-full"
-                    />
-                    <div className="mt-2 font-[AeonikArabic] text-white/80">
-                      Selected:{" "}
-                      <span className="font-semibold text-white">
-                        {(answers[step.id] as number) ?? (step.min ?? 1)}
-                      </span>
+                    <div className="mt-6 w-full max-w-xl">
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left">
+                        <p className="font-[AeonikArabic] text-white/80 text-sm leading-relaxed">
+                          <span className="font-semibold text-white">Privacy note:</span> This is for
+                          personalization. GrainFree doesn’t diagnose — it provides practical safety
+                          guidance and routines.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="font-[AeonikArabic] grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {step?.options?.map((opt) => {
-                      const selected =
-                        step.type === "single"
-                          ? answers[step.id] === opt
-                          : ((answers[step.id] as string[]) || []).includes(opt);
+                  <>
+                    <header className="shrink-0">
+                      <div className="flex items-center justify-between gap-4">
+                        <p className="font-[AeonikArabic] text-xs uppercase tracking-[0.22em] text-white/70">
+                          Question {stepIndex + 1} of {steps.length}
+                        </p>
+                        <p className="font-[AeonikArabic] text-xs text-white/60">
+                          {progress}%
+                        </p>
+                      </div>
 
-                      return (
-                        <button
-                          key={opt}
-                          onClick={() => onSelect(opt)}
-                          className={`px-5 py-4 rounded-lg border transition text-left ${
-                            selected
-                              ? "bg-[#008509] border-[#008509] text-white"
-                              : "bg-[#355B3E] border-[#384E3E] hover:bg-[#3E824F] text-white/90"
-                          }`}
-                        >
-                          <div className="font-semibold">{opt}</div>
+                      <div className="mt-3 h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-[#9DE7C5]/80 transition-[width] duration-300"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
 
-                          {/* micro helper for “Other” choices */}
-                          {opt.toLowerCase().includes("other") && selected ? (
-                            <div className="mt-1 text-xs text-white/80">
-                              You’ll be able to type details next.
+                      <div className="mt-5">
+                        <h1 className="font-[AeonikArabic] text-xl sm:text-2xl md:text-3xl font-bold leading-tight">
+                          {step?.label}
+                        </h1>
+                        {step?.helper ? (
+                          <p className="mt-2 font-[AeonikArabic] text-sm text-white/70 leading-relaxed">
+                            {step.helper}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="mt-4">
+                        {stepIndex >= 3 ? <RecapCard answers={answers} /> : null}
+                      </div>
+                    </header>
+
+                    <div className="mt-5 flex-1 overflow-hidden">
+                      <div
+                        className={[
+                          "h-full transition-all duration-200 ease-out",
+                          contentOpacity,
+                          contentTransform,
+                        ].join(" ")}
+                      >
+                        {step?.type === "text" ? (
+                          <div className="h-full">
+                            <textarea
+                              value={(answers[step.id] as string) || ""}
+                              onChange={(e) =>
+                                setAnswers((s) => ({ ...s, [step.id]: e.target.value }))
+                              }
+                              placeholder={step.placeholder}
+                              className={[
+                                "w-full h-full resize-none",
+                                "rounded-2xl border border-white/10 bg-white/5",
+                                "p-4 outline-none placeholder:text-white/45",
+                                "font-[AeonikArabic] text-white leading-relaxed",
+                                "focus:ring-2 focus:ring-[#9DE7C5]/30",
+                              ].join(" ")}
+                            />
+                          </div>
+                        ) : step?.type === "scale" ? (
+                          <div className="h-full rounded-2xl border border-white/10 bg-white/5 p-5 flex flex-col justify-center">
+                            <div className="flex items-center justify-between mb-3 font-[AeonikArabic] text-white/70 text-sm">
+                              <span>{step.minLabel ?? "Low"}</span>
+                              <span>{step.maxLabel ?? "High"}</span>
                             </div>
-                          ) : null}
+
+                            <input
+                              type="range"
+                              min={step.min ?? 1}
+                              max={step.max ?? 5}
+                              value={(answers[step.id] as number) ?? (step.min ?? 1)}
+                              onChange={(e) => onScale(Number(e.target.value))}
+                              className="w-full"
+                            />
+
+                            <div className="mt-4 font-[AeonikArabic] text-white/80">
+                              Selected:{" "}
+                              <span className="font-semibold text-white">
+                                {(answers[step.id] as number) ?? (step.min ?? 1)}
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="h-full">
+                            <div
+                              className={[
+                                "grid gap-3 h-full content-start",
+                                // ✅ PER-STEP CONTROL HERE
+                                optionGridCols,
+                              ].join(" ")}
+                            >
+                              {step?.options?.map((opt) => {
+                                const selected =
+                                  step.type === "single"
+                                    ? answers[step.id] === opt
+                                    : ((answers[step.id] as string[]) || []).includes(opt);
+
+                                return (
+                                  <button
+                                    key={opt}
+                                    onClick={() => onSelect(opt)}
+                                    className={[
+                                      "group rounded-2xl border text-left transition",
+                                      "px-4 py-4",
+                                      "font-[AeonikArabic]",
+                                      selected
+                                        ? "bg-[#00B84A]/90 border-[#00B84A] text-white"
+                                        : "bg-black/20 border-white/10 hover:bg-white/8 text-white/90",
+                                    ].join(" ")}
+                                    type="button"
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="min-w-0">
+                                        <div className="font-semibold leading-snug line-clamp-2">
+                                          {opt}
+                                        </div>
+                                        {opt.toLowerCase().includes("other") && selected ? (
+                                          <div className="mt-1 text-xs text-white/80">
+                                            You’ll be able to type details next.
+                                          </div>
+                                        ) : null}
+                                      </div>
+
+                                      <div
+                                        className={[
+                                          "shrink-0 mt-0.5 h-5 w-5 rounded-full border",
+                                          selected
+                                            ? "border-white/80 bg-white/20"
+                                            : "border-white/25 bg-black/10 group-hover:border-white/40",
+                                        ].join(" ")}
+                                      />
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <footer className="mt-5 shrink-0 flex items-center justify-between">
+                      <button
+                        onClick={onPrev}
+                        disabled={stepIndex === 0 || phase !== "idle"}
+                        className="rounded-xl border border-white/12 bg-white/5 hover:bg-white/10 disabled:opacity-40 transition px-4 py-2 font-[AeonikArabic] text-sm"
+                        type="button"
+                      >
+                        Back
+                      </button>
+
+                      {!isLast ? (
+                        <button
+                          onClick={onNext}
+                          disabled={!canNext || phase !== "idle"}
+                          className="rounded-xl bg-[#00B84A] hover:bg-green-700 disabled:opacity-40 transition px-5 py-2 font-[AeonikArabic] text-sm"
+                          type="button"
+                        >
+                          Next
                         </button>
-                      );
-                    })}
-                  </div>
+                      ) : (
+                        <button
+                          onClick={onSubmit}
+                          disabled={phase !== "idle"}
+                          className="rounded-xl bg-[#00B84A] hover:bg-green-700 disabled:opacity-40 transition px-5 py-2 font-[AeonikArabic] text-sm"
+                          type="button"
+                        >
+                          Build my guide
+                        </button>
+                      )}
+                    </footer>
+                  </>
                 )}
               </div>
-
-              {/* Actions */}
-              <footer className="mt-8 flex items-center justify-between">
-                <button
-                  onClick={onPrev}
-                  disabled={stepIndex === 0}
-                  className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-40 font-[AeonikArabic] text-white"
-                >
-                  Back
-                </button>
-
-                {!isLast ? (
-                  <button
-                    onClick={onNext}
-                    disabled={!canNext}
-                    className="px-5 py-2 rounded-lg bg-[#008509] hover:bg-green-700 disabled:opacity-40 font-[AeonikArabic] text-white"
-                  >
-                    Next
-                  </button>
-                ) : (
-                  <button
-                    onClick={onSubmit}
-                    className="px-5 py-2 rounded-lg bg-[#008509] hover:bg-green-700 font-[AeonikArabic] text-white"
-                  >
-                    Build my guide
-                  </button>
-                )}
-              </footer>
-            </>
-          )}
-
-          {/* Loading Overlay */}
-          {loading && (
-            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70">
-              <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#008509] border-t-transparent mb-4" />
-              <p className="text-lg font-semibold font-[AeonikArabic] text-white">
-                Building your allergen-safe guide…
-              </p>
-              <p className="mt-2 max-w-md text-center font-[AeonikArabic] text-white/70 text-sm">
-                We’re tailoring safety rules, swaps, meals, and a routine based on your answers.
-              </p>
             </div>
-          )}
+          </div>
         </section>
       </main>
+
+      {loading && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#00B84A] border-t-transparent mb-4" />
+          <p className="text-lg font-semibold font-[AeonikArabic] text-white">
+            Building your allergen-safe guide…
+          </p>
+          <p className="mt-2 max-w-md text-center font-[AeonikArabic] text-white/70 text-sm">
+            We’re tailoring safety rules, swaps, meals, and a routine based on your answers.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
