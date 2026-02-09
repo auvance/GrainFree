@@ -26,6 +26,9 @@ function MiniStat({
   );
 }
 
+// Keep this identical in TodayMealLog too
+const CARD_HEIGHT = "min-h-[720px] lg:min-h-[760px]";
+
 export default function TodaysStats({
   caloriesToday,
   goal,
@@ -44,12 +47,13 @@ export default function TodaysStats({
   const pct = goal > 0 ? Math.min(100, Math.round((caloriesToday / goal) * 100)) : 0;
 
   return (
-    <section className="relative overflow-hidden rounded-tr-[20px] rounded-bl-[20px] border border-white/10 bg-gradient-to-br from-[#2B5446] via-[#223A32] to-[#1B2C26]">
-      {/* different tonality than hero */}
+    <section
+      className={`relative h-full overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#2B5446] via-[#223A32] to-[#1B2C26] ${CARD_HEIGHT}`}
+    >
       <div className="pointer-events-none absolute inset-0 opacity-45 bg-[radial-gradient(circle_at_25%_20%,rgba(157,231,197,0.22),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_80%_70%,rgba(0,184,74,0.16),transparent_60%)]" />
 
-      <div className="relative p-3 sm:p-7">
+      <div className="relative h-full p-5 sm:p-7 flex flex-col">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/70">
@@ -70,7 +74,6 @@ export default function TodaysStats({
           </div>
         </div>
 
-        {/* Calories “hero row” */}
         <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-5">
           <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
             calories
@@ -83,20 +86,18 @@ export default function TodaysStats({
           </p>
 
           <div className="mt-4 h-2.5 w-full rounded-full bg-white/10 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-[#9DE7C5]/90"
-              style={{ width: `${pct}%` }}
-            />
+            <div className="h-full rounded-full bg-[#9DE7C5]/90" style={{ width: `${pct}%` }} />
           </div>
         </div>
 
-        {/* Everything else becomes one embedded block */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-2 gap-1  ">
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-2 gap-1">
           <MiniStat label="meals logged" value={`${mealsLogged}`} sub="completed today" />
           <MiniStat label="goal" value={`${goal} kcal`} sub="daily target" />
           <MiniStat label="saved meals" value={`${savedMeals}`} sub="your safe list" />
           <MiniStat label="saved products" value={`${savedProducts}`} sub="trusted picks" />
         </div>
+
+        <div className="mt-auto" />
       </div>
     </section>
   );

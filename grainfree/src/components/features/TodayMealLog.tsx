@@ -18,6 +18,9 @@ function cn(...c: Array<string | false | undefined | null>) {
   return c.filter(Boolean).join(" ");
 }
 
+// Keep this identical in TodaysStats too
+const CARD_HEIGHT = "min-h-[720px] lg:min-h-[760px]";
+
 export default function TodayMealLog({
   meals = [],
   onMealAdded,
@@ -46,7 +49,6 @@ export default function TodayMealLog({
 
   const SPOONACULAR_KEY = process.env.NEXT_PUBLIC_SPOONACULAR_KEY;
 
-  // Suggestions (debounced)
   useEffect(() => {
     const q = (newMeal.name || "").trim();
     if (!q || q.length < 3) {
@@ -133,15 +135,18 @@ export default function TodayMealLog({
     onMealAdded?.(data);
   };
 
- 
-
   return (
-    <section className="relative overflow-hidden rounded-tr-[20px] rounded-bl-[20px] border border-white/10 bg-gradient-to-br from-[#2F5A47] via-[#284338] to-[#1B2C26]">
-      {/* tonality overlay (hero-like but different green) */}
+    <section
+      className={cn(
+        "relative h-full overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#2F5A47] via-[#284338] to-[#1B2C26]",
+        CARD_HEIGHT
+      )}
+    >
       <div className="pointer-events-none absolute inset-0 opacity-45 bg-[radial-gradient(circle_at_25%_15%,rgba(157,231,197,0.25),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_75%_70%,rgba(0,184,74,0.18),transparent_60%)]" />
 
-      <div className="relative p-3 sm:p-7">
+      {/* Make inner layout stretch to fill height */}
+      <div className="relative h-full p-5 sm:p-7 flex flex-col">
         {/* Header row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -165,8 +170,6 @@ export default function TodayMealLog({
           </button>
         </div>
 
-        {/* Pills (sub-structure signal) */}
-
         {/* Form */}
         {showForm ? (
           <div className="relative mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
@@ -176,9 +179,7 @@ export default function TodayMealLog({
                   type="text"
                   placeholder="Meal name (e.g., quinoa salad)"
                   value={newMeal.name || ""}
-                  onChange={(e) =>
-                    setNewMeal((p) => ({ ...p, name: e.target.value }))
-                  }
+                  onChange={(e) => setNewMeal((p) => ({ ...p, name: e.target.value }))}
                   className="w-full rounded-xl bg-black/25 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/40"
                 />
 
@@ -193,8 +194,7 @@ export default function TodayMealLog({
                         const kcal =
                           Math.round(
                             s.nutrition?.nutrients?.find(
-                              (n: { name: string; amount?: number }) =>
-                                n.name === "Calories"
+                              (n: { name: string; amount?: number }) => n.name === "Calories"
                             )?.amount || 0
                           ) || 0;
 
@@ -266,9 +266,7 @@ export default function TodayMealLog({
                 <input
                   type="time"
                   value={newMeal.time || ""}
-                  onChange={(e) =>
-                    setNewMeal((p) => ({ ...p, time: e.target.value }))
-                  }
+                  onChange={(e) => setNewMeal((p) => ({ ...p, time: e.target.value }))}
                   className="w-full rounded-xl bg-black/25 border border-white/10 px-4 py-3 font-[AeonikArabic] outline-none focus:ring-2 focus:ring-[#9DE7C5]/40"
                 />
               </div>
@@ -300,8 +298,8 @@ export default function TodayMealLog({
           </div>
         ) : null}
 
-        {/* ONE container holding all meal types (no big separate cards) */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-2 gap-1  ">
+        {/* This area expands naturally; NO internal scrolling */}
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-2 gap-1">
           {mealTypes.map((mealType) => {
             const logged = pendingMeals.filter((m) => m.type === mealType);
 
@@ -327,9 +325,7 @@ export default function TodayMealLog({
                         className="rounded-xl border border-white/10 bg-white/5 p-3 flex items-start justify-between gap-3"
                       >
                         <div className="min-w-0">
-                          <p className="font-[AeonikArabic] text-white truncate">
-                            {meal.name}
-                          </p>
+                          <p className="font-[AeonikArabic] text-white truncate">{meal.name}</p>
                           <p className="mt-1 font-[AeonikArabic] text-xs text-white/70">
                             {meal.calories ? `${meal.calories} kcal` : "Calories N/A"}
                             {meal.time ? ` • ${meal.time}` : ""}
@@ -355,6 +351,9 @@ export default function TodayMealLog({
             );
           })}
         </div>
+
+        {/* small spacer so card doesn't feel cramped at bottom */}
+        <div className="mt-auto" />
       </div>
     </section>
   );

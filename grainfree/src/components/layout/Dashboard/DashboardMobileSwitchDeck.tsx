@@ -88,7 +88,7 @@ function SwipeDeck({
         ref={scrollerRef}
         onScroll={handleScroll}
         className={cx(
-          "flex w-full overflow-x-auto overflow-y-hidden",
+          "flex gap-10 w-full overflow-x-auto overflow-y-hidden",
           "scroll-smooth",
           "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           "snap-x snap-mandatory"
