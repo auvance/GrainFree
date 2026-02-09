@@ -1,15 +1,15 @@
 "use client";
 
-import SafetySnapshot from "@/components/features/SafetySnapshot";
-import PlanGoals from "@/components/features/PlanGoals";
+// import SafetySnapshot from "@/components/features/SafetySnapshot";
+// import PlanGoals from "@/components/features/PlanGoals";
 
 type PlanGoal = { title: string; progress: number };
 
 
 export default function MegaGuidance({
-  planGoals,
-  onUpdateGuide,
-  onViewAllGoals,
+  // planGoals,
+  // onUpdateGuide,
+  // onViewAllGoals,
   onAskCoach,
 }: {
   planGoals: PlanGoal[];
@@ -40,7 +40,8 @@ export default function MegaGuidance({
         </button>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+    {/* Need to move this */}
+      {/* <div className="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-7">
           <SafetySnapshot title="Safety snapshot" onUpdateGuide={onUpdateGuide} />
         </div>
@@ -53,7 +54,8 @@ export default function MegaGuidance({
             onBuildGuide={onUpdateGuide}
           />
         </div>
-      </div>
+      </div> */}
+
     </section>
   );
 }

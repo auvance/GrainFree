@@ -27,7 +27,7 @@ function MiniStat({
 }
 
 // Keep this identical in TodayMealLog too
-const CARD_HEIGHT = "min-h-[720px] lg:min-h-[760px]";
+const CARD_HEIGHT = "min-h-[600px] lg:min-h-[600px]";
 
 export default function TodaysStats({
   caloriesToday,

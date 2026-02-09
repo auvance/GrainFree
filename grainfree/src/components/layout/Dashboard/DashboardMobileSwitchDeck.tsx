@@ -111,6 +111,8 @@ export default function DashboardMobileSwitchDeck({
   // TODAY pages
   todayMeals,
   todayStats,
+  todayGoalsUpdate, // ✅ new
+
 
   // DASHBOARD pages
   guidance,
@@ -121,6 +123,8 @@ export default function DashboardMobileSwitchDeck({
 }: {
   todayMeals: ReactNode;
   todayStats: ReactNode;
+  todayGoalsUpdate: React.ReactNode; // ✅ new
+
 
   guidance: ReactNode;
   recommendations: ReactNode;
@@ -137,8 +141,9 @@ export default function DashboardMobileSwitchDeck({
     () => [
       { key: "meals", title: "Meals", content: <div className="pt-4">{todayMeals}</div> },
       { key: "stats", title: "Stats", content: <div className="pt-4">{todayStats}</div> },
+      { key: "goals", label: "Goals", content: <div className="pt-4">{todayGoalsUpdate}</div>},
     ],
-    [todayMeals, todayStats]
+    [todayMeals, todayStats, todayGoalsUpdate]
   );
 
   const dashPages = useMemo(

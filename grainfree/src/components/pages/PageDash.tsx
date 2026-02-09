@@ -26,6 +26,7 @@ import DashboardPanelSwitch from "@/components/layout/Dashboard/DashboardPanelSw
 import MegaGuidance from "@/components/layout/Dashboard/MegaGuidance";
 import MegaRecommendations from "@/components/layout/Dashboard/MegaRecommendations";
 import MegaLibrary from "@/components/layout/Dashboard/MegaLibrary";
+import GoalsUpdate from "../layout/Dashboard/GoalsUpdate";
 
 type CompletedMeal = Meal & { id: string; completed?: boolean; eaten_at?: string };
 
@@ -276,6 +277,23 @@ export default function PageDash() {
                 savedProducts={savedProductCount}
               />
             }
+            // ✅ NEW: GoalsUpdate is now part of "Today" swipe group
+            todayGoalsUpdate={
+              <GoalsUpdate
+                planGoals={plan?.goals ?? []}
+                onUpdateGuide={() => router.push("/system")}
+                onViewAllGoals={() => router.push("/dash?view=goals")}
+              />
+            }
+
+
+
+
+
+
+
+
+
             guidance={
               <MegaGuidance
                 planGoals={plan?.goals ?? []}
@@ -312,6 +330,8 @@ export default function PageDash() {
               savedProducts={savedProductCount}
             />
           </aside>
+
+
         </div>
 
         {/* SWITCHABLE “MEGA” AREA (this replaces scattered blocks) */}
