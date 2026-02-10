@@ -53,8 +53,8 @@ export default function TodaysStats({
       <div className="pointer-events-none absolute inset-0 opacity-45 bg-[radial-gradient(circle_at_25%_20%,rgba(157,231,197,0.22),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_80%_70%,rgba(68, 104, 82, 0.16),transparent_60%)]" />
 
-      <div className="relative h-full p-5 sm:p-7 flex flex-col">
-        <div className="flex items-start justify-between gap-4">
+      <div className="relative h-full sm:p-7 flex flex-col">
+        <div className="flex items-start justify-between p-4 gap-4 sm:p-0 mb-4">
           <div>
             <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/70">
               today
@@ -74,7 +74,7 @@ export default function TodaysStats({
           </div>
         </div>
 
-        <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-5">
+        <div className="m-2 sm:m-0 mt-5 rounded-2xl border border-white/10 bg-black/20 p-5">
           <p className="font-[AeonikArabic] text-xs tracking-[0.18em] uppercase text-white/60">
             calories
           </p>
@@ -90,7 +90,7 @@ export default function TodaysStats({
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-2 gap-1">
+        <div className="mt-6 grid grid-cols-2 gap-1 p-2 sm:p-0">
           <MiniStat label="meals logged" value={`${mealsLogged}`} sub="completed today" />
           <MiniStat label="goal" value={`${goal} kcal`} sub="daily target" />
           <MiniStat label="saved meals" value={`${savedMeals}`} sub="your safe list" />

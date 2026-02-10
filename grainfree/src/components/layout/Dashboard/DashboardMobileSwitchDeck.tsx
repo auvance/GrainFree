@@ -161,9 +161,9 @@ export default function DashboardMobileSwitchDeck({
       : dashPages[dashIdx]?.title;
 
   return (
-    <section className="mt-8 rounded-[28px] border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+    <section className="mt-8 rounded-[28px] border border-white/10 bg-white/[0.03] sm:p-5">
       {/* Top switch row */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 p-4">
         <div>
           <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/55">
             quick view
@@ -186,7 +186,7 @@ export default function DashboardMobileSwitchDeck({
       </div>
 
       {/* Swipe content (same vertical slot) */}
-      <div className="mt-4">
+      <div className="mt-4 p-2">
         {primary === "today" ? (
           <SwipeDeck pages={todayPages} onIndexChange={setTodayIdx} />
         ) : (

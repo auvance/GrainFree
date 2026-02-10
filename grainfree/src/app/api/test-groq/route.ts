@@ -205,11 +205,19 @@ OUTPUT FORMAT (STRICT JSON):
     });
 
     const text = response.choices?.[0]?.message?.content?.trim() || "";
+    
     const parsed = safeJsonExtract(text) as Partial<PlanJSON> | null;
 
     if (!parsed) {
-      return NextResponse.json({ error: "AI returned invalid JSON. Try again." }, { status: 502 });
+      return NextResponse.json(
+        {
+          error: "AI returned invalid JSON. Try again.",
+          debug_preview: text.slice(0, 800),
+        },
+        { status: 502 }
+      );
     }
+    
 
     const calorieTarget = deriveCalorieTarget(effectivePayload as GuidePayload, 2000);
 

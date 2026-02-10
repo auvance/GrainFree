@@ -212,7 +212,7 @@ export default function PageDash() {
     <main className="min-h-screen bg-[#2E3F36] text-white">
       <Header />
 
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <div className="mx-auto w-full max-w-7xl px-2 sm:px-6 lg:px-8 py-8 sm:py-10">
         {/* HERO */}
         <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#3D5A4C] via-[#31473D] to-[#1F2F28] border border-white/10">
           <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_30%_20%,rgba(157,231,197,0.35),transparent_55%)]" />

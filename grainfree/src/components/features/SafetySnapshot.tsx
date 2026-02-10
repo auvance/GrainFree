@@ -72,7 +72,7 @@ export default function SafetySnapshot({
   }, [allergens, diet]);
 
   return (
-    <section className={`relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-7 mr-4 ml-4`}>
+    <section className={`relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-5`}>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
 
       <div className="relative">

@@ -146,10 +146,10 @@ export default function TodayMealLog({
       <div className="pointer-events-none absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_75%_70%,rgba(0,184,74,0.18),transparent_60%)]" />
 
       {/* Make inner layout stretch to fill height */}
-      <div className="relative h-full p-5 sm:p-7 flex flex-col">
+      <div className="relative h-full sm:p-7 flex flex-col">
         {/* Header row */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        <div className="flex flex-col gap-4 p-4 sm:p-0 flex-row sm:items-end sm:justify-between">
+          <div className="">
             <p className="font-[AeonikArabic] text-xs tracking-[0.22em] uppercase text-white/70">
               today
             </p>
@@ -299,7 +299,7 @@ export default function TodayMealLog({
         ) : null}
 
         {/* This area expands naturally; NO internal scrolling */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-2 gap-1">
+        <div className="mt-6 grid grid-cols-2 p-2 sm:p-0 grid-cols-2 gap-1">
           {mealTypes.map((mealType) => {
             const logged = pendingMeals.filter((m) => m.type === mealType);
 
