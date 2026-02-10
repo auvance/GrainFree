@@ -194,7 +194,7 @@ function SafetySnapshotInline({
   }, [allergens, diet]);
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-6 sm:p-5">
+    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/15 backdrop-blur-xl p-4 sm:p-5">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-70" />
 
       <div className="relative">
@@ -207,7 +207,7 @@ function SafetySnapshotInline({
               {title}
             </h2>
             <p className="mt-2 font-[AeonikArabic] text-sm text-white/70 leading-relaxed">
-              Pulled from your profile (allergens/diet).
+              Pulled from your profile=
             </p>
           </div>
 

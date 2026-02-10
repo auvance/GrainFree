@@ -184,6 +184,11 @@ export default function DashboardMobileSwitchDeck({
           </TabButton>
         </div>
       </div>
+      
+      {/* Tiny hint */}
+      <div className="mt-3 text-[11px] font-[AeonikArabic] text-white/45 pl-4">
+        Tip: swipe left/right to switch sections.
+      </div>
 
       {/* Swipe content (same vertical slot) */}
       <div className="mt-4 p-2">
@@ -194,10 +199,7 @@ export default function DashboardMobileSwitchDeck({
         )}
       </div>
 
-      {/* Tiny hint */}
-      <div className="mt-3 text-[11px] font-[AeonikArabic] text-white/45">
-        Tip: swipe left/right to switch sections.
-      </div>
+      
     </section>
   );
 }
